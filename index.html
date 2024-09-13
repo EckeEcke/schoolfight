@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Titan+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.3/css/all.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <div id="game-wrapper">
+        <div id="background" style="position:relative; width: 550px; height: 314px; overflow: hidden">
+            <div id="running-background-wrapper" style="position: absolute;top:0;left:0">
+                <div id="running-background"
+                    style="height: 314px; width: 550px; overflow:hidden; position: relative;display: none;">
+                    <img id="running-bg-1" src="images_schoolfight/background6.jpg" alt="nope"
+                        style="position: absolute;left:0;top:0; height: 100%; width: auto">
+                    <img id="running-bg-2" src="images_schoolfight/background6.jpg" alt="nope"
+                        style="position: absolute;left:313px;top:0; height: 100%; width: auto">
+                    <img id="running-bg-3" src="images_schoolfight/background6.jpg" alt="nope"
+                        style="position: absolute;left:-313px;top:0;  height: 100%; width: auto">
+                    <h2
+                        style="position: absolute;width: 300px;left: calc(50% - 150px); top: 50px;text-align:center;color:white;text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;">
+                        Tap screen to run
+                        <br><i id="animated-pointer" class="far fa-hand-pointer"></i>
+                    </h2>
+                    <div id="character-running"
+                        style="position: absolute;height: 100px; width: 70px;left:80px;bottom:10px; transition:.2s">
+                        <div class="overflow-wrapper"
+                            style="overflow: hidden;height:100px;width:60px;position:relative">
+
+                            <img src="images_schoolfight/Character_spriteSheet.png" style="position: absolute; top: -435px; left: -410px;">
+                        </div>
+                    </div>
+                    <div id="enemy-running"
+                        style="position: absolute;height: 100px; width: 70px;left:350px;bottom:10px; transform:scale(1.1)">
+                        <div class="overflow-wrapper"
+                            style="overflow: hidden;height:100px;width:60px;position:relative">
+
+                            <img src="images_schoolfight/Character_spriteSheet.png" style="position: absolute; top: -535px; left: -410px;">
+                        </div>
+                    </div>
+                    <div id="overlay-running" style="position: absolute;top:0;left:0;height:100%;width:100%;"></div>
+                </div>
+            </div>
+            <div id="fade-out" class="hidden"></div>
+            <h1 id="title">School Fight</h1>
+            <button id="title-button">Start</button>
+            <button id="how-to-play-btn">How to play</button>
+            <h2 id="title-select"
+                style="position: absolute; top: -10px; color: white; font-weight: 400; width: 100%; text-align: center;text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;">
+                Add characters to your party 0/3</h2>
+            <div id="select-screen">
+                <button class="selectscreen-btn left-btn"><i class="fas fa-angle-left"></i></button>
+                <button class="selectscreen-btn right-btn"><i class="fas fa-angle-right"></i></button>
+                <div>
+                    <div class="selectsprite" style="overflow: hidden; width: 60px; height: 100px;">
+                        <div style="position: relative; height: 100%">
+
+                            <img src="images_schoolfight/Character_spriteSheet.png" style="position: absolute; top: -425px; left: -340px;">
+                        </div>
+
+                    </div>
+                </div>
+                <div>
+                    <div class="selectsprite" style="overflow: hidden; width: 60px; height: 100px;">
+                        <div style="position: relative; height: 100%">
+                            <img src="images_schoolfight/Character_spriteSheet.png" style="position: absolute; top: -320px; left: -42px;">
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="selectsprite" style="overflow: hidden; width: 60px; height: 100px;">
+                        <div style="position: relative; height: 100%">
+                            <img src="images_schoolfight/Character_spriteSheet.png"
+                                style="position: absolute; top: -425px; left: -42px;z-index: 0">
+                        </div>
+                    </div>
+                </div>
+                <div class="desc-box">
+                    Class: Bully
+                    <br>
+                    Type: Strength
+                    <br>
+                    Strength: 16
+                    <br>
+                    Intelligence: 0
+                    <br>
+                    Assholiness: 10
+                    <br>
+                    <button class="add-button" character="bully">Add</button>
+                </div>
+                <div class="desc-box">
+                    Class: Squealer
+                    <br>
+                    Type: Assholiness
+                    <br>
+                    Strength: 2
+                    <br>
+                    Intelligence: 2
+                    <br>
+                    Assholiness: 18
+                    <br>
+                    <button class="add-button" character="squealer">Add</button>
+                </div>
+                <div class="desc-box">
+                    Class: Nerd
+                    <br>
+                    Type: Intelligence
+                    <br>
+                    Strenth: 0
+                    <br>
+                    Intelligence: 20
+                    <br>
+                    Assholiness: 0
+                    <br>
+                    <button class="add-button" character="nerd">Add</button>
+                </div>
+            </div>
+
+            <div id="tutorial-screen">
+                <h2>How to play</h2>
+                <p>
+                    Every kid has three stats: <i class="fas fa-hand-rock"></i> strength, <i class="fas fa-glasses"></i>
+                    intelligence and <i class="fas fa-hand-middle-finger"></i> assholiness.
+                </p>
+                <p>
+                    <i class="fas fa-hand-rock"></i> Strength:
+                    <br> 
+                    good against type <i class="fas fa-glasses"></i>, weak against high <i class="fas fa-hand-middle-finger"></i> stat. 
+                </p>
+                <p>
+                    <i class="fas fa-glasses"></i> Intelligence: 
+                    <br>
+                    good against type <i class="fas fa-hand-middle-finger"></i>, weak against high <i class="fas fa-hand-rock"></i> stat.
+                </p>
+                <p>
+                    <i class="fas fa-hand-middle-finger"></i> Assholiness: 
+                    <br>
+                    strong against type <i class="fas fa-hand-rock"></i>, weak against high <i class="fas fa-glasses"></i> stat.
+                </p>
+                <p>
+                    <i class="fas fa-shield-alt"></i> Defend: 
+                    <br>
+                    character only takes half damage that turn, won't attack.
+                </p>
+                <button id="back-btn">Back</button>
+                <button id="toggleTutorialBtn">More</button>
+            </div>
+
+            <div id="battle-ticker">
+
+            </div>
+
+            <div id="dialogue-box-wrapper">
+                <div id="dialogue-box-triangle"></div>
+                <div id="dialogue-box"></div>
+                <span id="dialogue-animation"><i class="fas fa-chevron-down"></i></span>
+            </div>
+
+
+            <div class="energybar" id="energybar-char3" style="position: absolute; top: 10px; left: 10px;">
+                <div
+                    style="height: 30px; width: 100px; background: black; border: 2px solid white; border-radius: 8px; overflow: hidden">
+                    <span id="energy-char3-text"
+                        style="position: absolute; color: white; line-height: 30px; padding-left: 4px;">Nerd</span>
+                    <div id="energy-char3" style="background-color: green; height: 100%; width: 100%; transition: 2s">
+                    </div>
+                </div>
+            </div>
+            <div class="energybar" style="position: absolute; top: 50px; left: 10px;">
+                <div
+                    style="height: 30px; width: 100px; background: black; border: 2px solid white; border-radius: 8px; overflow: hidden;">
+                    <span id="energy-char2-text"
+                        style="position: absolute; color: white; line-height: 30px; padding-left: 4px;">Bully</span>
+                    <div id="energy-char2" style="background-color: green; height: 100%; width: 100%; transition: 2s">
+                    </div>
+                </div>
+            </div>
+            <div class="energybar" style="position: absolute; top: 90px; left: 10px;">
+                <div
+                    style="height: 30px; width: 100px; background: black; border: 2px solid white; border-radius: 8px; overflow: hidden">
+                    <span id="energy-char1-text"
+                        style="position: absolute; color: white; line-height: 30px; padding-left: 4px;">Squealer</span>
+                    <div id="energy-char1" style="background-color: green; height: 100%; width: 100%; transition: 2s">
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="energybar" id="energybar-enemy1" style="position: absolute; top: 10px; right: 10px;">
+                <div
+                    style="height: 30px; width: 100px; background: black; border: 2px solid white; border-radius: 8px; overflow: hidden">
+                    <span id="energy-enemy1-text"
+                        style="position: absolute; color: white; line-height: 30px; padding-left: 4px;">Nerd</span>
+                    <div id="energy-enemy1" style="background-color: green; height: 100%; width: 100%; transition: 2s">
+                    </div>
+                </div>
+            </div>
+            <div class="energybar" id="energybar-enemy2" style="position: absolute; top: 50px; right: 10px;">
+                <div
+                    style="height: 30px; width: 100px; background: black; border: 2px solid white; border-radius: 8px; overflow: hidden">
+                    <span id="energy-enemy2-text"
+                        style="position: absolute; color: white; line-height: 30px; padding-left: 4px;">Bully</span>
+                    <div id="energy-enemy2" style="background-color: green; height: 100%; width: 100%; transition: 2s">
+                    </div>
+                </div>
+            </div>
+            <div class="energybar" id="energybar-enemy3" style="position: absolute; top: 90px; right: 10px;">
+                <div
+                    style="height: 30px; width: 100px; background: black; border: 2px solid white; border-radius: 8px; overflow: hidden">
+                    <span id="energy-enemy3-text"
+                        style="position: absolute; color: white; line-height: 30px; padding-left: 4px;">Squealer</span>
+                    <div id="energy-enemy3" style="background-color: green; height: 100%; width: 100%; transition: 2s">
+                    </div>
+                </div>
+            </div>
+
+            <div id="char3" class="sprite-container left-party alive" style="top: 150px;left:150px">
+                <div class="overflow-wrapper" style="overflow: hidden;height:100px;width:60px;display: inline-block">
+                    <div style="position: relative; height: 100%">
+                        <img id="char3-sprite" src="images_schoolfight/Character_spriteSheet.png"
+                            style="position: absolute; top: -425px; left: -42px;z-index: 0">
+                    </div>
+
+                </div>
+                <div class="buttons-wrapper">
+                    <button class="btns-char3 btns-char" partymember="2" type="strength" char="3"><i
+                            class="fas fa-hand-rock"><span></span></i></button>
+                    <button class="btns-char3 btns-char" partymember="2" type="intelligence" char="3"><i
+                            class="fas fa-glasses"><span></span></i></button>
+                    <button class="btns-char3 btns-char" partymember="2" type="assholiness" char="3"><i
+                            class="fas fa-hand-middle-finger"><span></span></i></button>
+                    <button class="btns-char3 btns-char" partymember="2" type="" char="3" index="2"><i
+                            class="fas fa-shield-alt"></i></button>
+                </div>
+
+
+            </div>
+            <div id="char2" class="sprite-container left-party alive" style="top: 175px;left:100px">
+                <div class="overflow-wrapper" style="overflow: hidden;height:100px;width:60px;display: inline-block">
+                    <div style="position: relative; height: 100%">
+                        <img id="char2-sprite" src="images_schoolfight/Character_spriteSheet.png" style="position: absolute;">
+                    </div>
+                </div>
+                <div class="buttons-wrapper">
+                    <button class="btns-char2 btns-char" partymember="1" type="strength" char="2"><i
+                            class="fas fa-hand-rock"><span></span></i></button>
+                    <button class="btns-char2 btns-char" partymember="1" type="intelligence" char="2"><i
+                            class="fas fa-glasses"><span></span></i></button>
+                    <button class="btns-char2 btns-char" partymember="1" type="assholiness" char="2"><i
+                            class="fas fa-hand-middle-finger"><span></span></i></button>
+                    <button class="btns-char2 btns-char" partymember="1" type="" char="2" index="1"><i
+                            class="fas fa-shield-alt"></i></button>
+                </div>
+            </div>
+            <div id="char1" class="sprite-container left-party alive" style="top: 200px;left:50px">
+                <div class="overflow-wrapper" style="overflow: hidden;height:100px;width:60px;display: inline-block">
+                    <div id="btns-char1" style="position: relative; height: 100%">
+                        <img id="char1-sprite" src="images_schoolfight/Character_spriteSheet.png"
+                            style="position: absolute; top: -425px; left: -340px;">
+                    </div>
+                </div>
+                <div class="buttons-wrapper">
+                    <button class="btns-char1 btns-char" partymember="0" type="strength" char="1"><i
+                            class="fas fa-hand-rock"><span></span></i></button>
+                    <button class="btns-char1 btns-char" partymember="0" type="intelligence" char="1"><i
+                            class="fas fa-glasses"><span></span></i></button>
+                    <button class="btns-char1 btns-char" partymember="0" type="assholiness" char="1"><i
+                            class="fas fa-hand-middle-finger"><span></span></i></button>
+                    <button class="btns-char1 btns-char" partymember="0" type="" char="1" index="0"><i
+                            class="fas fa-shield-alt"><span></span></i></button>
+                </div>
+            </div>
+            <div id="enemy1" class="sprite-container right-party alive" enemy="0"
+                style="position: absolute; top: 150px; left: 350px; overflow: hidden; width: 60px; height: 100px; transform: scaleX(-1);">
+                <div style="position: relative; height: 100%">
+                    <img id="enemy1-sprite" src="images_schoolfight/Character_spriteSheet.png"
+                        style="position: absolute; top: -425px; left: -40px;">
+                </div>
+            </div>
+
+            <div id="enemy2" class="sprite-container right-party alive" enemy="1"
+                style="position: absolute; top: 175px; left: 400px; overflow: hidden; width: 60px; height: 100px; transform: scaleX(-1);">
+                <div style="position: relative; height: 100%">
+                    <img id="enemy2-sprite" src="images_schoolfight/Character_spriteSheet.png"
+                        style="position: absolute; top: -320px; left: -40px;">
+                </div>
+            </div>
+
+            <div id="enemy3" class="sprite-container right-party alive enemy3" enemy="2"
+                style="position: absolute; top: 200px; left: 450px; overflow: hidden; width: 60px; height: 100px; transform: scaleX(-1);">
+                <div style="position: relative; height: 100%">
+                    <img id="enemy3-sprite" src="images_schoolfight/Character_spriteSheet.png"
+                        style="position: absolute; top: -425px; left: -340px;">
+                </div>
+            </div>
+
+
+            <div id="rope-skipping-game" style="position: absolute; top: 0; left: 0; display: none">
+                <h2 id="title-select"
+                    style="position: absolute; top: -10px; color: white; font-weight: 400; width: 100%; text-align: center;text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;">
+                </h2>
+                <div id="click-overlay" style="position: absolute; height: 314px; width: 550px;z-index: 10;"></div>
+                <div id="rope-skips" style="position: absolute; left: 225px;top:60px;width:110px; text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black;
+                color: white;">Skips: 0/20</div>
+                <canvas id="canvas" width="550" height="314" style="z-index: 3; position: absolute;"></canvas>
+                <div id="box"
+                    style="width: 60px; height: 100px; background: transparent; position: absolute; left: 255px; top: 170px; transition: .4s; z-index: 2">
+                    <div id="character-wrapper" style="position: relative; height:100%; width: 100%;overflow:hidden">
+                        <img id="rope-sprite" src="images_schoolfight/Character_spriteSheet.png"
+                            style="position: absolute; top: -320px; left: -42px;">
+                    </div>
+                </div>
+                <div id="girl-left"
+                    style="position: absolute; width: 60px; height: 100px; left: 110px; top: 150px; background: transparent;z-index:4">
+                    <div id="girl-wrapper" style="position: relative; height:100%; width: 100%;overflow:hidden">
+                        <div id="character-wrapper"
+                            style="position: relative; height:100%; width: 100%;overflow:hidden">
+                            <img id="girl-sprite" src="images_schoolfight/Character_spriteSheet.png"
+                                style="position: absolute; top: -532px; left: -42px;">
+                        </div>
+                    </div>
+                </div>
+                <div id="girl-right"
+                    style="position: absolute; width: 60px; height: 100px; left: 380px; top: 150px; background: transparent;z-index:4">
+                    <div id="girl-wrapper" style="position: relative; height:100%; width: 100%;overflow:hidden">
+                        <div id="character-wrapper"
+                            style="position: relative; height:100%; width: 100%;overflow:hidden">
+                            <img id="girl-sprite" src="images_schoolfight/Character_spriteSheet.png"
+                                style="position: absolute; top: -532px; left: -42px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="itembox" style="display:none">
+                <div id="item-button" style="position: absolute; left: calc(50% - 100px);bottom: 10px;width:100px;text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;">
+                    <button style="width:100%;background:transparent;font-size:24px;border:none;color:white;text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;"><i class="fas fa-hamburger"></i></button>
+                </div>
+                <div id="bomb-button" style="position: absolute;left: 50%; bottom: 10px; width: 100px;text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;">
+                    <button style="width:100%; background:transparent;font-size:24px;border:none;color:white;text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;"><i class="fas fa-bomb"></i></button>
+                </div>
+            </div>
+
+            <div id="bomb-container-wrapper" style="display: none;position: absolute; right: 110px;bottom:40px;height:35px;width:35px;transform: rotate(180deg);filter:blur(0.5px)">
+                <div id="bomb-container" style="height:100%;width:100%;position:relative;border-radius:50%;background-image: url('images_schoolfight/grenade.png');background-size: 35px 35px;">
+
+                </div>
+            </div>
+            
+
+
+            <div id="overlay"
+                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: transparent; z-index: -1">
+            </div>
+
+
+
+        </div>
+        <article>
+            Schoolfight is a turn based game I created using jQuery, Vanilla JS and CSS. Pick a party of three characters and battle it out. The game uses a rock paper scissors principle with one type being more effetive then others. There is a total of nine levels including two mini games and a boss fight.  
+        </article>
+    </div>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="js_schoolfight/script.js"></script>
+
+</body>
+
+</html>
