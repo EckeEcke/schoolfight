@@ -9,6 +9,7 @@
         }
 
         body {
+            background: black;
             width: 550px;
             margin: 0 auto;
             display: flex;
@@ -359,6 +360,11 @@
 
         .sprite-container div:hover button.hidden {
             display: none;
+        }
+
+        .btns-char {
+            box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
+            border-radius: 4px;
         }
 
         .sprite-container div button:hover {

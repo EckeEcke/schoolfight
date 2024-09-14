@@ -1,9 +1,8 @@
 $(document).ready(function () {
     function adjustGameSize() {
-        console.log(window.innerWidth >= window.innerHeight * 550/314)
-        if(window.innerWidth >= window.innerHeight * 550/314){
-            document.getElementById("game-wrapper").style.transform = `scale(${window.innerWidth/650})`
-        } else document.getElementById("game-wrapper").style.transform = `scale(1)`
+        window.innerWidth >= window.innerHeight * 550/314 
+        ? document.getElementById("game-wrapper").style.transform = `scale(${window.innerWidth/660})`
+        : document.getElementById("game-wrapper").style.transform = `scale(1)`
     }
     
     adjustGameSize()
@@ -35,6 +34,18 @@ $(document).ready(function () {
     let itemsReceived = 0
 
     let survivalpoints = 0
+
+    /*
+    *
+    * Helper Functions
+    * 
+    */
+
+    function playSound(sound) {
+        sound.pause()
+        sound.currentTime = 0
+        sound.play()
+    }
 
     /**
      * 
@@ -452,8 +463,7 @@ $(document).ready(function () {
     function getPointRope() {
 
         points += 1
-        confirmSound.currentTime = 0
-        confirmSound.play()
+        playSound(confirmSound)
         $("#rope-skips").html(`Skips: ${points}/20`)
         if (points == 20) {
             nextRoundRope()
@@ -463,8 +473,7 @@ $(document).ready(function () {
 
     function getHitRope() {
         party[2].energy -= 30
-        failSound.currentTime = 0
-        failSound.play()
+        playSound(failSound)
         $("#energy-char3").css({ "width": party[2].energy + "%", "background": party[2].energy < 30 ? "red" : "green" })
         if (party[2].energy <= 0) {
             $("#box").addClass("defeated")
@@ -477,9 +486,7 @@ $(document).ready(function () {
     function jump() {
         if (!characterJumps) {
             characterJumps = true
-            jumpSound.pause()
-            jumpSound.currentTime = 0
-            jumpSound.play()
+            playSound(jumpSound)
             $("#box").css({ "top": "140px" })
             setTimeout(() => {
                 characterJumps = false
@@ -487,6 +494,12 @@ $(document).ready(function () {
             }, 300)
         }
     }
+
+/*
+*
+* General Game
+*
+*/
 
     $("#title-button").on("click", startgame)
     function startgame() {
@@ -522,9 +535,9 @@ $(document).ready(function () {
     $("#how-to-play-btn").on("click", toggleTutorial)
     $("#tutorial-screen").on("click", "#back-btn", toggleTutorial)
     function toggleTutorial() {
-        confirmSound.currentTime = 0
-        confirmSound.play()
+        playSound(confirmSound)
         showTutorial = !showTutorial
+
         if (showTutorial) {
             $("#title").hide()
             $("#title-button").hide()
@@ -532,14 +545,15 @@ $(document).ready(function () {
             $("#how-to-play-btn").css({ "top": "80%" })
             $("#back-btn").show()
             $("#how-to-play-btn").hide()
-        } else {
-            $("#title").show()
-            $("#title-button").show()
-            $("#tutorial-screen").hide()
-            $("#how-to-play-btn").css({ "top": "65%" })
-            $("#back-btn").hide()
-            $("#how-to-play-btn").show()
+            return
         }
+
+        $("#title").show()
+        $("#title-button").show()
+        $("#tutorial-screen").hide()
+        $("#how-to-play-btn").css({ "top": "65%" })
+        $("#back-btn").hide()
+        $("#how-to-play-btn").show()
     }
 
     let showFirstPageTutorial = true
@@ -583,45 +597,49 @@ $(document).ready(function () {
     $("#dialogue-box-wrapper").on("click", nextDialogue)
 
     function nextDialogue() {
-        if (showDialogue && indexOfMessage == 0) {
+        if(party.length === 0) return
+
+        if (showDialogue && indexOfMessage === 0) {
             indexOfMessage = 1
             document.getElementById("dialogue-box").innerHTML = dialogues[round][indexOfMessage]
+            return
         }
-        else {
-            indexOfMessage = 0
-            document.getElementById("dialogue-box-wrapper").style.display = "none"
-            $("#itembox").show()
-            showDialogue = false
-            if (round == 3) {
-                ropeInterval = setInterval(moveRope, 1000 / gamespeed)
-                $("#itembox").hide()
-            }
-            if (round == 5) {
-                moveBackgroundInterval = setInterval(moveBackground, 1000 / 120)
-                steps.playbackRate = 2
-                steps.loop = true
-                steps.play()
-                $("#character-running img").css(eval(`${party[0].class}SidePosition`))
-                $("#character-running").addClass("running")
-                $("#enemy-running").addClass("running")
-                $("#itembox").hide()
-            }
-            if (round == 8) {
-                bossmusic.play()
-                bossmusic.volume = 0.6
-                bossmusic.loop = true
-            }
+
+        indexOfMessage = 0
+        document.getElementById("dialogue-box-wrapper").style.display = "none"
+        $("#itembox").show()
+        showDialogue = false
+
+        if (round === 3) {
+            ropeInterval = setInterval(moveRope, 1000 / gamespeed)
+            $("#itembox").hide()
+        }
+
+        if (round === 5) {
+            moveBackgroundInterval = setInterval(moveBackground, 1000 / 120)
+            steps.playbackRate = 2
+            steps.loop = true
+            steps.play()
+            $("#character-running img").css(eval(`${party[0].class}SidePosition`))
+            $("#character-running").addClass("running")
+            $("#enemy-running").addClass("running")
+            $("#itembox").hide()
+        }
+
+        if (round === 8) {
+            bossmusic.play()
+            bossmusic.volume = 0.6
+            bossmusic.loop = true
         }
     }
 
     $("body").on("click", ".add-button", addCharacter)
 
     function addCharacter() {
-        let string = "bully"
-        let obj = JSON.parse(JSON.stringify(eval($(this).attr("character"))))
+        const obj = JSON.parse(JSON.stringify(eval($(this).attr("character"))))
+
         if (party.length < 3) {
-            confirmSound.currentTime = 0
-            confirmSound.play()
+            playSound(confirmSound)
             obj.id = id
             enemyParty[id - 1].id = id
             id += 1
@@ -630,6 +648,7 @@ $(document).ready(function () {
             document.getElementById(`energy-char${id - 1}-text`).innerHTML = obj.class
             document.getElementById(`energy-enemy${id - 1}-text`).innerHTML = enemyParty[id - 2].class
         }
+
         if (party.length == 3) {
             showDialogue = true
             activateFade()
@@ -671,7 +690,7 @@ $(document).ready(function () {
 
     function selectTarget() {
         $(`#char${selectedChar.id} .overflow-wrapper`).addClass("selected")
-        let enemy = enemyParty[$(this).attr("enemy")]
+        const enemy = enemyParty[$(this).attr("enemy")]
 
         if (attackType !== "") {
             $(".open").each(function () {
@@ -682,16 +701,13 @@ $(document).ready(function () {
 
         if (playerTurn && moves.length < possibleMoves && selectedChar !== "" && enemy.energy > 0) {
             moves.push({ attacker: selectedChar, target: enemy, type: attackType })
-            //moves.push([selectedChar, enemy, attackType])
-            
             selectedChar = ""
             intSelector = ""
             attackType = ""
-            confirmSound.currentTime = 0
-            confirmSound.play()
+            playSound(confirmSound)
         }
 
-        if (moves.length == possibleMoves) {
+        if (moves.length === possibleMoves) {
             runFightanimation()
             $("div").each(function () {
                 $(this).removeClass("hidden-buttons")
@@ -704,8 +720,7 @@ $(document).ready(function () {
 
     function selectChar() {
         $("#bomb-container-wrapper").hide()
-        confirmSound.currentTime = 0
-        confirmSound.play()
+        playSound(confirmSound)
         selectedChar = party[$(this).attr("partymember")]
         intSelector = $(this).attr("char")
         attackType = $(this).attr("type")
@@ -721,6 +736,7 @@ $(document).ready(function () {
     }
 
     $("body").on("click", ".left-party", showButtons)
+
     function showButtons(event) {
         if (!showDialogue && !fightanimationRunning && !disableAttackBtns) {
             $("#battle-ticker").hide()
@@ -738,8 +754,7 @@ $(document).ready(function () {
         })
         party[index].defends = true
         moves.push({ attacker: player, target: "", type: "" })
-        confirmSound.currentTime = 0
-        confirmSound.play()
+        playSound(confirmSound)
 
         if (moves.length == possibleMoves) {
             runFightanimation()
@@ -810,7 +825,7 @@ $(document).ready(function () {
 
     function setEnemiesDefending() {
         remainingEnemyParty.forEach(enemy => {
-            let randomDefending = Math.floor(Math.random() * (10))
+            const randomDefending = Math.floor(Math.random() * (10))
             enemy.defends = false
 
             if (randomDefending <= 8 || enemy.energy <= 0) return
@@ -824,22 +839,24 @@ $(document).ready(function () {
         moves.forEach(element => {
             if (element.attacker.defends) {
                 battleMessages.push("<span class='text-player'>" + element.attacker.class + " <i class='fas fa-shield-alt'></i>" + "</span><br>")
-            } else {
-                battleMessages.push("<span class='text-player'>" + element.attacker.class + '  ' + setBattletickerIcon(element.type) + '  ' + "<span class='text-enemy'>Enemy " + element.target.class + "</span><br>")
-                let selector = element.type
-                let attack = element.attacker[selector]
-                let defense = getDefenseType(selector, "target")
-                let typeBonus = getEffectiveness(selector, element.target.type)
+                return
+            }
 
-                let damage = 2 * attack * typeBonus * (100 / (100 + element.target[defense] * 10))
-                if (element.target.defends) {
-                    damage = damage / 2
-                }
-                element.target.energy -= damage
-                if (element.target.energy < 0) {
-                    element.target.energy = 0
-                    setTimeout(() => deathcry2.play(), 2500)
-                }
+            battleMessages.push("<span class='text-player'>" + element.attacker.class + '  ' + setBattletickerIcon(element.type) + '  ' + "<span class='text-enemy'>Enemy " + element.target.class + "</span><br>")
+            const selector = element.type
+            const attack = element.attacker[selector]
+            const defense = getDefenseType(selector, "target")
+            const typeBonus = getEffectiveness(selector, element.target.type)
+
+            let damage = attack * typeBonus * (100 / (100 + element.target[defense] * 10))
+
+            if (!element.target.defends) damage = damage * 2
+
+            element.target.energy -= damage
+
+            if (element.target.energy < 0) {
+                element.target.energy = 0
+                setTimeout(() => deathcry2.play(), 2500)
             }
         })
     }
@@ -882,12 +899,8 @@ $(document).ready(function () {
 
         remainingEnemyParty.forEach(enemy => {
             if (!enemy.defends) {
-                let selector = enemy.type
-
-                if (enemy.type == attackTypes.teacher || enemy.type == attackTypes.allrounder) {
-                    selector = randomAttacktype()
-                }
-
+                const selector = (enemy.type === attackTypes.teacher || enemy.type === attackTypes.allrounder) 
+                    ? randomAttacktype() : enemy.type
                 const attack = enemy[selector]
                 const randomNumber = Math.floor(Math.random() * (possibleTargets.length))
                 let energy = 100
@@ -911,7 +924,7 @@ $(document).ready(function () {
                 let damage = 2 * attack * typeBonus * (100 / (100 + target[defense] * 10))
 
                 if (target.defends) damage = damage / 2
-                
+
                 target.energy -= damage
 
                 if (target.energy <= 0) {
@@ -960,7 +973,7 @@ $(document).ready(function () {
         const isEffective = (attackType === attackTypes.strength && defenderType === attackTypes.intelligence) || 
         (attackType === attackTypes.intelligence && defenderType === attackTypes.assholiness) || 
         (attackType === attackTypes.assholiness && defenderType === attackTypes.strength)
-        
+
         return isEffective ? 1.5 : 1
     }
 
@@ -1179,7 +1192,6 @@ $(document).ready(function () {
     }
 
     function updateEnergybars() {
-        console.log("update energy bars", party)
         for (let i = 0; i <= 2; i++) {
             $(`#energy-char${i + 1}`).css({ 
                 "width": party[i].energy + "%", 
@@ -1247,20 +1259,17 @@ $(document).ready(function () {
     }
 
     $("body").on("click", "#char1.victory", function(){
-        clapSound.currentTime = 0
-        clapSound.play()
+            playSound(clapSound)
         }
     )
 
     $("body").on("click", "#char2.victory", function(){
-        laughSound.currentTime = 0
-        laughSound.play()
+            playSound(laughSound)
         }
     )
 
     $("body").on("click", "#char3.victory", function(){
-        screamSound.currentTime = 0
-        screamSound.play()
+            playSound(screamSound)
         }
     )
 
