@@ -10,7 +10,7 @@ Use items to deal damage or repleanish your health. Beat all nine levels includi
 
 ## How to play
 
-Open index.html to start the game. Choose three characters for your party. Click on a character. Select a type of attack and an opponent to attack. Do this for all your party members. Alternatively set a character on defending to reduce taken damage next turn. To control minigames you need to click on the screen. To use an item simply click one of the icons on the bottom of the screen. The sandwich recovers health for your whole party. The bomb damages all opoonents. The more of your characters survive a fight, the more items you can obtain.
+Open index.html or go to https://eckeecke.github.io/schoolfight/ to start the game. Choose three characters for your party. Click on a character. Select a type of attack and an opponent to attack. Do this for all your party members. Alternatively set a character on defending to reduce taken damage next turn. To control minigames you need to click on the screen. To use an item simply click one of the icons on the bottom of the screen. The sandwich recovers health for your whole party. The bomb damages all opoonents. The more of your characters survive a fight, the more items you can obtain.
 
 ![alt text](./images_schoolfight/tutorial.png)
 
