@@ -1,8 +1,9 @@
 $(document).ready(function () {
     function adjustGameSize() {
+        const gameWrapper = document.getElementById("game-wrapper")
         window.innerWidth >= window.innerHeight * 550/314 
-        ? document.getElementById("game-wrapper").style.transform = `scale(${window.innerWidth/660})`
-        : document.getElementById("game-wrapper").style.transform = `scale(1)`
+        ? gameWrapper.style.transform = `scale(${window.innerWidth/660})`
+        : gameWrapper.style.transform = `scale(1)`
     }
     
     adjustGameSize()
@@ -83,9 +84,9 @@ $(document).ready(function () {
     const assholinessMessage = "</span><i class='fas fa-hand-middle-finger'></i>"
     let battleMessages = []
 
-    const energybarEnemy1 = $("#energy-enemy1")
-    const energybarEnemy2 = $("#energy-enemy2")
-    const energybarEnemy3 = $("#energy-enemy3")
+    const energybarEnemy1 = document.getElementById("energy-enemy1")
+    const energybarEnemy2 = document.getElementById("energy-enemy2")
+    const energybarEnemy3 = document.getElementById("energy-enemy3")
 
     const strengthIcon = "<i class='fas fa-hand-rock'></i>"
     const assholinessIcon = "<i class='fas fa-hand-middle-finger'></i>"
@@ -146,7 +147,7 @@ $(document).ready(function () {
      * 
      */
 
-    let canvas = $("#canvas")[0]
+    const canvas = document.getElementById("canvas")
     const ctx = canvas.getContext("2d")
     let moveRopeDownwards = false
     let ropeY = 270
@@ -155,7 +156,6 @@ $(document).ready(function () {
     let characterJumps = false
     let points = 0
     let ropeInterval
-
 
     /*
     * 
@@ -345,17 +345,20 @@ $(document).ready(function () {
         let distance = enemyLeft - characterLeft
         if (distance < 160 && !showWarning) {
             showWarning = true
-            $("#running-background h2").html("Run faster!!! He almost got you!")
-            $("#running-background h2").addClass("animated-text")
+            const messageContainer = document.querySelector("#running-background h2");
+            messageContainer.innerHTML = "Run faster!!! He almost got you!";
+            messageContainer.classList.add("animated-text")
             evilLaugh.play()
         }
 
         if (enemyLeft < characterLeft + 20) {
             gameOverRunningGame()
+            return
         }
 
         if (characterLeft < -60) {
             nextRoundRunningGame()
+            return
         }
         $("#running-bg-1").css({ "left": bgs[0] + "px" })
         $("#running-bg-2").css({ "left": bgs[1] + "px" })
