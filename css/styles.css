@@ -135,7 +135,7 @@
             border-radius: 8px;
         }
 
-        #how-to-play-btn {
+        #how-to-play-button {
             position: absolute;
             width: 200px;
             left: 175px;
@@ -173,10 +173,11 @@
             color: white;
         }
 
-        #back-btn, #toggleTutorialBtn {
+        #back-button, #toggle-tutorial-button {
             background: none;
             color: white;
             position: absolute;
+            bottom: 12px;
             border: 2px solid white;
             border-radius: 8px;
             padding: 8px;
@@ -186,15 +187,11 @@
             text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
         }
 
-        #back-btn, #toggleTutorialBtn {
-            bottom: 12px;
-        }
-
-        #toggleTutorialBtn {
+        #toggle-tutorial-button {
             right: 56px;
         }
 
-        #back-btn:hover, #toggleTutorialBtn:hover {
+        #back-button:hover, #toggle-tutorial-button:hover {
             background: white;
             color: black;
             transform: scale(1.1);
@@ -202,14 +199,15 @@
         }
 
         #title-button:hover,
-        #how-to-play-btn:hover,
+        #how-to-play-button:hover,
         .add-button:hover {
             background: rgb(255, 123, 0);
             color: white;
             transform: scale(1.1);
         }
 
-        #select-screen {
+        #select-screen,
+        #select-screen2 {
             position: absolute;
             top: 40px;
             left: 38px;
@@ -220,8 +218,11 @@
             background: rgb(0, 0, 0, .5);
             padding: 8px 8px 2px;
             color: white;
-		border-radius: 12px;
+		    border-radius: 12px;
+        }
 
+        #select-screen2 {
+            display: none;
         }
 
         #tutorial-screen {
@@ -229,7 +230,7 @@
 		border-radius: 12px;
         }
 
-        .selectscreen-btn {
+        .selectscreen-button {
             position: absolute;
             top: 30%;
             height: 40%;
@@ -259,21 +260,21 @@
 
         #next-button:hover,
         #refresh-button:hover,
-        .selectscreen-btn:hover {
+        .selectscreen-button:hover {
             transform: scale(1.1);
         }
 
-        .btns-char:focus {
+        .buttons-char:focus {
             opacity: 1;
             color: orange;
             background: rgb(0, 0, 0, 1);
         }
 
-        .btns-char i {
+        .buttons-char i {
             position: relative;
         }
 
-        .btns-char span {
+        .buttons-char span {
             position: absolute;
             top: -9px;
             right: -10px;
@@ -282,16 +283,16 @@
             text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black;
         }
 
-        .btns-char:hover span {
+        .buttons-char:hover span {
             color:orange;
         }
 
-        .left-btn {
+        .left-button {
             left: -34px;
 		border: 2px solid black;
         }
 
-        .right-btn {
+        .right-button {
             right: -34px;
             border: 2px solid black;
         }
@@ -362,7 +363,7 @@
             display: none;
         }
 
-        .btns-char {
+        .buttons-char {
             box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
             border-radius: 4px;
         }
