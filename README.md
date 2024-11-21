@@ -16,4 +16,4 @@ Open index.html or go to https://eckeecke.github.io/schoolfight/ to start the ga
 
 ## Used Technologies
 
-The game is written in Javascript/jQuery using mainly regular HTML and CSS for displaying graphics.
+The game is written in Javascript using mainly regular HTML and CSS for displaying graphics.
