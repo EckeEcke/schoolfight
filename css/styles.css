@@ -53,6 +53,81 @@
             filter: brightness(0.5) sepia(1) saturate(100%);
         }
 
+        #trophy-messages-container {
+            display: flex;
+            gap: 8px;
+            flex-direction: column-reverse;
+            align-items: flex-end;
+            position:absolute;
+            bottom: 0;
+            right: 0;
+            z-index: 10;
+            margin-bottom: 8px;
+        }
+
+        .trophy-message {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            justify-content: flex-start;
+            background: rgb(0, 0, 0, .6);
+            width: 160px;
+            border-bottom-left-radius: 8px;
+            border-top-left-radius: 8px;
+            padding: 4px;
+            font-size: 12px!important;
+        }
+
+        .trophy-message .trophy-icon-wrapper {
+            margin: 8px;
+        }
+
+        #trophies {
+            display: none; 
+            background: rgb(0, 0, 0, .5);
+            padding: 8px;
+            padding-bottom: 20px;
+            color: white;
+            text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+            width: 80%;
+            margin: 8px auto;
+            height: 274px;
+        }
+
+        #trophies h2 {
+            text-align: center;
+            margin: 8px;
+        }
+
+        .trophies-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .trophy {
+            text-align: center;
+            text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black;
+            color: white;
+            font-size: 14px
+        }
+
+        .trophy-icon-wrapper {
+            background: orange;
+            width: 20px;
+            padding: 8px;
+            border-radius: 50%;
+            margin: 8px auto;
+        }
+
+        .trophy.not-received {
+            opacity: 0.6;
+        }
+
+        .trophy.not-received .trophy-icon-wrapper {
+            background: white;
+        }
 
         .left-party.defeated,
         #box.defeated,
@@ -138,8 +213,21 @@
         #how-to-play-button {
             position: absolute;
             width: 200px;
-            left: 175px;
-            top: 65%;
+            left: 60px;
+            top: 70%;
+            padding: 16px 0;
+            background: orange;
+            border: 2px solid white;
+            border-radius: 8px;
+            color: white;
+            text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+        }
+
+        #trophies-button {
+            position: absolute;
+            width: 200px;
+            left: 290px;
+            top: 70%;
             padding: 16px 0;
             background: orange;
             border: 2px solid white;
@@ -173,7 +261,7 @@
             color: white;
         }
 
-        #back-button, #toggle-tutorial-button {
+        #back-button, #back-button-trophies, #toggle-tutorial-button {
             background: none;
             color: white;
             position: absolute;
@@ -191,7 +279,7 @@
             right: 56px;
         }
 
-        #back-button:hover, #toggle-tutorial-button:hover {
+        #back-button:hover, #back-button-trophies:hover, #toggle-tutorial-button:hover {
             background: white;
             color: black;
             transform: scale(1.1);
@@ -200,6 +288,7 @@
 
         #title-button:hover,
         #how-to-play-button:hover,
+        #trophies-button:hover,
         .add-button:hover {
             background: rgb(255, 123, 0);
             color: white;

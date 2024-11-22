@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>School Fight</title>
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Titan+One&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.3/css/all.css">
@@ -15,6 +15,48 @@
 <body>
     <div id="game-wrapper">
         <div id="background" style="position:relative; width: 550px; height: 314px; overflow: hidden">
+            <div id="trophies">
+                <h2>Trophies</h2>
+                <div class="trophies-grid">
+                    <div id ="trophy-beaten" class="trophy not-received">
+                        <div class="trophy-icon-wrapper">
+                            <i class='fas fa-trophy'></i>
+                        </div>
+                        <div>Beat the game</div>
+                    </div>
+                    <div id="itemless" class="trophy not-received">
+                        <div class="trophy-icon-wrapper">
+                            <i class='fas fa-trophy'></i>
+                        </div>
+                        <div>Beat game without items</div>
+                    </div>
+                    <div id="six-tems" class="trophy not-received">
+                        <div class="trophy-icon-wrapper">
+                            <i class='fas fa-trophy'></i>
+                        </div>
+                        <div>Use at least 6 items</div>
+                    </div>
+                    <div id="all-strength" class="trophy not-received">
+                        <div class="trophy-icon-wrapper">
+                            <i class='fas fa-trophy'></i>
+                        </div>
+                        <div>Beat game with strength only</div>
+                    </div>
+                    <div id="all-intelligence" class="trophy not-received">
+                        <div class="trophy-icon-wrapper">
+                            <i class='fas fa-trophy'></i>
+                        </div>
+                        <div>Beat game with intelligence only</div>
+                    </div>
+                    <div id="all-assholes" class="trophy not-received">
+                        <div class="trophy-icon-wrapper">
+                            <i class='fas fa-trophy'></i>
+                        </div>
+                        <div>Beat game with assholes only</div>
+                    </div>
+                </div>
+                <button id="back-button-trophies" onclick="location.reload()">Back</button>
+            </div>
             <div id="running-background-wrapper" style="position: absolute;top:0;left:0">
                 <div id="running-background"
                     style="height: 314px; width: 550px; overflow:hidden; position: relative;display: none;">
@@ -52,6 +94,7 @@
             <h1 id="title">School Fight</h1>
             <button id="title-button">Start</button>
             <button id="how-to-play-button">How to play</button>
+            <button id="trophies-button">Trophies</button>
             <h2 id="title-select"
                 style="position: absolute; top: -10px; color: white; font-weight: 400; width: 100%; text-align: center;text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;">
                 Add characters to your party 0/3</h2>
@@ -419,6 +462,45 @@
                 <div id="bomb-container" style="height:100%;width:100%;position:relative;border-radius:50%;background-image: url('images_schoolfight/grenade.png');background-size: 35px 35px;">
 
                 </div>
+            </div>
+
+            <div id="trophy-messages-container"> 
+                <div id="beaten-game" class="trophy trophy-message">
+                    <div class="trophy-icon-wrapper">
+                        <i class='fas fa-trophy'></i>
+                    </div>
+                    <div>Beat game</div>
+                </div>
+                <div id="all-assholes-message" class="trophy trophy-message">
+                    <div class="trophy-icon-wrapper">
+                        <i class='fas fa-trophy'></i>
+                    </div>
+                    <div>All Assholes</div>
+                </div> 
+                <div id="all-strength-message" class="trophy trophy-message">
+                    <div class="trophy-icon-wrapper">
+                        <i class='fas fa-trophy'></i>
+                    </div>
+                    <div>All Strength</div>
+                </div> 
+                <div id="all-intelligence-message" class="trophy trophy-message">
+                    <div class="trophy-icon-wrapper">
+                        <i class='fas fa-trophy'></i>
+                    </div>
+                    <div>All Intelligence</div>
+                </div> 
+                <div id="no-items" class="trophy trophy-message">
+                    <div class="trophy-icon-wrapper">
+                        <i class='fas fa-trophy'></i>
+                    </div>
+                    <div>No Items used</div>
+                </div> 
+                <div id="six-items" class="trophy trophy-message">
+                    <div class="trophy-icon-wrapper">
+                        <i class='fas fa-trophy'></i>
+                    </div>
+                    <div>Six Items used</div>
+                </div> 
             </div>
             
 
