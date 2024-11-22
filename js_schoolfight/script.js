@@ -210,11 +210,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const bully = {
         class: "Bully",
-        type: attackTypes.strength,
+        type: attackTypes.assholiness,
         energy: 100,
-        strength: 16,
+        strength: 14,
         intelligence: 0,
-        assholiness: 10,
+        assholiness: 14,
     }
 
     const squealer = {
@@ -246,11 +246,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const richkid = {
         class: "Richkid",
-        type: attackTypes.assholiness,
+        type: attackTypes.intelligence,
         energy: 100,
         strength: 0,
-        intelligence: 12,
-        assholiness: 14,
+        intelligence: 14,
+        assholiness: 12,
     }
 
     const sportskid = {
@@ -1445,7 +1445,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.right-party:not(.defeated)').forEach(element => {
                 element.classList.remove('bombed-enemy')
             })
-        },4000)
+        },3500)
         setTimeout(()=>{
             hide(bombContainerWrapper)
         },7000)
@@ -1514,12 +1514,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (getRemainingEnemies().length === 0) return 
         
         enemyParty.forEach(enemy => { 
-            enemy.energy -= 20 
+            enemy.energy -= 20
+            if(enemy.energy <= 0) enemy.energy = 0 
             updateEnergybars() 
-            checkRemainingEnemies() 
+            checkRemainingEnemies()
             setTimeout(() => { 
-                setCharactersDefeated() 
-            }, 3000) 
+                setCharactersDefeated()
+            }, 5000) 
         }) 
     }
 
