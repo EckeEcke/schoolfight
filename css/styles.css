@@ -76,6 +76,8 @@
             border-top-left-radius: 8px;
             padding: 4px;
             font-size: 12px!important;
+            margin-right: -180px;
+            transition: all 0.3s linear;
         }
 
         .trophy-message .trophy-icon-wrapper {
@@ -400,6 +402,10 @@
         #title-select {
             display: none;
             transition: .3s;
+        }
+
+        #title-select {
+            z-index: 9;
         }
 
         .energybar {

@@ -153,6 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const clapSound = new Audio("sounds_schoolfight/clap.wav")
     const screamSound = new Audio("sounds_schoolfight/scream.mp3")
     const laughSound = new Audio("sounds_schoolfight/laugh.wav")
+    const trophySound = new Audio("sounds_schoolfight/trophy unlocked.mp3")
 
 
     /*
@@ -212,7 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
         class: "Bully",
         type: attackTypes.assholiness,
         energy: 100,
-        strength: 14,
+        strength: 12,
         intelligence: 0,
         assholiness: 14,
     }
@@ -221,9 +222,9 @@ document.addEventListener('DOMContentLoaded', () => {
         class: "Squealer",
         energy: 100,
         type: attackTypes.assholiness,
-        strength: 2,
-        intelligence: 2,
-        assholiness: 18,
+        strength: 0,
+        intelligence: 0,
+        assholiness: 20,
     }
 
     const nerd = {
@@ -310,7 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let enemyParty = []
 
     const setTeams = [
-        [new Character(bully), new Character(nerd), new Character(squealer)], //1
+        [new Character(bully), new Character(nerd), new Character(joe)], //1
         [new Character(squealer), new Character(wally), new Character(richkid)], //2
         [new Character(sportskid), new Character(sportskid), new Character(sportskid)], //3
         [new Character(dummy), new Character(dummy), new Character(dummy)], //4 (rope skipping)
@@ -394,16 +395,20 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!hasBeatenGameTrophy) {
             setTimeout(() => {
                 document.getElementById('beaten-game').style.display = 'flex'
-                playSound(confirmSound)
+
+                document.getElementById('beaten-game').style.marginRight = '0'
+                playSound(trophySound)
             }, 1000)
         }
         parsedTrophies.beatenGame = true
-        console.log(document.getElementById('all-strength'))
+
         if (allStrength()) {
             if(!hasAllStrengthTrophy) {
                 setTimeout(() => {
                     document.getElementById('all-strength-message').style.display = 'flex'
-                    playSound(confirmSound)
+
+                    document.getElementById('all-strength-message').style.marginRight = '0'
+                    playSound(trophySound)
                 }, 1500)
             }
             parsedTrophies.allStrength = true
@@ -412,7 +417,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if(!hasAllAssholesTrophy) {
                 setTimeout(() => {
                     document.getElementById('all-assholes-message').style.display = 'flex'
-                    playSound(confirmSound)
+
+                    document.getElementById('all-assholes-message').style.marginRight = '0'
+                    playSound(trophySound)
                 }, 2000)
             }
             parsedTrophies.allAssholes = true
@@ -421,7 +428,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if(!hasAllIntelligenceTrophy) {
                 setTimeout(() => {
                     document.getElementById('all-intelligence-message').style.display = 'flex'
-                    playSound(confirmSound)
+
+                    document.getElementById('all-intelligence-message').style.marginRight = '0'
+                    playSound(trophySound)
                 }, 2500)
             }
             parsedTrophies.allIntelligence = true
@@ -429,8 +438,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!itemUsed) {
             if(!hasNoItemsTrophy) {
                 setTimeout(() => {
-                    document.getElementById('no-items').style.display = 'flex'
-                    playSound(confirmSound)
+                    document.getElementById('no-items-message').style.display = 'flex'
+
+                    document.getElementById('no-items-message').style.marginRight = '0'
+                    playSound(trophySound)
                 }, 3000)
             }
             parsedTrophies.hasNoItems = true
@@ -438,8 +449,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (itemsUsed >= 6) {
             if(!hasSixItemsTrophy) {
                 setTimeout(() => {
-                    document.getElementById('six-items').style.display = 'flex'
-                    playSound(confirmSound) 
+                    document.getElementById('six-items-message').style.display = 'flex'
+
+                    document.getElementById('six-items-message').style.marginRight = '0'
+                    playSound(trophySound) 
                 }, 3500)
             }
             parsedTrophies.hasSixItems = true
@@ -1514,7 +1527,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (getRemainingEnemies().length === 0) return 
         
         enemyParty.forEach(enemy => { 
-            enemy.energy -= 20
+            enemy.energy -= 30
             if(enemy.energy <= 0) enemy.energy = 0 
             updateEnergybars() 
             checkRemainingEnemies()
