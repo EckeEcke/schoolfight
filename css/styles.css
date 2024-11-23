@@ -148,14 +148,14 @@
 
         .sprite-container div button {
             display: inline-block;
-            background: rgb(0, 0, 0, .9);
+            background-color: orange;
             border: none;
             font-size: 2rem;
             color: white;
             z-index: 1;
             width: 60px;
             height: 50px;
-            opacity: .8;
+            opacity: .95;
             margin: 1px;
             transition: all 0.3s;
         }
@@ -163,7 +163,6 @@
         .sprite-container button {
             display: none;
             background: rgb(0, 0, 0, .2);
-            border: none;
             font-size: 1rem;
             color: white;
             z-index: 10;
@@ -177,13 +176,37 @@
         }
 
         .buttons-wrapper {
+            background: rgb(0,0,0,0.8);
+            box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
+            border-radius: 8px;
+            padding: 4px 8px;
             display: none;
             width: 124px;
             transform: translateY(-10px);
             position: absolute;
-            top: -100px;
-            left: -30px;
+            top: -136px;
+            left: -38px;
             font-size: 0;
+        }
+
+        .buttons-wrapper:after { 
+            content: ''; 
+            display: block;
+            margin: 4px auto 0; 
+            width: 0; 
+            height: 0; 
+            border-left: 10px solid transparent; 
+            border-right: 10px solid transparent; 
+            border-top: 10px solid white;
+        }
+
+        .buttons-wrapper:before { 
+            content: 'Choose action';
+            font-size: 12px;
+            color: white;
+            display: block;
+            text-align: center;
+            margin-bottom: 4px;
         }
 
         #title {
@@ -361,8 +384,13 @@
             background: rgb(0, 0, 0, 1);
         }
 
+        .buttons-char:focus span {
+            color: orange;
+        }
+
         .buttons-char i {
             position: relative;
+            text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
         }
 
         .buttons-char span {
@@ -371,11 +399,7 @@
             right: -10px;
             font-size: 12px;
             color: white;
-            text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black;
-        }
-
-        .buttons-char:hover span {
-            color:orange;
+            text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
         }
 
         .left-button {
@@ -410,6 +434,11 @@
 
         .energybar {
             border-radius: 8px;
+        }
+
+        .energybar span,
+        .add-button {
+            text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
         }
 
         .energybar,
@@ -459,14 +488,12 @@
         }
 
         .buttons-char {
-            box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
             border-radius: 4px;
         }
 
-        .sprite-container div button:hover {
+        .buttons-char:hover {
             cursor: pointer;
-            background: rgba(0, 0, 0, 1);
-            color: orange;
+            background: rgb(255, 123, 0);
             opacity: 1;
             transform: scale(1.02)
         }
@@ -474,10 +501,6 @@
 	  .overflow-wrapper {
 		cursor: pointer;
 	  }
-
-        /*.buttons-wrapper:focus-within {
-            display: inline-block;
-        }*/
 
         .add-button {
             display: block;
@@ -613,7 +636,7 @@
             opacity: 0.5;
             border-radius: 50%;
             top: -20%;
-		pointer-events: none;
+		    pointer-events: none;
         }
 
         .sprite-container.victory {
