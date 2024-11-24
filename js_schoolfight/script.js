@@ -1592,11 +1592,11 @@ document.addEventListener('DOMContentLoaded', () => {
             hide(descBoxes[2])        
         }
 
-        if (event.target.classList.contains('right-button')) {
+        if (event.currentTarget.classList.contains('right-button')) {
             displayedSelectScreenIndex += 1
         }
 
-        if (event.target.classList.contains('left-button')) {
+        if (event.currentTarget.classList.contains('left-button')) {
             displayedSelectScreenIndex -= 1
         }
 
