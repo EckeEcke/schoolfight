@@ -297,9 +297,9 @@ document.addEventListener('DOMContentLoaded', () => {
         class: "Weirdo",
         type: attackTypes.intelligence,
         energy: 100,
-        strength: 2,
+        strength: 6,
         intelligence: 14,
-        assholiness: 10,
+        assholiness: 6,
     }
 
     const wolf = {
@@ -402,6 +402,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const hasSixItemsTrophy = parsedTrophies && 'hasSixItems' in parsedTrophies
     const hasNoItemsTrophy = parsedTrophies && 'hasNoItems' in parsedTrophies
     const achievedTrophies = [hasBeatenGameTrophy, hasAllAssholesTrophy, hasAllStrengthTrophy, hasAllIntelligenceTrophy, hasNoItemsTrophy, hasSixItemsTrophy]
+    const amountTrophies = achievedTrophies.filter(Boolean).length
 
     if (hasBeatenGameTrophy) beatenGameTrophyElement.classList.remove('not-received')
     if (hasNoItemsTrophy) itemlessTrophyElement.classList.remove('not-received')
@@ -1571,7 +1572,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function switchSelectscreen(event) {
-        const amountTrophies = achievedTrophies.filter(Boolean).length
         const maximumIndex = selectScreens.length - 1
 
         const parentElement = document.getElementById('select-screen3')
