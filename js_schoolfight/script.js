@@ -1,62 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-    function adjustGameSize() {
-        const gameWrapper = document.getElementById("game-wrapper")
-        window.innerWidth >= window.innerHeight * 550/314 
-        ? gameWrapper.style.transform = `scale(${window.innerWidth/660})`
-        : gameWrapper.style.transform = `scale(1)`
-    }
-    adjustGameSize()
-    window.addEventListener("resize", adjustGameSize)
 
-    let showTutorial = false
-    let round = 0
-    const party = []
-    let moves = []
-    let playerTurn = true
-    let selectedChar = ""
-    let intSelector
-    let attackType
-    let displaySelectScreen1 = true
-    let lastMoveTeacher = "intelligence"
-    const attackTypes = {
-        strength: 'strength',
-        intelligence: 'intelligence',
-        assholiness: 'assholiness',
-        allrounder: 'allrounder',
-        teacher: 'teacher'
-    }
-    let bombs = 1
-    let snacks = 1
-    let itemsReceived = 0
-    let survivalpoints = 0
-
-    let fightanimationRunning = false
-
-    /**
-     * 
-     * Spritepositions
-     * 
-     */
-
-    const BullySpritePosition = { top: "-425px", left: "-340px" }
-    const BullySidePosition = { top: "-425px", left: "-410px" }
-    const SquealerSpritePosition = { top: "-320px", left: "-42px" }
-    const SquealerSidePosition = { top: "-320px", left: "-108px" }
-    const NerdSpritePosition = { top: "-425px", left: "-42px" }
-    const NerdSidePosition = { top: "-425px", left: "-108px" }
-    const WallySpritePosition = { top: "-105px", left: "-340px" }
-    const WallySidePosition = { top: "-105px", left: "-410px" }
-    const DummySpritePosition = { top: "10000px", left: "10000px" }
-    const SportskidSpritePosition = { top: "-320px", left: "-340px" }
-    const SportskidSidePosition = { top: "-320px", left: "-410px" }
-    const RichkidSpritePosition = { top: "-215px", left: "-340px" }
-    const RichkidSidePosition = { top: "-215px", left: "-410px" }
-    const TeacherSpritePosition = { top: "-215px", left: "-42px" }
-    const WeirdoSpritePosition = { top: "-105px", left: "-42px" }
-    const WolfkidSpritePosition = { top: "-532px", left: "-340px" }
-    const JoeSpritePosition = { top: "0px", left: "-42px" }
-    let pervertSidePosition
-
+    
     /**
      * 
      * UI variables
@@ -96,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const runningBackgroundText = document.querySelector('#running-background h2')
     const selectScreen = document.getElementById('select-screen')
     const selectScreen2 = document.getElementById('select-screen2')
+    const selectScreen3 = document.getElementById('select-screen3')
     const dialogueBoxWrapper = document.getElementById("dialogue-box-wrapper")
     const dialogueBox = document.getElementById("dialogue-box")
     const box = document.getElementById('box')
@@ -120,10 +65,76 @@ document.addEventListener('DOMContentLoaded', () => {
     const allAssholesTrophyElement = document.getElementById('all-assholes')
     const displayTrophiesButton = document.getElementById('trophies-button')
     const trophiesScreen = document.getElementById('trophies')
+    const soundControlButton = document.getElementById('sound-control-button')
 
+     /**
+     * 
+     * Basic variables and functions
+     * 
+     */
 
+    function adjustGameSize() {
+        const gameWrapper = document.getElementById("game-wrapper")
+        window.innerWidth >= window.innerHeight * 550/314 
+        ? gameWrapper.style.transform = `scale(${window.innerWidth/660})`
+        : gameWrapper.style.transform = `scale(1)`
+    }
+    adjustGameSize()
+    window.addEventListener("resize", adjustGameSize)
 
+    let showTutorial = false
+    let round = 0
+    const party = []
+    let moves = []
+    let playerTurn = true
+    let selectedChar = ""
+    let intSelector
+    let attackType
+    let displayedSelectScreenIndex = 0
+    const selectScreens = [selectScreen, selectScreen2, selectScreen3]
+    let lastMoveTeacher = "intelligence"
+    const attackTypes = {
+        strength: 'strength',
+        intelligence: 'intelligence',
+        assholiness: 'assholiness',
+        allrounder: 'allrounder',
+        teacher: 'teacher'
+    }
+    let bombs = 1
+    let snacks = 1
+    let itemsReceived = 0
+    let survivalpoints = 0
 
+    let fightanimationRunning = false
+
+    /**
+     * 
+     * Spritepositions
+     * 
+     */
+
+    const BullySpritePosition = { top: "-425px", left: "-340px" }
+    const BullySidePosition = { top: "-425px", left: "-410px" }
+    const SquealerSpritePosition = { top: "-320px", left: "-42px" }
+    const SquealerSidePosition = { top: "-320px", left: "-108px" }
+    const NerdSpritePosition = { top: "-425px", left: "-42px" }
+    const NerdSidePosition = { top: "-425px", left: "-108px" }
+    const WallySpritePosition = { top: "-105px", left: "-340px" }
+    const WallySidePosition = { top: "-105px", left: "-410px" }
+    const DummySpritePosition = { top: "10000px", left: "10000px" }
+    const SportskidSpritePosition = { top: "-320px", left: "-340px" }
+    const SportskidSidePosition = { top: "-320px", left: "-410px" }
+    const RichkidSpritePosition = { top: "-215px", left: "-340px" }
+    const RichkidSidePosition = { top: "-215px", left: "-410px" }
+    const TeacherSpritePosition = { top: "-215px", left: "-42px" }
+    const TeacherSidePosition = { top: "-215px", left: "-108px" }
+    const WeirdoSpritePosition = { top: "-105px", left: "-42px" }
+    const WeirdoSidePosition = { top: "-105px", left: "-108px" }
+    const WolfkidSpritePosition = { top: "-532px", left: "-340px" }
+    const NormieSpritePosition = { top: "0px", left: "-42px" }
+    const NormieSidePosition = { top: "0px", left: "-108px" }
+
+    let pervertSidePosition
 
     /*
      * 
@@ -155,7 +166,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const laughSound = new Audio("sounds_schoolfight/laugh.wav")
     const trophySound = new Audio("sounds_schoolfight/trophy unlocked.mp3")
 
-
+    const allAudio = [ confirmSound, schoolbell, music, failSound, steps, fightSound, fadeSound, punchSounds, deathcry, deathcry2, clicksound, girlcry, evilLaugh, victorySound, bossmusic, jumpSound, stinkSound, eatingSound, cheerSound, clapSound, screamSound, laughSound, trophySound ]
+    let soundMuted = false
+    function toggleMute() { 
+        soundMuted = !soundMuted
+        allAudio.forEach(audio => { 
+            audio.muted = soundMuted
+        })
+        soundControlButton.innerHTML = soundMuted ? "<i class='fas fa-volume-mute'></i>" : "<i class='fas fa-volume-up'></i>"
+    }
+    
+    soundControlButton.addEventListener('click', toggleMute)
     /*
      * 
      * Running Minigame variables
@@ -263,8 +284,8 @@ document.addEventListener('DOMContentLoaded', () => {
         assholiness: 0,
     }
 
-    const joe = {
-        class: "Joe",
+    const normie = {
+        class: "Normie",
         type: attackTypes.allrounder,
         energy: 100,
         strength: 8,
@@ -311,7 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let enemyParty = []
 
     const setTeams = [
-        [new Character(bully), new Character(nerd), new Character(joe)], //1
+        [new Character(bully), new Character(nerd), new Character(normie)], //1
         [new Character(squealer), new Character(wally), new Character(richkid)], //2
         [new Character(sportskid), new Character(sportskid), new Character(sportskid)], //3
         [new Character(dummy), new Character(dummy), new Character(dummy)], //4 (rope skipping)
@@ -380,6 +401,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const hasAllIntelligenceTrophy = parsedTrophies && 'allIntelligence' in parsedTrophies
     const hasSixItemsTrophy = parsedTrophies && 'hasSixItems' in parsedTrophies
     const hasNoItemsTrophy = parsedTrophies && 'hasNoItems' in parsedTrophies
+    const achievedTrophies = [hasBeatenGameTrophy, hasAllAssholesTrophy, hasAllStrengthTrophy, hasAllIntelligenceTrophy, hasNoItemsTrophy, hasSixItemsTrophy]
 
     if (hasBeatenGameTrophy) beatenGameTrophyElement.classList.remove('not-received')
     if (hasNoItemsTrophy) itemlessTrophyElement.classList.remove('not-received')
@@ -833,6 +855,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function initializeGame() {
         hide(selectScreen)
         hide(selectScreen2)
+        hide(selectScreen3)
         hide(titleSelect)
         dialogueBoxWrapper.style.opacity = 1
         dialogueBox.innerHTML = dialogues[round][indexOfMessage]
@@ -1547,16 +1570,40 @@ document.addEventListener('DOMContentLoaded', () => {
         return remainingChars
     }
 
-    function switchSelectscreen() {
-        clicksound.play()
-        displaySelectScreen1 = !displaySelectScreen1
-        if (!displaySelectScreen1) {
-            hide(selectScreen)
-            selectScreen2.style.display = 'grid'
-        } else {
-            hide(selectScreen2)
-            selectScreen.style.display = 'grid'
+    function switchSelectscreen(event) {
+        const amountTrophies = achievedTrophies.filter(Boolean).length
+        const maximumIndex = selectScreens.length - 1
+
+        const parentElement = document.getElementById('select-screen3')
+        const sprites = parentElement.getElementsByClassName('selectsprite')
+        const descBoxes = parentElement.getElementsByClassName('desc-box')
+
+        if (amountTrophies >= 2) hide(document.getElementById('unlockables-message'))
+        if (amountTrophies < 2) {
+            hide(sprites[0])
+            hide(descBoxes[0])
         }
+        if (amountTrophies < 4) {
+            hide(sprites[1])
+            hide(descBoxes[1])
+        }
+        if (amountTrophies < 6) {
+            hide(sprites[2])
+            hide(descBoxes[2])        
+        }
+
+        if (event.target.classList.contains('right-button')) {
+            displayedSelectScreenIndex += 1
+        } else displayedSelectScreenIndex -= 1
+
+        if (displayedSelectScreenIndex < 0) displayedSelectScreenIndex = maximumIndex
+        if (displayedSelectScreenIndex > maximumIndex) displayedSelectScreenIndex = 0
+
+        selectScreens.forEach((screen, index) => {
+            screen.style.display = index === displayedSelectScreenIndex ? 'grid' : 'none'
+        })
+
+        clicksound.play()
     }
 })
 
