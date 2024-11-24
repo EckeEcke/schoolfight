@@ -1539,7 +1539,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (bombs <= 0 || enemyParty.length === 0) return
         itemsUsed += 1
         itemUsed = true
-        battleTicker.innerHTML = "<span style='color:limegreen'>Stink bomb</span>!<br>Enemies take 20% <span style='color:red'>damage</span>!" 
+        battleTicker.innerHTML = "<span style='color:limegreen'>Stink bomb</span>!<br>Enemies take 30% <span style='color:red'>damage</span>!" 
         battleTicker.style.display = 'block' 
         
         showBomb()
@@ -1594,7 +1594,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (event.target.classList.contains('right-button')) {
             displayedSelectScreenIndex += 1
-        } else displayedSelectScreenIndex -= 1
+        }
+
+        if (event.target.classList.contains('left-button')) {
+            displayedSelectScreenIndex -= 1
+        }
 
         if (displayedSelectScreenIndex < 0) displayedSelectScreenIndex = maximumIndex
         if (displayedSelectScreenIndex > maximumIndex) displayedSelectScreenIndex = 0
