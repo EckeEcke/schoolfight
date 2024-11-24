@@ -73,14 +73,16 @@ document.addEventListener('DOMContentLoaded', () => {
      * 
      */
 
-    function adjustGameSize() {
+    function adjustGameSize() { 
         const gameWrapper = document.getElementById("game-wrapper")
-        window.innerWidth >= window.innerHeight * 550/314 
-        ? gameWrapper.style.transform = `scale(${window.innerWidth/660})`
-        : gameWrapper.style.transform = `scale(1)`
-    }
+        const aspectRatio = 550 / 314
+        if (window.innerWidth >= window.innerHeight * aspectRatio) { 
+            gameWrapper.style.transform = `scale(${window.innerHeight * aspectRatio / 660})`
+        } else { gameWrapper.style.transform = `scale(${window.innerWidth / 660})` 
+    }}
     adjustGameSize()
     window.addEventListener("resize", adjustGameSize)
+    window.addEventListener('fullscreenchange', adjustGameSize)
 
     let showTutorial = false
     let round = 0
@@ -1608,6 +1610,12 @@ document.addEventListener('DOMContentLoaded', () => {
         })
 
         clicksound.play()
+    }
+
+    document.getElementById('fullscreen-button').addEventListener('click', setFullscreen)
+    function setFullscreen() {
+        if (!document.fullscreenElement) document.body.requestFullscreen()    
+        else document.exitFullscreen()
     }
 })
 

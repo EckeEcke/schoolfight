@@ -32,6 +32,7 @@
 
         #game-wrapper {
             align-self: center;
+            margin: 0 auto;
         }
 
         #background {
@@ -716,7 +717,22 @@
             opacity: 0.5;
         }
 
-        #sound-control-button:hover {
+        #fullscreen-button {
+            position: absolute;
+            bottom: 2px;
+            left: 2px;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: rgb(0, 0, 0, .6);
+            color: white;
+            transition: 0.3s all;
+            opacity: 0.5;
+        }
+
+        #sound-control-button:hover,
+        #fullscreen-button:hover {
             opacity: 1;
             background: orange;
             transform: scale(1.1);
