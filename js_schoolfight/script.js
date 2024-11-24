@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function adjustGameSize() { 
         const gameWrapper = document.getElementById("game-wrapper")
-        const aspectRatio = 550 / 314
+        const aspectRatio = 550 / 280
         if (window.innerWidth >= window.innerHeight * aspectRatio) { 
             gameWrapper.style.transform = `scale(${window.innerHeight * aspectRatio / 660})`
         } else { gameWrapper.style.transform = `scale(${window.innerWidth / 660})` 
@@ -768,7 +768,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 intelligence and ${assholinessIcon} assholiness.
             </p>
             <p>
-                ${strengthIcon} Strength: 
+                ${strengthIcon} Strength:
+                <br> 
                 good against type ${intelligenceIcon}, weak against high ${assholinessIcon} stat. 
             </p>
             <p>
@@ -776,19 +777,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 good against type ${assholinessIcon}, weak against high ${strengthIcon} stat.
             </p>
             <p>
-                ${assholinessIcon} Assholiness: 
+                ${assholinessIcon} Assholiness:
+                <br> 
                 strong against type ${strengthIcon}, weak against high ${intelligenceIcon} stat.
             </p>
             <p>
-                ${shieldIcon} Defend: this character only takes half damage that turn, but won't attack.
+                ${shieldIcon} Defend: 
+                <br>
+                this character only takes half damage that turn, but won't attack.
             </p>
             <button id="back-button">Back</button>
             <button id="toggle-tutorial-button">More</button>`
         :
             `<img src="images_schoolfight/tutorial.png" style="width: 100%"></img>
-            <div style="position: absolute; top: 170px; left: 120px;width: 120px; height: 40px; padding: 8px; opacity: 0;background: rgba(255,165,0,0.7); border-radius: 8px; animation: toggleTutorialSteps 12s infinite">1. Click your character</div>
-            <div style="position: absolute; top: 68px; left: 150px;width: 120px; height: 40px; padding: 8px; opacity: 0; background: rgba(255,165,0,0.7); border-radius: 8px; animation: toggleTutorialSteps 12s infinite; animation-delay: 4s">2. Choose attack type</div>
-            <div style="position: absolute; top: 170px; left: 346px;width: 120px; height: 40px; padding: 8px; opacity: 0; background: rgba(255,165,0,0.7); border-radius: 8px; animation: toggleTutorialSteps 12s infinite; animation-delay: 8s">3. Choose target enemy</div>
+            <div class="tutorial-info" style="top: 138px; left: 90px;"><div>1. Click your character</div></div>
+            <div class="tutorial-info" style="top: 25px; left: 130px; animation-delay: 4s"><div>2. Choose attack type</div></div>
+            <div class="tutorial-info" style="top: 135px; left: 328px;animation-delay: 8s"><div>3. Choose target</div></div>
             <button id="back-button">Back</button>
             <button id="toggle-tutorial-button">More</button>`
     }
