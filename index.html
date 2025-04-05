@@ -76,7 +76,7 @@
                         <div class="overflow-wrapper"
                             style="overflow: hidden;height:100px;width:60px;position:relative">
 
-                            <img src="images_schoolfight/Character_spriteSheet.png" id="running-sprite" style="position: absolute; top: -435px; left: -410px;">
+                            <img src="images_schoolfight/Character_spriteSheet.png" id="running-sprite" alt="spritesheet" style="position: absolute; top: -435px; left: -410px;">
                         </div>
                     </div>
                     <div id="enemy-running"
@@ -84,7 +84,7 @@
                         <div class="overflow-wrapper"
                             style="overflow: hidden;height:100px;width:60px;position:relative">
 
-                            <img src="images_schoolfight/Character_spriteSheet.png" style="position: absolute; top: -535px; left: -410px;">
+                            <img src="images_schoolfight/Character_spriteSheet.png" alt="spritesheet" style="position: absolute; top: -535px; left: -410px;">
                         </div>
                     </div>
                     <div id="overlay-running" style="position: absolute;top:0;left:0;height:100%;width:100%;"></div>
@@ -95,6 +95,7 @@
             <button id="title-button">Start</button>
             <button id="how-to-play-button">How to play</button>
             <button id="trophies-button">Trophies</button>
+            <button id="vendetta-button" style="display: none">Time for Revenge!</button>
             <h2 id="title-select"
                 style="position: absolute; top: -10px; color: white; font-weight: 400; width: 100%; text-align: center;text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;">
                 Add characters to your party 0/3</h2>
@@ -105,7 +106,7 @@
                     <div class="selectsprite" style="overflow: hidden; width: 60px; height: 100px;">
                         <div style="position: relative; height: 100%">
 
-                            <img src="images_schoolfight/Character_spriteSheet.png" style="position: absolute; top: -425px; left: -340px;">
+                            <img src="images_schoolfight/Character_spriteSheet.png" alt="spritesheet" style="position: absolute; top: -425px; left: -340px;">
                         </div>
 
                     </div>
@@ -113,15 +114,18 @@
                 <div>
                     <div class="selectsprite" style="overflow: hidden; width: 60px; height: 100px;">
                         <div style="position: relative; height: 100%">
-                            <img src="images_schoolfight/Character_spriteSheet.png" style="position: absolute; top: -320px; left: -42px;">
+                            <img src="images_schoolfight/Character_spriteSheet.png" alt="spritesheet" style="position: absolute; top: -320px; left: -42px;">
                         </div>
                     </div>
                 </div>
                 <div>
                     <div class="selectsprite" style="overflow: hidden; width: 60px; height: 100px;">
                         <div style="position: relative; height: 100%">
-                            <img src="images_schoolfight/Character_spriteSheet.png"
-                                style="position: absolute; top: -425px; left: -42px;z-index: 0">
+                            <img
+                                src="images_schoolfight/Character_spriteSheet.png"
+                                style="position: absolute; top: -425px; left: -42px;z-index: 0"
+                                alt="spritesheet"
+                            >
                         </div>
                     </div>
                 </div>
@@ -136,7 +140,7 @@
                     <br>
                     Assholiness: 14
                     <br>
-                    <button class="add-button" character="bully">Add</button>
+                    <button class="add-button" data-character="bully">Add</button>
                 </div>
                 <div class="desc-box">
                     Class: Squealer
@@ -149,7 +153,7 @@
                     <br>
                     Assholiness: 20
                     <br>
-                    <button class="add-button" character="squealer">Add</button>
+                    <button class="add-button" data-character="squealer">Add</button>
                 </div>
                 <div class="desc-box">
                     Class: Nerd
@@ -162,7 +166,7 @@
                     <br>
                     Assholiness: 0
                     <br>
-                    <button class="add-button" character="nerd">Add</button>
+                    <button class="add-button" data-character="nerd">Add</button>
                 </div>
             </div>
 
@@ -173,7 +177,7 @@
                     <div class="selectsprite" style="overflow: hidden; width: 60px; height: 100px;">
                         <div style="position: relative; height: 100%">
 
-                            <img src="images_schoolfight/Character_spriteSheet.png" style="position: absolute; top: -105px; left: -340px;">
+                            <img src="images_schoolfight/Character_spriteSheet.png" alt="spritesheet" style="position: absolute; top: -105px; left: -340px;">
                         </div>
 
                     </div>
@@ -181,15 +185,18 @@
                 <div>
                     <div class="selectsprite" style="overflow: hidden; width: 60px; height: 100px;">
                         <div style="position: relative; height: 100%">
-                            <img src="images_schoolfight/Character_spriteSheet.png" style="position: absolute; top: -320px; left: -340px;">
+                            <img src="images_schoolfight/Character_spriteSheet.png" alt="spritesheet" style="position: absolute; top: -320px; left: -340px;">
                         </div>
                     </div>
                 </div>
                 <div>
                     <div class="selectsprite" style="overflow: hidden; width: 60px; height: 100px;">
                         <div style="position: relative; height: 100%">
-                            <img src="images_schoolfight/Character_spriteSheet.png"
-                                style="position: absolute; top: -215px; left: -340px;">
+                            <img
+                                src="images_schoolfight/Character_spriteSheet.png"
+                                style="position: absolute; top: -215px; left: -340px;"
+                                alt="spritesheet"
+                            >
                         </div>
                     </div>
                 </div>
@@ -204,7 +211,7 @@
                     <br>
                     Assholiness: 0
                     <br>
-                    <button class="add-button" character="wally">Add</button>
+                    <button class="add-button" data-character="wally">Add</button>
                 </div>
                 <div class="desc-box">
                     Class: Sports Kid
@@ -217,7 +224,7 @@
                     <br>
                     Assholiness: 0
                     <br>
-                    <button class="add-button" character="sportskid">Add</button>
+                    <button class="add-button" data-character="sportskid">Add</button>
                 </div>
                 <div class="desc-box">
                     Class: Rich Kid
@@ -230,7 +237,7 @@
                     <br>
                     Assholiness: 12
                     <br>
-                    <button class="add-button" character="richkid">Add</button>
+                    <button class="add-button" data-character="richkid">Add</button>
                 </div>
             </div>
 
@@ -248,7 +255,7 @@
                     <div class="selectsprite" style="overflow: hidden; width: 60px; height: 100px;">
                         <div style="position: relative; height: 100%">
 
-                            <img src="images_schoolfight/Character_spriteSheet.png" style="position: absolute; top: 0px; left: -42px;">
+                            <img src="images_schoolfight/Character_spriteSheet.png" alt="spritesheet" style="position: absolute; top: 0; left: -42px;">
                         </div>
 
                     </div>
@@ -256,15 +263,18 @@
                 <div>
                     <div class="selectsprite" style="overflow: hidden; width: 60px; height: 100px;">
                         <div style="position: relative; height: 100%">
-                            <img src="images_schoolfight/Character_spriteSheet.png" style="position: absolute; top: -105px; left: -42px;">
+                            <img src="images_schoolfight/Character_spriteSheet.png" alt="spritesheet" style="position: absolute; top: -105px; left: -42px;">
                         </div>
                     </div>
                 </div>
                 <div>
                     <div class="selectsprite" style="overflow: hidden; width: 60px; height: 100px;">
                         <div style="position: relative; height: 100%">
-                            <img src="images_schoolfight/Character_spriteSheet.png"
-                                style="position: absolute; top: -215px; left: -42px;">
+                            <img
+                                src="images_schoolfight/Character_spriteSheet.png"
+                                style="position: absolute; top: -215px; left: -42px;"
+                                alt="spritesheet"
+                            >
                         </div>
                     </div>
                 </div>
@@ -279,7 +289,7 @@
                     <br>
                     Assholiness: 8
                     <br>
-                    <button class="add-button" character="normie">Add</button>
+                    <button class="add-button" data-character="normie">Add</button>
                 </div>
                 <div class="desc-box">
                     Class: Weirdo
@@ -292,7 +302,7 @@
                     <br>
                     Assholiness: 6
                     <br>
-                    <button class="add-button" character="weirdo">Add</button>
+                    <button class="add-button" data-character="weirdo">Add</button>
                 </div>
                 <div class="desc-box">
                     Class: Teacher
@@ -305,7 +315,7 @@
                     <br>
                     Assholiness: 34
                     <br>
-                    <button class="add-button" character="teacher">Add</button>
+                    <button class="add-button" data-character="teacher">Add</button>
                 </div>
             </div>
             
@@ -410,19 +420,22 @@
             <div id="char3" class="sprite-container left-party alive" style="top: 150px;left:150px">
                 <div class="overflow-wrapper" style="overflow: hidden;height:100px;width:60px;display: inline-block">
                     <div style="position: relative; height: 100%">
-                        <img id="char3-sprite" class="player-sprite" src="images_schoolfight/Character_spriteSheet.png"
-                            style="position: absolute; top: -425px; left: -42px;z-index: 0">
+                        <img
+                            id="char3-sprite" class="player-sprite" src="images_schoolfight/Character_spriteSheet.png"
+                            style="position: absolute; top: -425px; left: -42px;z-index: 0"
+                            alt="spritesheet"
+                        >
                     </div>
 
                 </div>
                 <div class="buttons-wrapper">
-                    <button class="buttons-char3 buttons-char" partymember="2" type="strength" char="3"><i
+                    <button class="buttons-char3 buttons-char" data-partymember="2" data-type="strength" data-char="3"><i
                             class="fas fa-hand-rock"><span></span></i></button>
-                    <button class="buttons-char3 buttons-char" partymember="2" type="intelligence" char="3"><i
+                    <button class="buttons-char3 buttons-char" data-partymember="2" data-type="intelligence" data-char="3"><i
                             class="fas fa-glasses"><span></span></i></button>
-                    <button class="buttons-char3 buttons-char" partymember="2" type="assholiness" char="3"><i
+                    <button class="buttons-char3 buttons-char" data-partymember="2" data-type="assholiness" data-char="3"><i
                             class="fas fa-hand-middle-finger"><span></span></i></button>
-                    <button class="buttons-char3 buttons-char" partymember="2" type="" char="3" index="2"><i
+                    <button class="buttons-char3 buttons-char" data-partymember="2" data-type="" data-char="3" data-index="2"><i
                             class="fas fa-shield-alt"></i></button>
                 </div>
 
@@ -431,59 +444,83 @@
             <div id="char2" class="sprite-container left-party alive" style="top: 175px;left:100px">
                 <div class="overflow-wrapper" style="overflow: hidden;height:100px;width:60px;display: inline-block">
                     <div style="position: relative; height: 100%">
-                        <img id="char2-sprite" class="player-sprite" src="images_schoolfight/Character_spriteSheet.png" style="position: absolute;">
+                        <img
+                            id="char2-sprite" class="player-sprite"
+                            src="images_schoolfight/Character_spriteSheet.png"
+                            style="position: absolute;"
+                            alt="spritesheet"
+                        >
                     </div>
                 </div>
                 <div class="buttons-wrapper">
-                    <button class="buttons-char2 buttons-char" partymember="1" type="strength" char="2"><i
+                    <button class="buttons-char2 buttons-char" data-partymember="1" data-type="strength" data-char="2"><i
                             class="fas fa-hand-rock"><span></span></i></button>
-                    <button class="buttons-char2 buttons-char" partymember="1" type="intelligence" char="2"><i
+                    <button class="buttons-char2 buttons-char" data-partymember="1" data-type="intelligence" data-char="2"><i
                             class="fas fa-glasses"><span></span></i></button>
-                    <button class="buttons-char2 buttons-char" partymember="1" type="assholiness" char="2"><i
+                    <button class="buttons-char2 buttons-char" data-partymember="1" data-type="assholiness" data-char="2"><i
                             class="fas fa-hand-middle-finger"><span></span></i></button>
-                    <button class="buttons-char2 buttons-char" partymember="1" type="" char="2" index="1"><i
+                    <button class="buttons-char2 buttons-char" data-partymember="1" data-type="" data-char="2" data-index="1"><i
                             class="fas fa-shield-alt"></i></button>
                 </div>
             </div>
             <div id="char1" class="sprite-container left-party alive" style="top: 200px;left:50px">
                 <div class="overflow-wrapper" style="overflow: hidden;height:100px;width:60px;display: inline-block">
                     <div id="buttons-char1" style="position: relative; height: 100%">
-                        <img id="char1-sprite" class="player-sprite" src="images_schoolfight/Character_spriteSheet.png"
-                            style="position: absolute; top: -425px; left: -340px;">
+                        <img
+                            id="char1-sprite"
+                            class="player-sprite"
+                            src="images_schoolfight/Character_spriteSheet.png"
+                            style="position: absolute; top: -425px; left: -340px;"
+                            alt="spritesheet"
+                        >
                     </div>
                 </div>
                 <div class="buttons-wrapper">
-                    <button class="buttons-char1 buttons-char" partymember="0" type="strength" char="1"><i
+                    <button class="buttons-char1 buttons-char" data-partymember="0" data-type="strength" data-char="1"><i
                             class="fas fa-hand-rock"><span></span></i></button>
-                    <button class="buttons-char1 buttons-char" partymember="0" type="intelligence" char="1"><i
+                    <button class="buttons-char1 buttons-char" data-partymember="0" data-type="intelligence" data-char="1"><i
                             class="fas fa-glasses"><span></span></i></button>
-                    <button class="buttons-char1 buttons-char" partymember="0" type="assholiness" char="1"><i
+                    <button class="buttons-char1 buttons-char" data-partymember="0" data-type="assholiness" data-char="1"><i
                             class="fas fa-hand-middle-finger"><span></span></i></button>
-                    <button class="buttons-char1 buttons-char" partymember="0" type="" char="1" index="0"><i
+                    <button class="buttons-char1 buttons-char" data-partymember="0" data-type="" data-char="1" data-index="0"><i
                             class="fas fa-shield-alt"><span></span></i></button>
                 </div>
             </div>
-            <div id="enemy1" class="sprite-container right-party alive" enemy="0"
+            <div id="enemy1" class="sprite-container right-party alive" data-enemy="0"
                 style="position: absolute; top: 150px; left: 340px; overflow: hidden; width: 60px; height: 100px; transform: scaleX(-1);">
                 <div style="position: relative; height: 100%">
-                    <img id="enemy1-sprite" class="enemy-sprite" src="images_schoolfight/Character_spriteSheet.png"
-                        style="position: absolute; top: -425px; left: -40px;">
+                    <img
+                        id="enemy1-sprite"
+                        class="enemy-sprite"
+                        src="images_schoolfight/Character_spriteSheet.png"
+                        style="position: absolute; top: -425px; left: -40px;"
+                        alt="spritesheet"
+                    >
                 </div>
             </div>
 
-            <div id="enemy2" class="sprite-container right-party alive" enemy="1"
+            <div id="enemy2" class="sprite-container right-party alive" data-enemy="1"
                 style="position: absolute; top: 175px; left: 390px; overflow: hidden; width: 60px; height: 100px; transform: scaleX(-1);">
                 <div style="position: relative; height: 100%">
-                    <img id="enemy2-sprite" class="enemy-sprite" src="images_schoolfight/Character_spriteSheet.png"
-                        style="position: absolute; top: -320px; left: -40px;">
+                    <img
+                        id="enemy2-sprite"
+                        class="enemy-sprite"
+                        src="images_schoolfight/Character_spriteSheet.png"
+                        style="position: absolute; top: -320px; left: -40px;"
+                        alt="spritesheet"
+                    >
                 </div>
             </div>
 
-            <div id="enemy3" class="sprite-container right-party alive enemy3" enemy="2"
+            <div id="enemy3" class="sprite-container right-party alive enemy3" data-enemy="2"
                 style="position: absolute; top: 200px; left: 440px; overflow: hidden; width: 60px; height: 100px; transform: scaleX(-1);">
                 <div style="position: relative; height: 100%">
-                    <img id="enemy3-sprite" class="enemy-sprite" src="images_schoolfight/Character_spriteSheet.png"
-                        style="position: absolute; top: -425px; left: -340px;">
+                    <img
+                        id="enemy3-sprite"
+                        class="enemy-sprite"
+                        src="images_schoolfight/Character_spriteSheet.png"
+                        style="position: absolute; top: -425px; left: -340px;"
+                        alt="spritesheet">
                 </div>
             </div>
 
@@ -499,8 +536,11 @@
                 <div id="box"
                     style="width: 60px; height: 100px; background: transparent; position: absolute; left: 255px; top: 170px; transition: .4s; z-index: 2">
                     <div id="character-wrapper" style="position: relative; height:100%; width: 100%;overflow:hidden">
-                        <img id="rope-sprite" src="images_schoolfight/Character_spriteSheet.png"
-                            style="position: absolute; top: -320px; left: -42px;">
+                        <img
+                            id="rope-sprite"
+                            src="images_schoolfight/Character_spriteSheet.png"
+                            style="position: absolute; top: -320px; left: -42px;"
+                            alt="spritesheet">
                     </div>
                 </div>
                 <div id="girl-left"
@@ -508,8 +548,12 @@
                     <div id="girl-wrapper" style="position: relative; height:100%; width: 100%;overflow:hidden">
                         <div id="character-wrapper"
                             style="position: relative; height:100%; width: 100%;overflow:hidden">
-                            <img id="girl-sprite" src="images_schoolfight/Character_spriteSheet.png"
-                                style="position: absolute; top: -532px; left: -42px;">
+                            <img
+                                id="girl-sprite"
+                                src="images_schoolfight/Character_spriteSheet.png"
+                                style="position: absolute; top: -532px; left: -42px;"
+                                alt="spritesheet"
+                            >
                         </div>
                     </div>
                 </div>
@@ -518,8 +562,12 @@
                     <div id="girl-wrapper" style="position: relative; height:100%; width: 100%;overflow:hidden">
                         <div id="character-wrapper"
                             style="position: relative; height:100%; width: 100%;overflow:hidden">
-                            <img id="girl-sprite" src="images_schoolfight/Character_spriteSheet.png"
-                                style="position: absolute; top: -532px; left: -42px;">
+                            <img
+                                id="girl-sprite"
+                                src="images_schoolfight/Character_spriteSheet.png"
+                                style="position: absolute; top: -532px; left: -42px;"
+                                alt="spritesheet"
+                            >
                         </div>
                     </div>
                 </div>
