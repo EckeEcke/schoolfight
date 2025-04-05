@@ -368,7 +368,10 @@ document.addEventListener('DOMContentLoaded', () => {
         [new Character(characters.dummy), new Character(characters.dummy), new Character(characters.dummy)], //6 (running)
         [new Character(characters.richkid), new Character(characters.richkid), new Character(characters.richkid)],  //6
         [new Character(characters.nerd), new Character(characters.nerd), new Character(characters.nerd)], //7
-        [new Character(characters[lastVictoryTeam[0]]), new Character(characters[lastVictoryTeam[1]]), new Character(characters[lastVictoryTeam[2]])], //8
+        [
+            new Character(characters[lastVictoryTeam[0].toLowerCase()]),
+            new Character(characters[lastVictoryTeam[1].toLowerCase()]),
+            new Character(characters[lastVictoryTeam[2].toLowerCase()])], //8
     ]
 
     const teacherTeam = [
@@ -402,7 +405,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ["You think you still got what it takes?", "Show us your moves. ROPE SKIP FIGHT!"],
         ["We still dont like sports...", "And we don't like old farts like YOU!"],
         ["If police sees the two of us...", "you might get ARRESTED! 😈"],
-        ["What are you doing here?! This is a private school!", "You are not wealthy and classy enough to be here."],
+        ["What are you doing here?! This is a private school!", "You are way too old and poor to be here."],
         ["Last time our calculations were incorrect.", "But this time we used quantum computing!"],
         ["How dare you coming back here?!", "Whatever, we will beat you up once again!"]
     ]
@@ -421,6 +424,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const nextRoundTemplate = `You won! <br><br><br><br> <button id="next-button">Next round</button>`
     const victoryTemplate = `Congratulations! <br> You are king of school!<br><br><br><br> <button id="refresh-button" onclick="location.reload()">Play again</button>`
+    const victoryTemplateTeacher = `Congratulations! <br> You got your revenge!<br><br><br><br> <button id="refresh-button" onclick="location.reload()">Play again</button>`
     const gameOverTemplate = `You lost...!? <br><br><br><br> <button id="refresh-button" onclick="location.reload()">Try again</button>`
 
       /**
@@ -1353,7 +1357,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 cheerSound.play()
             }, 500)
             showConfetti()
-            titleSelect.innerHTML = victoryTemplate
+            titleSelect.innerHTML = isTeacherMode ? victoryTemplateTeacher : victoryTemplate
         }, 2600)
     }
 
