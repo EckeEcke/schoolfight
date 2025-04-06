@@ -426,6 +426,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const victoryTemplate = `Congratulations! <br> You are king of school!<br><br><br><br> <button id="refresh-button" onclick="location.reload()">Play again</button>`
     const victoryTemplateTeacher = `Congratulations! <br> You got your revenge!<br><br><br><br> <button id="refresh-button" onclick="location.reload()">Play again</button>`
     const gameOverTemplate = `You lost...!? <br><br><br><br> <button id="refresh-button" onclick="location.reload()">Try again</button>`
+    const bombMessageTemplate = "<span style='color:limegreen'>Stink bomb</span>!<br>Enemies take 30% <span style='color:red'>damage</span>!"
+    const additionalBombMessageTemplate = `${bombIcon}<span style='color:limegreen'>+1</span>`
+    const snackMessageTemplate = `You had a <span style='color: orange'>snack</span>!<br>30% <span style='color:lightblue'>health</span> recovered`
+    const additionalSnackMessageTemplate = `${snackIcon}<span style='color:limegreen'>+1</span>`
 
     const tutorialPage1template = `<h2>How to play</h2>
             <p>
@@ -962,7 +966,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showPlayerspritesTeacher()
         showEnemysprites()
         showDialogue = true
-        bombButton.innerHTML = `<i class="fas fa-bomb"></i>x${bombs}`
+        bombButton.innerHTML = `${bombIcon}x${bombs}`
         itemButton.innerHTML = `${snackIcon}x${snacks}`
     }
 
@@ -1381,10 +1385,10 @@ document.addEventListener('DOMContentLoaded', () => {
         snacks += 1
         setTimeout(()=> itemBox.style.display = 'block', 2500)
         bombButton.setAttribute('disabled', true)
-        bombButton.innerHTML = `<i class="fas fa-bomb"></i><span style='color:limegreen'>+1</span>`
+        bombButton.innerHTML = additionalBombMessageTemplate
         bombButtonWrapper.classList.add('animated-text')
         itemButton.setAttribute('disabled', true)
-        itemButton.innerHTML = `${snackIcon}<span style='color:limegreen'>+1</span>`
+        itemButton.innerHTML = additionalSnackMessageTemplate
         itemButtonWrapper.classList.add('animated-text')
         setTimeout(()=>{
             hide(itemBox)
@@ -1650,7 +1654,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(()=>{ 
             aliveLeftParty.forEach(element => element.classList.remove('eating-snack'))
         },1000)
-        battleTicker.innerHTML = `You had a <span style='color: orange'>snack</span>!<br>30% <span style='color:lightblue'>health</span> recovered`
+        battleTicker.innerHTML = snackMessageTemplate
         battleTicker.style.display = 'block'
         eatingSound.play()
         hide(itemBox)
@@ -1670,7 +1674,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (bombs <= 0 || enemyParty.length === 0) return
         itemsUsed += 1
         itemUsed = true
-        battleTicker.innerHTML = "<span style='color:limegreen'>Stink bomb</span>!<br>Enemies take 30% <span style='color:red'>damage</span>!" 
+        battleTicker.innerHTML = bombMessageTemplate
         battleTicker.style.display = 'block' 
         
         showBomb()
