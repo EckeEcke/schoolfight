@@ -427,6 +427,40 @@ document.addEventListener('DOMContentLoaded', () => {
     const victoryTemplateTeacher = `Congratulations! <br> You got your revenge!<br><br><br><br> <button id="refresh-button" onclick="location.reload()">Play again</button>`
     const gameOverTemplate = `You lost...!? <br><br><br><br> <button id="refresh-button" onclick="location.reload()">Try again</button>`
 
+    const tutorialPage1template = `<h2>How to play</h2>
+            <p>
+                Every kid has three stats: ${strengthIcon} strength, ${intelligenceIcon}
+                intelligence and ${assholinessIcon} assholiness.
+            </p>
+            <p>
+                ${strengthIcon} Strength:
+                <br> 
+                good against type ${intelligenceIcon}, weak against high ${assholinessIcon} stat. 
+            </p>
+            <p>
+                ${intelligenceIcon} Intelligence: 
+                good against type ${assholinessIcon}, weak against high ${strengthIcon} stat.
+            </p>
+            <p>
+                ${assholinessIcon} Assholiness:
+                <br> 
+                strong against type ${strengthIcon}, weak against high ${intelligenceIcon} stat.
+            </p>
+            <p>
+                ${shieldIcon} Defend: 
+                <br>
+                this character only takes half damage that turn, but won't attack.
+            </p>
+            <button id="back-button">Back</button>
+            <button id="toggle-tutorial-button">More</button>`
+
+    const tutorialPage2template = `<img src="./images_schoolfight/tutorial.png" alt="tutorial" style="width: 100%">
+            <div class="tutorial-info" style="top: 138px; left: 90px;"><div>1. Click your character</div></div>
+            <div class="tutorial-info" style="top: 25px; left: 130px; animation-delay: 4s"><div>2. Choose attack type</div></div>
+            <div class="tutorial-info" style="top: 135px; left: 328px;animation-delay: 8s"><div>3. Choose target</div></div>
+            <button id="back-button">Back</button>
+            <button id="toggle-tutorial-button">More</button>`
+
       /**
      * 
      * Trophies
@@ -831,40 +865,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function switchTutorialPage() {
         showFirstPageTutorial = !showFirstPageTutorial
-        tutorialScreen.innerHTML = showFirstPageTutorial ? 
-            `<h2>How to play</h2>
-            <p>
-                Every kid has three stats: ${strengthIcon} strength, ${intelligenceIcon}
-                intelligence and ${assholinessIcon} assholiness.
-            </p>
-            <p>
-                ${strengthIcon} Strength:
-                <br> 
-                good against type ${intelligenceIcon}, weak against high ${assholinessIcon} stat. 
-            </p>
-            <p>
-                ${intelligenceIcon} Intelligence: 
-                good against type ${assholinessIcon}, weak against high ${strengthIcon} stat.
-            </p>
-            <p>
-                ${assholinessIcon} Assholiness:
-                <br> 
-                strong against type ${strengthIcon}, weak against high ${intelligenceIcon} stat.
-            </p>
-            <p>
-                ${shieldIcon} Defend: 
-                <br>
-                this character only takes half damage that turn, but won't attack.
-            </p>
-            <button id="back-button">Back</button>
-            <button id="toggle-tutorial-button">More</button>`
-        :
-            `<img src="../images_schoolfight/tutorial.png" alt="tutorial" style="width: 100%">
-            <div class="tutorial-info" style="top: 138px; left: 90px;"><div>1. Click your character</div></div>
-            <div class="tutorial-info" style="top: 25px; left: 130px; animation-delay: 4s"><div>2. Choose attack type</div></div>
-            <div class="tutorial-info" style="top: 135px; left: 328px;animation-delay: 8s"><div>3. Choose target</div></div>
-            <button id="back-button">Back</button>
-            <button id="toggle-tutorial-button">More</button>`
+        tutorialScreen.innerHTML = showFirstPageTutorial ? tutorialPage1template : tutorialPage2template
     }
 
     dialogueBoxWrapper.addEventListener('click', nextDialogue)
