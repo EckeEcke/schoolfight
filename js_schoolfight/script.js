@@ -285,6 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     let fightAnimationRunning = false
+    let bombAnimationRunning = false
 
     /**
      * 
@@ -970,15 +971,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showButtons(event) {
-        if (!showDialogue && !fightAnimationRunning && !disableAttackButtons) {
-            const element = event.currentTarget
-            if (game.isTeacherMode && (element.id === 'char1' || element.id === 'char3')) return
-            hide(battleTicker)
-            Array.from(document.getElementsByClassName('left-party')).forEach(element => {
-                element.classList.remove('open')
-            })
-            element.classList.toggle('open')
-        }
+        if (showDialogue || fightAnimationRunning || disableAttackButtons || bombAnimationRunning) return
+        
+        const element = event.currentTarget
+        if (game.isTeacherMode && (element.id === 'char1' || element.id === 'char3')) return
+        hide(battleTicker)
+        Array.from(document.getElementsByClassName('left-party')).forEach(element => {
+            element.classList.remove('open')
+        })
+        element.classList.toggle('open')
     }
 
     function selectChar(event) {
@@ -1806,6 +1807,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function runBombAnimation(){
+        bombAnimationRunning = true
         bombContainerWrapper.style.display = 'block'
         for (let i = 0; i < 100; i++) {
             const cloud = document.createElement('div')
@@ -1829,6 +1831,7 @@ document.addEventListener('DOMContentLoaded', () => {
             })
         },3500)
         setTimeout(()=>{
+            bombAnimationRunning = false
             hide(bombContainerWrapper)
         },7000)
     }
