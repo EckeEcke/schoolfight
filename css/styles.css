@@ -40,6 +40,45 @@ article {
     background-repeat: no-repeat;
 }
 
+#shop {
+    background-image: url("../images_schoolfight/backgroundShop.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: 100%;
+}
+
+#upgrade-message-wrapper {
+    position: absolute;
+    left: 50%;
+    bottom: 5%;
+    z-index: 12;
+}
+
+.upgrade-message {
+    transform: translateX(-50%);
+    color: limegreen;
+    text-shadow: 1px 1px black;
+    font-size: 24px;
+}
+
+#money {
+    color: white;
+    font-size:24px;
+    border:none;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+}
+
+#money.animated-text {
+    color: green;
+}
+
+#current-amount-money {
+    color: white;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+    text-align: center;
+    padding-top: 16px;
+}
+
 .hidden {
     display: none;
 }
@@ -66,18 +105,18 @@ article {
 }
 
 .trophy-message {
-    display: none;
+    display: flex;
     align-items: center;
     gap: 8px;
     justify-content: flex-start;
-    background: rgb(0, 0, 0, .6);
+    background: rgba(0, 0, 0, .6);
     width: 160px;
     border-bottom-left-radius: 8px;
     border-top-left-radius: 8px;
     padding: 4px;
     font-size: 12px!important;
     margin-right: -180px;
-    transition: all 0.3s linear;
+    animation: slideIn 0.3s ease-out forwards;
 }
 
 .trophy-message .trophy-icon-wrapper {
@@ -402,14 +441,15 @@ article {
 }
 
 #next-button,
-#refresh-button {
+#refresh-button,
+#open-shop-button {
     border: 2px solid white;
-    position: absolute;
+    position: fixed;
     width: 140px;
     left: 0;
     right: 0;
     margin: 0 auto;
-    top: 90%;
+    top: 40%;
     background: orange;
     color: white;
     font-size: 16px;
@@ -418,8 +458,13 @@ article {
     z-index: 99;
 }
 
+#open-shop-button {
+    top: 60%;
+}
+
 #next-button:hover,
 #refresh-button:hover,
+#open-shop-button:hover,
 .selectscreen-button:hover {
     transform: scale(1.1);
 }
@@ -567,14 +612,69 @@ cursor: pointer;
     animation: moveCharacters2 2.5s normal forwards
 }
 
-.selectsprite {
+.select-sprite {
     animation: selectscreen-animation 2.5s infinite;
     margin: 0 auto;
 }
 
+#money-placeholder {
+    font-size: 16px;
+    color: limegreen;
+}
+
+.shop-sprite {
+    position: absolute;
+    bottom: -10%;
+    left: 30%;
+    zoom: 1.2;
+}
+
+.shop-buttons-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    padding: 16px;
+}
+
+.shop-buttons-wrapper * {
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+}
+
+.shop-buttons-wrapper button {
+    background: orange;
+    border: 2px solid white;
+    border-radius: 8px;
+    color: white;
+    padding: 4px;
+    transition: 0.3s;
+    position: relative;
+}
+
+.shop-buttons-wrapper button span {
+    position: absolute;
+    top: -10px;
+    right: 0;
+    background: limegreen;
+    padding: 8px;
+    border-radius: 50%;
+    border: 1px solid white;
+    transform: rotate(20deg);
+}
+
+.shop-buttons-wrapper button:hover {
+    cursor: pointer;
+    background: rgb(255, 123, 0);
+    opacity: 1;
+    transform: scale(1.02)
+}
+
+.shop-buttons-wrapper button:disabled {
+    opacity: 0.6;
+}
+
 #battle-ticker,
 #dialogue-box-wrapper {
-    opacity: 0;
+    display: none;
     transition: .5s;
     position: absolute;
     top: 3%;
@@ -587,11 +687,6 @@ cursor: pointer;
     border-radius: 8px;
     font-size: .8rem;
     z-index: 11;
-}
-
-#battle-ticker {
-    opacity: 1;
-    display: none;
 }
 
 #dialogue-box-wrapper {
@@ -627,6 +722,33 @@ cursor: pointer;
     font-size: 20px;
     animation: dialogue-animation 1s infinite;
     z-index: 1;
+}
+
+#shop-dialogue-box-wrapper {
+    position: absolute;
+    bottom: 25%;
+    width: 40%;
+    right: 15%;
+    background: white;
+    min-height: 10%;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: .8rem;
+    z-index: 11;
+    color: black;
+}
+
+#shop-dialogue-box-triangle {
+    position: absolute;
+    bottom: -30px;
+    left: 5%;
+    width: 0;
+    height: 0;
+    border-left: 25px solid transparent;
+    border-right: 25px solid transparent;
+    border-top: 50px solid white;
+    transform: rotate(37deg);
+    z-index: -1;
 }
 
 .text-enemy {
@@ -699,6 +821,10 @@ button,
 cursor: pointer;
 }
 
+#item-button-wrapper {
+    z-index: 1;
+}
+
 .bombcloud {
     animation: risingCloud 2s;
     animation-direction: reverse;
@@ -723,7 +849,16 @@ cursor: pointer;
     animation: thrownBombY 1.5s forwards ease-in-out;
 }
 
-#itembox div button:hover {
+#item-box {
+    position: absolute;
+    bottom: 8px;
+    width: 100%;
+    gap: 16px;
+    justify-content: center;
+    align-items: center;
+}
+
+#item-box div button:hover {
     color: orange!important;
     transform: scale(1.1)
 }
@@ -1225,5 +1360,14 @@ cursor: pointer;
     }
     100% {
         transform: scale(1) rotate(0deg)
+    }
+}
+
+@keyframes slideIn {
+    0% {
+        margin-right: -180px;
+    }
+    100% {
+        margin-right: 0;
     }
 }

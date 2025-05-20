@@ -1,13 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
-
-    
     /**
-     * 
+     *
      * UI variables
-     * 
+     *
      */
 
-    let battleMessages = []
+    const canvas = document.getElementById("canvas")
+    const ctx = canvas.getContext("2d")
 
     const strengthIcon = "<i class='fas fa-hand-rock'></i>"
     const assholinessIcon = "<i class='fas fa-hand-middle-finger'></i>"
@@ -20,12 +19,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const titleButton = document.getElementById('title-button')
     const howToPlayButton = document.getElementById('how-to-play-button')
     const vendettaButton = document.getElementById('vendetta-button')
-    const battleTicker = document.getElementById('battle-ticker') 
+    const battleTicker = document.getElementById('battle-ticker')
     const bombButton = document.getElementById('bomb-button')
-    const bombButtonWrapper = document.getElementById('bomb-button-wrapper') 
+    const bombButtonWrapper = document.getElementById('bomb-button-wrapper')
     const bombContainer = document.getElementById('bomb-container')
-    const bombContainerWrapper = document.getElementById('bomb-container-wrapper') 
-    const itemBox = document.getElementById('itembox')
+    const bombContainerWrapper = document.getElementById('bomb-container-wrapper')
+    const itemBox = document.getElementById('item-box')
     const itemButtonWrapper = document.getElementById('item-button-wrapper')
     const itemButton = document.getElementById('item-button')
     const enemyRunning = document.getElementById('enemy-running')
@@ -39,8 +38,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const dialogueBox = document.getElementById("dialogue-box")
     const box = document.getElementById('box')
     const tutorialScreen = document.getElementById('tutorial-screen')
-    const girlLeft = document.getElementById('girl-left')
-    const girlRight = document.getElementById('girl-right')
     const overlay = document.getElementById('overlay')
     const clickOverlay = document.getElementById('click-overlay')
     const backgroundElement = document.getElementById("background")
@@ -50,21 +47,113 @@ document.addEventListener('DOMContentLoaded', () => {
     const char2 = document.getElementById('char2')
     const char3 = document.getElementById('char3')
     const runningSprite = document.getElementById('running-sprite')
-    const beatenGameTrophyElement = document.getElementById('trophy-beaten')
-    const itemlessTrophyElement = document.getElementById('itemless')
-    const sixItemsTrophyElement = document.getElementById('six-items')
-    const allStrengthTrophyElement = document.getElementById('all-strength')
-    const allIntelligenceTrophyElement = document.getElementById('all-intelligence')
-    const allAssholesTrophyElement = document.getElementById('all-assholes')
     const displayTrophiesButton = document.getElementById('trophies-button')
     const trophiesScreen = document.getElementById('trophies')
     const soundControlButton = document.getElementById('sound-control-button')
+
+    /**
+     *
+     * HTML Templates
+     *
+     */
+
+    const nextRoundTemplate = `You won! <br><br><button id="next-button">Next round</button><div id="money-placeholder" class="animated-text"></div><button id="open-shop-button">Go to Shop</button>`
+    const victoryTemplate = `Congratulations! <br> You are king of school!<br><br><br><br> <button id="refresh-button" onclick="location.reload()">Play again</button>`
+    const victoryTemplateTeacher = `Congratulations! <br> You got your revenge!<br><br><br><br> <button id="refresh-button" onclick="location.reload()">Play again</button>`
+    const gameOverTemplate = `You lost...!? <br><br><br><br> <button id="refresh-button" onclick="location.reload()">Try again</button>`
+    const bombMessageTemplate = "<span style='color:limegreen'>Stink bomb</span>!<br>Enemies take 30% <span style='color:red'>damage</span>!"
+    const additionalBombMessageTemplate = `${bombIcon}<span style='color:limegreen'>+1</span>`
+    const snackMessageTemplate = `You had a <span style='color: orange'>snack</span>!<br>30% <span style='color:lightblue'>health</span> recovered`
+    const additionalSnackMessageTemplate = `${snackIcon}<span style='color:limegreen'>+1</span>`
+
+    const tutorialPage1template = `<h2>How to play</h2>
+            <p>
+                Every kid has three stats: ${strengthIcon} strength, ${intelligenceIcon}
+                intelligence and ${assholinessIcon} assholiness.
+            </p>
+            <p>
+                ${strengthIcon} Strength:
+                <br> 
+                good against type ${intelligenceIcon}, weak against high ${assholinessIcon} stat. 
+            </p>
+            <p>
+                ${intelligenceIcon} Intelligence: 
+                good against type ${assholinessIcon}, weak against high ${strengthIcon} stat.
+            </p>
+            <p>
+                ${assholinessIcon} Assholiness:
+                <br>
+                strong against type ${strengthIcon}, weak against high ${intelligenceIcon} stat.
+            </p>
+            <p>
+                ${shieldIcon} Defend: 
+                <br>
+                this character only takes half damage that turn, but won't attack.
+            </p>
+            <button id="back-button">Back</button>
+            <button id="toggle-tutorial-button">More</button>`
+
+    const tutorialPage2template = `<img src="./images_schoolfight/tutorial.png" alt="tutorial" style="width: 100%">
+            <div class="tutorial-info" style="top: 138px; left: 90px;"><div>1. Click your character</div></div>
+            <div class="tutorial-info" style="top: 25px; left: 130px; animation-delay: 4s"><div>2. Choose attack type</div></div>
+            <div class="tutorial-info" style="top: 135px; left: 328px;animation-delay: 8s"><div>3. Choose target</div></div>
+            <button id="back-button">Back</button>
+            <button id="toggle-tutorial-button">More</button>`
+
+    /**
+     *
+     * Sounds
+     *
+    */
+
+    const sounds = {
+        confirm: new Audio('sounds_schoolfight/confirm.wav'),
+        schoolBell: new Audio('sounds_schoolfight/schoolbell.wav'),
+        music: new Audio('sounds_schoolfight/music.mp3'),
+        fail: new Audio('sounds_schoolfight/wrong.wav'),
+        steps: new Audio('sounds_schoolfight/steps.wav'),
+        fight: new Audio('sounds_schoolfight/fight.mp3'),
+        fade: new Audio('sounds_schoolfight/fade.wav'),
+        punch: new Audio('sounds_schoolfight/punches.wav'),
+        deathCry: new Audio('sounds_schoolfight/deathcry.wav'),
+        deathCry2: new Audio('sounds_schoolfight/deathcry2.wav'),
+        click: new Audio('sounds_schoolfight/clicksound.wav'),
+        girl: new Audio('sounds_schoolfight/girlcry.mp3'),
+        evilLaugh: new Audio('sounds_schoolfight/evil-laugh.wav'),
+        victory: new Audio('sounds_schoolfight/victory.mp3'),
+        bossMusic: new Audio('sounds_schoolfight/bossmusic.wav'),
+        jump: new Audio('sounds_schoolfight/jump.wav'),
+        stink: new Audio('sounds_schoolfight/stinksound.wav'),
+        eating: new Audio('sounds_schoolfight/eating.wav'),
+        cheer: new Audio('sounds_schoolfight/cheer.wav'),
+        clap: new Audio('sounds_schoolfight/clap.wav'),
+        scream: new Audio('sounds_schoolfight/scream.mp3'),
+        laugh: new Audio('sounds_schoolfight/laugh.wav'),
+        trophy: new Audio('sounds_schoolfight/trophy unlocked.mp3'),
+        powerUp: new Audio('sounds_schoolfight/powerup.mp3'),
+    }
+
+    const allAudio = Object.values(sounds)
+
+    function toggleMute() {
+        game.soundMuted = !game.soundMuted
+        allAudio.forEach(audio => {
+            audio.muted = game.soundMuted
+        })
+        soundControlButton.innerHTML = game.soundMuted ? "<i class='fas fa-volume-mute'></i>" : "<i class='fas fa-volume-up'></i>"
+    }
+
+    soundControlButton.addEventListener('click', toggleMute)
 
      /**
      * 
      * Basic variables and functions
      * 
-     */
+     **/
+
+    if (!localStorage.getItem('trophies')) localStorage.setItem('trophies', JSON.stringify({}))
+    const trophiesFromStorage = localStorage.getItem('trophies')
+    const parsedTrophies = trophiesFromStorage ? JSON.parse(trophiesFromStorage) : undefined
 
     function adjustGameSize() { 
         const gameWrapper = document.getElementById("game-wrapper")
@@ -73,21 +162,12 @@ document.addEventListener('DOMContentLoaded', () => {
             gameWrapper.style.transform = `scale(${window.innerHeight * aspectRatio / 660})`
         } else { gameWrapper.style.transform = `scale(${window.innerWidth / 660})` 
     }}
+
     adjustGameSize()
+
     window.addEventListener("resize", adjustGameSize)
     window.addEventListener('fullscreenchange', adjustGameSize)
 
-    let showTutorial = false
-    let round = 0
-    const party = []
-    let moves = []
-    let playerTurn = true
-    let selectedChar = ""
-    let intSelector
-    let attackType
-    let displayedSelectScreenIndex = 0
-    const selectScreens = [selectScreen, selectScreen2, selectScreen3]
-    let lastMoveTeacher = "intelligence"
     const attackTypes = {
         strength: 'strength',
         intelligence: 'intelligence',
@@ -95,16 +175,120 @@ document.addEventListener('DOMContentLoaded', () => {
         allrounder: 'allrounder',
         teacher: 'teacher'
     }
-    let bombs = 1
-    let snacks = 1
-    let itemsReceived = 0
-    let survivalpoints = 0
 
-    let fightanimationRunning = false
+    const prices = {
+        item: 3,
+        upgrade: 2,
+    }
+
+    const gameStates = {
+        title: 'display title screen',
+        characterSelect: 'display character select screen',
+        dialogue: 'display dialogues',
+        selectTargets: 'select targets',
+        battleAnimation: 'battle animation is running',
+        bombAnimation: 'bomb animation running',
+        snackAnimation: 'snack animation running',
+        levelComplete: 'fade away to next level',
+        ropeSkip: 'rope skip minigame',
+        lockerRoom: 'locker room minigame',
+        gameOver: 'player lost',
+        victory: 'player won the game',
+    }
+
+    function updateGameState(newState) {
+        game.state = newState // currently not used
+    }
+
+    const game = {
+        state: gameStates.title,
+        round: 0,
+        player: {
+            party: [],
+            moves: [],
+            selectedChar: '',
+            selectedCharId: null,
+            selectedAttackType: '',
+        },
+        enemy: {
+            party: [],
+        },
+        items: {
+            bombs: 1,
+            snacks: 1,
+            received: 0,
+            money: 0,
+            moneyEarnedLastRound: 0,
+            moneyEarnedTotal: 0,
+        },
+        battleMessages: [],
+        messageIndex: 0,
+        itemUsed: false,
+        itemsUsed: 0,
+        isTeacherMode: false,
+        lastVictoryTeam: JSON.parse(localStorage.getItem('lastVictoryTeam')),
+        soundMuted: false,
+        showTutorial: false,
+        displayedSelectScreenIndex: 0,
+        lastMoveTeacher: 'intelligence',
+        miniGames: {
+            ropeSkip: {
+                moveRopeDownwards: false,
+                ropeY: 270,
+                skips: 0,
+                speed: 100,
+                characterJumps: false,
+                points: 0,
+                interval: null,
+            },
+            running: {
+                bg1Left: 0,
+                bg2Left: 313,
+                bg3Left: 616,
+                characterLeft: 100,
+                enemyLeft: 350,
+                moveBackgroundInterval: null,
+            }
+        },
+        trophies: {
+            beatenGame: {
+                unlocked: parsedTrophies && 'beatenGame' in parsedTrophies,
+                element: document.getElementById('trophy-beaten'),
+                message: 'Beaten the game',
+            },
+            allAssholes: {
+                unlocked: parsedTrophies && 'allAssholes' in parsedTrophies,
+                element: document.getElementById('all-assholes'),
+                message: 'All Assholes',
+            },
+            allStrength: {
+                unlocked: parsedTrophies && 'allStrength' in parsedTrophies,
+                element: document.getElementById('all-strength'),
+                message: 'All Strength',
+            },
+            allIntelligence: {
+                unlocked: parsedTrophies && 'allIntelligence' in parsedTrophies,
+                element: document.getElementById('all-intelligence'),
+                message: 'All Intelligence',
+            },
+            sixItems: {
+                unlocked: parsedTrophies && 'hasSixItems' in parsedTrophies,
+                element: document.getElementById('six-items'),
+                message: 'Use six items',
+            },
+            noItems: {
+                unlocked: parsedTrophies && 'hasNoItems' in parsedTrophies,
+                element: document.getElementById('itemless'),
+                message: 'Beat game without items',
+            },
+        }
+    }
+
+    let fightAnimationRunning = false
 
     /**
      * 
-     * Spritepositions
+     * Sprite positions
      * 
      */
 
@@ -156,78 +340,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /*
-     * 
-     * Sounds
-     * 
-     */
-
-    const confirmSound = new Audio("sounds_schoolfight/confirm.wav")
-    const schoolbell = new Audio("sounds_schoolfight/schoolbell.wav")
-    const music = new Audio("sounds_schoolfight/music.mp3")
-    const failSound = new Audio("sounds_schoolfight/wrong.wav")
-    const steps = new Audio("sounds_schoolfight/steps.wav")
-    const fightSound = new Audio("sounds_schoolfight/fight.mp3")
-    const fadeSound = new Audio("sounds_schoolfight/fade.wav")
-    const punchSounds = new Audio("sounds_schoolfight/punches.wav")
-    const deathcry = new Audio("sounds_schoolfight/deathcry.wav")
-    const deathcry2 = new Audio("sounds_schoolfight/deathcry2.wav")
-    const clicksound = new Audio("sounds_schoolfight/clicksound.wav")
-    const girlcry = new Audio("sounds_schoolfight/girlcry.mp3")
-    const evilLaugh = new Audio("sounds_schoolfight/evil-laugh.wav")
-    const victorySound = new Audio("sounds_schoolfight/victory.mp3")
-    const bossmusic = new Audio("sounds_schoolfight/bossmusic.wav")
-    const jumpSound = new Audio("sounds_schoolfight/jump.wav")
-    const stinkSound = new Audio("sounds_schoolfight/stinksound.wav")
-    const eatingSound = new Audio("sounds_schoolfight/eating.wav")
-    const cheerSound = new Audio("sounds_schoolfight/cheer.wav")
-    const clapSound = new Audio("sounds_schoolfight/clap.wav")
-    const screamSound = new Audio("sounds_schoolfight/scream.mp3")
-    const laughSound = new Audio("sounds_schoolfight/laugh.wav")
-    const trophySound = new Audio("sounds_schoolfight/trophy unlocked.mp3")
-
-    const allAudio = [ confirmSound, schoolbell, music, failSound, steps, fightSound, fadeSound, punchSounds, deathcry, deathcry2, clicksound, girlcry, evilLaugh, victorySound, bossmusic, jumpSound, stinkSound, eatingSound, cheerSound, clapSound, screamSound, laughSound, trophySound ]
-    let soundMuted = false
-    function toggleMute() { 
-        soundMuted = !soundMuted
-        allAudio.forEach(audio => { 
-            audio.muted = soundMuted
-        })
-        soundControlButton.innerHTML = soundMuted ? "<i class='fas fa-volume-mute'></i>" : "<i class='fas fa-volume-up'></i>"
-    }
-    
-    soundControlButton.addEventListener('click', toggleMute)
-
-    /*
-     * 
-     * Running Minigame variables
-     * 
-     */
-
-    let moveBackgroundInterval
-    let bg1Left = 0
-    let bg2Left = 313
-    let bg3Left = 616
-    const bgs = [bg1Left, bg2Left, bg3Left]
-    let characterLeft = 100
-    let enemyLeft = 350
-
-    /*
-     * 
-     * Ropeskip Minigame variables
-     * 
-     */
-
-    const canvas = document.getElementById("canvas")
-    const ctx = canvas.getContext("2d")
-    let moveRopeDownwards = false
-    let ropeY = 270
-    let skips = 0
-    let gamespeed = 100
-    let characterJumps = false
-    let points = 0
-    let ropeInterval
-
-    /*
     * 
     * Characters
     * 
@@ -247,7 +359,16 @@ document.addEventListener('DOMContentLoaded', () => {
         takeDamage(damage) {
             this.energy -= this.defends ? damage : damage * 2
             if (this.energy < 0) this.energy = 0
-        } 
+        }
+        eatSnack() {
+            if (this.energy <= 0) return
+            this.energy += 30
+            if (this.energy > 100) this.energy = 100
+        }
+        takeBombDamage() {
+            this.energy -= 30
+            if (this.energy < 0) this.energy = 0
+        }
     }
 
     const characters = {
@@ -341,12 +462,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    let enemyParty = []
-
-    const lastVictoryTeam = JSON.parse(localStorage.getItem('lastVictoryTeam'))
-
-    if (lastVictoryTeam && lastVictoryTeam.length >=1) vendettaButton.style.display = 'block'
-
     const setTeams = [
         [new Character(characters.bully), new Character(characters.nerd), new Character(characters.normie)], //1
         [new Character(characters.squealer), new Character(characters.wally), new Character(characters.richkid)], //2
@@ -369,9 +484,9 @@ document.addEventListener('DOMContentLoaded', () => {
         [new Character(characters.richkid), new Character(characters.richkid), new Character(characters.richkid)],  //6
         [new Character(characters.nerd), new Character(characters.nerd), new Character(characters.nerd)], //7
         [
-            new Character(characters[lastVictoryTeam[0].toLowerCase()]),
-            new Character(characters[lastVictoryTeam[1].toLowerCase()]),
-            new Character(characters[lastVictoryTeam[2].toLowerCase()])], //8
+            new Character(characters[game.lastVictoryTeam[0].toLowerCase()]),
+            new Character(characters[game.lastVictoryTeam[1].toLowerCase()]),
+            new Character(characters[game.lastVictoryTeam[2].toLowerCase()])], //8
     ]
 
     const teacherTeam = [
@@ -410,60 +525,8 @@ document.addEventListener('DOMContentLoaded', () => {
         ["How dare you coming back here?!", "Whatever, we will beat you up once again!"]
     ]
 
-    let isTeacherMode = false
-
     let showDialogue = false
-    let indexOfMessage = 0
     let disableAttackButtons = false
-
-    /**
-     * 
-     * HTML Templates
-     * 
-     */
-
-    const nextRoundTemplate = `You won! <br><br><br><br> <button id="next-button">Next round</button>`
-    const victoryTemplate = `Congratulations! <br> You are king of school!<br><br><br><br> <button id="refresh-button" onclick="location.reload()">Play again</button>`
-    const victoryTemplateTeacher = `Congratulations! <br> You got your revenge!<br><br><br><br> <button id="refresh-button" onclick="location.reload()">Play again</button>`
-    const gameOverTemplate = `You lost...!? <br><br><br><br> <button id="refresh-button" onclick="location.reload()">Try again</button>`
-    const bombMessageTemplate = "<span style='color:limegreen'>Stink bomb</span>!<br>Enemies take 30% <span style='color:red'>damage</span>!"
-    const additionalBombMessageTemplate = `${bombIcon}<span style='color:limegreen'>+1</span>`
-    const snackMessageTemplate = `You had a <span style='color: orange'>snack</span>!<br>30% <span style='color:lightblue'>health</span> recovered`
-    const additionalSnackMessageTemplate = `${snackIcon}<span style='color:limegreen'>+1</span>`
-
-    const tutorialPage1template = `<h2>How to play</h2>
-            <p>
-                Every kid has three stats: ${strengthIcon} strength, ${intelligenceIcon}
-                intelligence and ${assholinessIcon} assholiness.
-            </p>
-            <p>
-                ${strengthIcon} Strength:
-                <br> 
-                good against type ${intelligenceIcon}, weak against high ${assholinessIcon} stat. 
-            </p>
-            <p>
-                ${intelligenceIcon} Intelligence: 
-                good against type ${assholinessIcon}, weak against high ${strengthIcon} stat.
-            </p>
-            <p>
-                ${assholinessIcon} Assholiness:
-                <br> 
-                strong against type ${strengthIcon}, weak against high ${intelligenceIcon} stat.
-            </p>
-            <p>
-                ${shieldIcon} Defend: 
-                <br>
-                this character only takes half damage that turn, but won't attack.
-            </p>
-            <button id="back-button">Back</button>
-            <button id="toggle-tutorial-button">More</button>`
-
-    const tutorialPage2template = `<img src="./images_schoolfight/tutorial.png" alt="tutorial" style="width: 100%">
-            <div class="tutorial-info" style="top: 138px; left: 90px;"><div>1. Click your character</div></div>
-            <div class="tutorial-info" style="top: 25px; left: 130px; animation-delay: 4s"><div>2. Choose attack type</div></div>
-            <div class="tutorial-info" style="top: 135px; left: 328px;animation-delay: 8s"><div>3. Choose target</div></div>
-            <button id="back-button">Back</button>
-            <button id="toggle-tutorial-button">More</button>`
 
       /**
      * 
@@ -471,119 +534,71 @@ document.addEventListener('DOMContentLoaded', () => {
      * 
      */
 
-    function showTrophiesScreen () {
-        playSound(confirmSound)
-        show(trophiesScreen)
-        hide(titleButton)
-        hide(howToPlayButton)
-        hide(displayTrophiesButton)
-        hide(vendettaButton)
-        hide(title)
-    }
+    const allTrophies = Object.values(game.trophies)
 
-    displayTrophiesButton.addEventListener('click', showTrophiesScreen)
+    allTrophies.forEach(trophy => displayAlreadyUnlockedTrophy(trophy))
 
-    if (!localStorage.getItem('trophies')) localStorage.setItem('trophies', JSON.stringify({}))
-    const trophiesFromStorage = localStorage.getItem('trophies')
-    const parsedTrophies = trophiesFromStorage ? JSON.parse(trophiesFromStorage) : undefined
-    const hasBeatenGameTrophy = parsedTrophies && 'beatenGame' in parsedTrophies
-    const hasAllAssholesTrophy = parsedTrophies && 'allAssholes' in parsedTrophies
-    const hasAllStrengthTrophy = parsedTrophies && 'allStrength' in parsedTrophies
-    const hasAllIntelligenceTrophy = parsedTrophies && 'allIntelligence' in parsedTrophies
-    const hasSixItemsTrophy = parsedTrophies && 'hasSixItems' in parsedTrophies
-    const hasNoItemsTrophy = parsedTrophies && 'hasNoItems' in parsedTrophies
-    const achievedTrophies = [hasBeatenGameTrophy, hasAllAssholesTrophy, hasAllStrengthTrophy, hasAllIntelligenceTrophy, hasNoItemsTrophy, hasSixItemsTrophy]
-    const amountTrophies = achievedTrophies.filter(Boolean).length
-
-    if (hasBeatenGameTrophy) beatenGameTrophyElement.classList.remove('not-received')
-    if (hasNoItemsTrophy) itemlessTrophyElement.classList.remove('not-received')
-    if (hasSixItemsTrophy) sixItemsTrophyElement.classList.remove('not-received')
-    if (hasAllAssholesTrophy) allAssholesTrophyElement.classList.remove('not-received')
-    if (hasAllStrengthTrophy) allStrengthTrophyElement.classList.remove('not-received')
-    if (hasAllIntelligenceTrophy) allIntelligenceTrophyElement.classList.remove('not-received')
-
-    let itemsUsed = 0
-    let itemUsed = false
-
-    function handleTrohies() {
-        if (!hasBeatenGameTrophy) {
-            setTimeout(() => {
-                document.getElementById('beaten-game').style.display = 'flex'
-
-                document.getElementById('beaten-game').style.marginRight = '0'
-                playSound(trophySound)
-            }, 1000)
+    function handleTrophies() {
+        const trophiesToUnlock = []
+        if (!game.trophies.beatenGame.unlocked) {
+            trophiesToUnlock.push(game.trophies.beatenGame)
         }
         parsedTrophies.beatenGame = true
 
-        if (allStrength()) {
-            if(!hasAllStrengthTrophy) {
-                setTimeout(() => {
-                    document.getElementById('all-strength-message').style.display = 'flex'
-
-                    document.getElementById('all-strength-message').style.marginRight = '0'
-                    playSound(trophySound)
-                }, 1500)
+        if (allOneType(attackTypes.strength)) {
+            if(!game.trophies.allStrength.unlocked) {
+                trophiesToUnlock.push(game.trophies.allStrength)
             }
             parsedTrophies.allStrength = true
         }
-        if (allAssholes()) {
-            if(!hasAllAssholesTrophy) {
-                setTimeout(() => {
-                    document.getElementById('all-assholes-message').style.display = 'flex'
-
-                    document.getElementById('all-assholes-message').style.marginRight = '0'
-                    playSound(trophySound)
-                }, 2000)
+        if (allOneType(attackTypes.assholiness)) {
+            if(!game.trophies.allAssholes.unlocked) {
+                trophiesToUnlock.push(game.trophies.allAssholes)
             }
             parsedTrophies.allAssholes = true
         }
-        if (allIntelligence()) {
-            if(!hasAllIntelligenceTrophy) {
-                setTimeout(() => {
-                    document.getElementById('all-intelligence-message').style.display = 'flex'
-
-                    document.getElementById('all-intelligence-message').style.marginRight = '0'
-                    playSound(trophySound)
-                }, 2500)
+        if (allOneType(attackTypes.intelligence)) {
+            if(!game.trophies.allIntelligence.unlocked) {
+                trophiesToUnlock.push(game.trophies.allIntelligence)
             }
             parsedTrophies.allIntelligence = true
         }
-        if (!itemUsed) {
-            if(!hasNoItemsTrophy) {
-                setTimeout(() => {
-                    document.getElementById('no-items-message').style.display = 'flex'
-
-                    document.getElementById('no-items-message').style.marginRight = '0'
-                    playSound(trophySound)
-                }, 3000)
+        if (!game.itemUsed) {
+            if(!game.trophies.noItems.unlocked) {
+                trophiesToUnlock.push(game.trophies.noItems)
             }
             parsedTrophies.hasNoItems = true
         }
-        if (itemsUsed >= 6) {
-            if(!hasSixItemsTrophy) {
-                setTimeout(() => {
-                    document.getElementById('six-items-message').style.display = 'flex'
-
-                    document.getElementById('six-items-message').style.marginRight = '0'
-                    playSound(trophySound) 
-                }, 3500)
+        if (game.itemsUsed >= 6) {
+            if(!game.trophies.sixItems.unlocked) {
+                trophiesToUnlock.push(game.trophies.sixItems)
             }
             parsedTrophies.hasSixItems = true
         }
+        trophiesToUnlock.forEach((trophy, index) => {
+            setTimeout(() => {
+                playSound(sounds.trophy)
+                displayTrophyToast(trophy)
+            }, index * 500)
+        })
         setTimeout(() => hideAll('trophy'), 5000)
         localStorage.setItem('trophies', JSON.stringify(parsedTrophies))
     }
-    function allStrength() {
-        return party.every(item => item.type === attackTypes.strength)
+
+    function displayTrophyToast(trophy) {
+        const trophyMessageDiv = document.createElement('div');
+        trophyMessageDiv.innerHTML = `
+            <div class="trophy-icon-wrapper">
+                <i class='fas fa-trophy'></i>
+            </div>
+            <div>${trophy.message}</div>
+        `
+        trophyMessageDiv.classList.add('trophy', 'trophy-message')
+        document.getElementById('trophy-messages-container').appendChild(trophyMessageDiv)
     }
 
-    function allIntelligence() {
-        return party.every(item => item.type === attackTypes.intelligence)
-    }
-
-    function allAssholes() {
-        return party.every(item => item.type === attackTypes.assholiness)
+    function allOneType(type) {
+        return game.player.party.every(char => char.type === type)
     }
 
     /**
@@ -595,15 +610,21 @@ document.addEventListener('DOMContentLoaded', () => {
     function playSound(sound) {
         sound.pause()
         sound.currentTime = 0
-        sound.play()
+        sound.play().catch()
+    }
+
+    function playMusic() {
+        sounds.music.volume = 0.3
+        sounds.music.loop = true
+        sounds.music.play().catch()
     }
 
     function hide(element) {
         element.style.display = 'none'
     }
 
-    function show(element) {
-        element.style.display = 'block'
+    function show(element, displayStyle) {
+        element.style.display = displayStyle || 'block'
     }
 
     function hideAll(className) {
@@ -618,45 +639,60 @@ document.addEventListener('DOMContentLoaded', () => {
         })
     }
 
+    function hideMoveSelectButtons() {
+        const openButtons = document.querySelectorAll(`.open`)
+        openButtons.forEach(element => {
+            element.classList.add("hidden-buttons")
+            element.classList.remove("open")
+        })
+    }
+
+
     /**
      * 
      * Running Minigame
      * 
      */
 
-    function moveBackground() { 
-        bgs.forEach((_, index) => { 
-            bgs[index] += 1 
-            if (bgs[index] >= 616) bgs[index] = -313 
-        }) 
-        characterLeft += 0.1 
-        enemyLeft -= 0.2 
-        const distance = enemyLeft - characterLeft 
+    function moveBackground() {
+        const gameData = game.miniGames.running
 
-        if (distance < 160 && !runningBackgroundText.classList.contains("animated-text")) { 
-            runningBackgroundText.innerHTML = "Run faster!!! He almost got you!" 
-            runningBackgroundText.classList.add("animated-text") 
-            evilLaugh.play() 
+        gameData.bg1Left += 1
+        gameData.bg2Left += 1
+        gameData.bg3Left += 1
+
+        if (gameData.bg1Left >= 616) gameData.bg1Left = -313
+        if (gameData.bg2Left >= 616) gameData.bg2Left = -313
+        if (gameData.bg3Left >= 616) gameData.bg3Left = -313
+
+        gameData.characterLeft += 0.1
+        gameData.enemyLeft -= 0.2
+        const distance = gameData.enemyLeft - gameData.characterLeft
+
+        if (distance < 160 && !runningBackgroundText.classList.contains('animated-text')) {
+            runningBackgroundText.innerHTML = 'Run faster!!! He almost got you!'
+            runningBackgroundText.classList.add('animated-text')
+            playSound(sounds.evilLaugh)
         } 
-        if (enemyLeft < characterLeft + 20) { 
+        if (gameData.enemyLeft < gameData.characterLeft + 20) {
             gameOverRunningGame() 
             return 
         } 
-        if (characterLeft < -60) { 
+        if (gameData.characterLeft < -60) {
             nextRoundRunningGame() 
             return 
         } 
-        document.getElementById("running-bg-1").style.left = bgs[0] + "px" 
-        document.getElementById("running-bg-2").style.left = bgs[1] + "px" 
-        document.getElementById("running-bg-3").style.left = bgs[2] + "px" 
-        document.getElementById("character-running").style.left = characterLeft + "px" 
-        document.getElementById("enemy-running").style.left = enemyLeft + "px" 
+        document.getElementById('running-bg-1').style.left = gameData.bg1Left + 'px'
+        document.getElementById('running-bg-2').style.left = gameData.bg2Left + 'px'
+        document.getElementById('running-bg-3').style.left = gameData.bg3Left + 'px'
+        document.getElementById('character-running').style.left = gameData.characterLeft + 'px'
+        document.getElementById('enemy-running').style.left = gameData.enemyLeft + 'px'
     }
 
     function gameOverRunningGame() { 
-        clearInterval(moveBackgroundInterval) 
-        evilLaugh.play() 
-        steps.pause() 
+        clearInterval(game.miniGames.running.moveBackgroundInterval)
+        playSound(sounds.evilLaugh)
+        sounds.steps.pause()
         titleSelect.style.display = 'block' 
         titleSelect.innerHTML = gameOverTemplate 
         characterRunning.classList.remove('running') 
@@ -666,20 +702,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function nextRoundRunningGame() {
-        clearInterval(moveBackgroundInterval)
+        clearInterval(game.miniGames.running.moveBackgroundInterval)
         characterRunning.classList.remove('running')
         enemyRunning.classList.remove('running')
         hide(runningBackgroundText) 
-        deathcry.play()
-        round += 1
+        playSound(sounds.deathCry)
+        game.round += 1
         enemyRunning.classList.add('defeated')
-        steps.pause()
-        titleSelect.style.display = "block"
+        sounds.steps.pause()
+        titleSelect.style.display = 'block'
         titleSelect.innerHTML =
             nextRoundTemplate
+        if (game.items.moneyEarnedLastRound > 0) document.getElementById('money-placeholder').innerHTML = `Earned $${game.items.moneyEarnedLastRound}`
+        document.getElementById('open-shop-button').style.display = 'none'
     }
 
-    document.getElementById('overlay-running').addEventListener('click', () => characterLeft -= 4)
+    document.getElementById('overlay-running').addEventListener('click', () => game.miniGames.running.characterLeft -= 4)
 
     /**
      * 
@@ -690,53 +728,57 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('click-overlay').addEventListener('click', jump)
 
     function moveRope() {
+        const ropeSkip = game.miniGames.ropeSkip
         ctx.clearRect(0, 0, canvas.width, canvas.height)
         ctx.beginPath()
         ctx.moveTo(150, 200)
-        ctx.bezierCurveTo(150, ropeY, 400, ropeY, 400, 200)
-        ctx.lineWidth = moveRopeDownwards ? 2 : 4
+        ctx.bezierCurveTo(150, ropeSkip.ropeY, 400, ropeSkip.ropeY, 400, 200)
+        ctx.lineWidth = ropeSkip.moveRopeDownwards ? 2 : 4
         ctx.stroke()
 
-        if (moveRopeDownwards && ropeY < 280) {
-            ropeY += 2
+        if (ropeSkip.moveRopeDownwards && ropeSkip.ropeY < 280) {
+            ropeSkip.ropeY += 2
         }
 
-        if (!moveRopeDownwards && ropeY > 20) {
-            ropeY -= 2
+        if (!ropeSkip.moveRopeDownwards && ropeSkip.ropeY > 20) {
+            ropeSkip.ropeY -= 2
         }
 
-        if (ropeY >= 280 || ropeY <= 80) {
-            moveRopeDownwards = !moveRopeDownwards
-            skips += .5
-            canvas.style.zIndex = moveRopeDownwards ? '1' : '3'
+        if (ropeSkip.ropeY >= 280 || ropeSkip.ropeY <= 80) {
+            ropeSkip.moveRopeDownwards = !ropeSkip.moveRopeDownwards
+            ropeSkip.skips += .5
+            canvas.style.zIndex = ropeSkip.moveRopeDownwards ? '1' : '3'
 
-            if (skips % 3 === 0) {
-                clearInterval(ropeInterval) 
-                gamespeed *= 1.1
-                ropeInterval = setInterval(moveRope, 1000 / gamespeed)
+            if (ropeSkip.skips % 3 === 0) {
+                clearInterval(ropeSkip.interval)
+                ropeSkip.speed *= 1.1
+                ropeSkip.interval = setInterval(moveRope, 1000 / ropeSkip.speed)
             }
 
-            if (ropeY >= 240) {
-                characterJumps && party[1].energy > 0 ? getPointRope() : getHitRope()
+            if (ropeSkip.ropeY >= 240) {
+                ropeSkip.characterJumps && game.player.party[1].energy > 0 ? getPointRope() : getHitRope()
             }
         }
     }
 
     function nextRoundRope() {
-        round += 1
-        girlLeft.classList.add('defeated')
-        girlRight.classList.add('defeated')
-        clearInterval(ropeInterval)
-        girlcry.play()
+        game.round += 1
+        document.getElementById('girl-left').classList.add('defeated')
+        document.getElementById('girl-right').classList.add('defeated')
+        clearInterval(game.miniGames.ropeSkip.interval)
+        playSound(sounds.girl)
+        document.getElementById('rope-skips').innerHTML = ''
         titleSelect.style.display = 'block'
         titleSelect.innerHTML = nextRoundTemplate
+        if (game.items.moneyEarnedLastRound > 0) document.getElementById('money-placeholder').innerHTML = `Earned $${game.items.moneyEarnedLastRound}`
+        document.getElementById('open-shop-button').style.display = 'none'
         hide(canvas)
         hide(clickOverlay)
     }
 
     function gameOverRope() {
-        clearInterval(ropeInterval)
-        deathcry.play()
+        clearInterval(game.miniGames.ropeSkip.interval)
+        playSound(sounds.deathCry)
         hide(canvas)
         hide(clickOverlay)
         show(titleSelect)
@@ -744,22 +786,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function getPointRope() {
-        points += 1
-        playSound(confirmSound)
+        game.miniGames.ropeSkip.points += 1
+        playSound(sounds.confirm)
         const ropeSkips = document.getElementById('rope-skips')
-        ropeSkips.innerHTML = `Skips: ${points}/20`
-        if (points === 20) {
+        ropeSkips.innerHTML = `Skips: ${game.miniGames.ropeSkip.points}/20`
+        if (game.miniGames.ropeSkip.points === 20) {
             nextRoundRope()
         }
     }
 
     function getHitRope() {
-        party[1].energy -= 30
-        playSound(failSound)
+        game.player.party[1].energy -= 30
+        playSound(sounds.fail)
         const energyBars = Array.from(document.getElementsByClassName('energybar'))
-        energyBars[1].querySelector('#energy-char2').style.width = party[1].energy + "%"
-        energyBars[1].querySelector('#energy-char2').style.background = party[1].energy < 30 ? "red" : "green"
-        if (party[1].energy <= 0) {
+        energyBars[1].querySelector('#energy-char2').style.width = game.player.party[1].energy + "%"
+        energyBars[1].querySelector('#energy-char2').style.background = game.player.party[1].energy < 30 ? "red" : "green"
+        if (game.player.party[1].energy <= 0) {
             box.classList.add('defeated')
             setTimeout(() => {
                 gameOverRope()
@@ -768,12 +810,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function jump() {
-        if (!characterJumps) {
-            characterJumps = true
-            playSound(jumpSound)
+        if (!game.miniGames.ropeSkip.characterJumps) {
+            game.miniGames.ropeSkip.characterJumps = true
+            playSound(sounds.jump)
             box.style.top = '140px'
             setTimeout(() => {
-                characterJumps = false
+                game.miniGames.ropeSkip.characterJumps = false
                 box.style.top = '170px'
             }, 300)
         }
@@ -785,148 +827,100 @@ document.addEventListener('DOMContentLoaded', () => {
 *
 */
 
-    titleButton.addEventListener('click', startGame)
-    vendettaButton.addEventListener('click', startGameTeacher)
-
-    function startGame() {
+    function startGame(isTeacherMode) {
+        game.isTeacherMode = isTeacherMode
         hide(title)
         hide(titleButton)
         hide(howToPlayButton)
         hide(displayTrophiesButton)
         hide(vendettaButton)
-        selectScreen.style.display = 'grid'
-        show(titleSelect)
-        hide(battleTicker)
-        enemyParty = setTeams[round]
-        schoolbell.play()
-        music.volume = 0.3
-        music.loop = true
-        music.play()
-    }
-
-    function startGameTeacher() {
-        hide(title)
-        hide(titleButton)
-        hide(howToPlayButton)
-        hide(displayTrophiesButton)
-        hide(vendettaButton)
-        hide(battleTicker)
-        enemyParty = setTeamsTeacher()[round]
-        schoolbell.play()
-        music.volume = 0.3
-        music.loop = true
-        music.play()
-        initializeGameTeacher()
-        isTeacherMode = true
-    }
-
-    const fadeOutElement = document.getElementById('fade-out') 
-
-    function activateFade() {
-        fadeSound.play()
-        fadeOutElement.classList.remove('hidden', 'fade-out')
-        fadeOutElement.classList.add('fade-out')
-        setTimeout(() => fadeOutElement.classList.add('hidden'), 2000)
-    }
-
-    function activateFadeGameover() {
-        fadeSound.play()
-        fadeOutElement.classList.remove('hidden', 'fade-out') 
-        fadeOutElement.classList.add('fade-out-red')
-    }
-
-    document.getElementById('how-to-play-button').addEventListener('click', toggleTutorial)
-
-    document.getElementById('tutorial-screen').addEventListener('click', function(event) { 
-        if (event.target && event.target.id === 'back-button') { 
-            toggleTutorial() 
-        }
-
-        if (event.target && event.target.id === 'toggle-tutorial-button') {
-            switchTutorialPage()
-        }
-    })
-
-    function toggleTutorial() {
-        playSound(confirmSound)
-        showTutorial = !showTutorial
-
-        if (showTutorial) {
-            hide(title)
-            hide(titleButton)
-            hide(vendettaButton)
-            show(tutorialScreen)
-            show(backButton)
-            hide(howToPlayButton)
-            hide(displayTrophiesButton)
+        playSound(sounds.schoolBell)
+        playMusic()
+        if (isTeacherMode) {
+            game.enemy.party = setTeamsTeacher()[game.round]
+            initializeGameTeacher()
             return
         }
-
-        location.reload()
-    }
-
-    let showFirstPageTutorial = true
-
-    function switchTutorialPage() {
-        showFirstPageTutorial = !showFirstPageTutorial
-        tutorialScreen.innerHTML = showFirstPageTutorial ? tutorialPage1template : tutorialPage2template
+        updateGameState(gameStates.characterSelect)
+        selectScreen.style.display = 'grid'
+        show(titleSelect)
+        game.enemy.party = setTeams[game.round]
     }
 
     dialogueBoxWrapper.addEventListener('click', nextDialogue)
 
     function nextDialogue() {
-        if(party.length === 0) return
-
-        if (showDialogue && indexOfMessage === 0) {
-            indexOfMessage = 1
-            const currentDialogues = isTeacherMode ? dialoguesTeacher : dialogues
-            dialogueBox.innerHTML = currentDialogues[round][indexOfMessage]
+        if (showDialogue && game.messageIndex === 0) {
+            game.messageIndex = 1
+            setDialogue()
             return
         }
 
-        indexOfMessage = 0
+        game.messageIndex = 0
         hide(dialogueBoxWrapper)
-        show(itemBox)
+        show(itemBox, 'flex')
         showDialogue = false
+        startNextRound()
 
-        if (round === 3) {
-            ropeInterval = setInterval(moveRope, 1000 / gamespeed)
-            hide(itemBox)
+    }
+
+    function startNextRound() {
+        updateGameState(gameStates.selectTargets)
+        bombButton.removeAttribute('disabled')
+        itemButton.removeAttribute('disabled')
+
+        if (game.round === 3) {
+            startRopeGame()
         }
 
-        if (round === 5) {
-            moveBackgroundInterval = setInterval(moveBackground, 1000 / 120)
-            steps.playbackRate = 2
-            steps.loop = true
-            steps.play()
-            const spritePosition = spritePositions[party[1].class].side
-            runningSprite.style.top = spritePosition.top
-            runningSprite.style.left = spritePosition.left
-            characterRunning.classList.add('running')
-            enemyRunning.classList.add('running')
-            hide(itemBox)
+        if (game.round === 5) {
+            startRunningGame()
         }
 
-        if (round === 8) {
-            bossmusic.play()
-            bossmusic.volume = 0.6
-            bossmusic.loop = true
+        if (game.round === 8) {
+            startBossRound()
         }
+    }
+
+    function startRopeGame() {
+        updateGameState(gameStates.ropeSkip)
+        game.miniGames.ropeSkip.interval = setInterval(moveRope, 1000 / game.miniGames.ropeSkip.speed)
+        hide(itemBox)
+    }
+
+    function startRunningGame() {
+        updateGameState(gameStates.lockerRoom)
+        game.miniGames.running.moveBackgroundInterval = setInterval(moveBackground, 1000 / 120)
+        sounds.steps.playbackRate = 2
+        sounds.steps.loop = true
+        sounds.steps.play().catch()
+        const spritePosition = spritePositions[game.player.party[1].class].side
+        runningSprite.style.top = spritePosition.top
+        runningSprite.style.left = spritePosition.left
+        characterRunning.classList.add('running')
+        enemyRunning.classList.add('running')
+        hide(itemBox)
+    }
+
+    function startBossRound() {
+        sounds.bossMusic.volume = 0.6
+        sounds.bossMusic.loop = true
+        sounds.bossMusic.play().catch()
     }
 
     function addCharacter(event) {
         const character = event.currentTarget.dataset.character
         const obj = new Character(characters[character])
 
-        if (party.length < 3) {
-            playSound(confirmSound)
-            obj.id = party.length + 1
-            party.push(obj)
-            titleSelect.innerHTML = `Add characters to your party ${party.length}/3`
+        if (game.player.party.length < 3) {
+            playSound(sounds.confirm)
+            obj.id = game.player.party.length + 1
+            game.player.party.push(obj)
+            titleSelect.innerHTML = `Add characters to your party ${game.player.party.length}/3`
             document.getElementById(`energy-char${obj.id}-text`).innerHTML = obj.class
         }
 
-        if (party.length === 3) {
+        if (game.player.party.length === 3) {
             showDialogue = true
             activateFade()
             setTimeout(() => {
@@ -936,125 +930,69 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function initializeGame() {
+        updateGameState(gameStates.dialogue)
         hide(selectScreen)
         hide(selectScreen2)
         hide(selectScreen3)
         hide(titleSelect)
-        dialogueBoxWrapper.style.opacity = 1
-        dialogueBox.innerHTML = dialogues[round][indexOfMessage]
+        setDialogue()
         const energyBars = Array.from(document.getElementsByClassName('energybar'))
         energyBars.forEach(bar => show(bar))
         const spriteContainers = Array.from(document.getElementsByClassName('sprite-container'))
         spriteContainers.forEach(sprite => show(sprite))
-        showPlayersprites()
-        showEnemysprites()
-        bombButton.innerHTML = `<i class="fas fa-bomb"></i>x${bombs}`
-        itemButton.innerHTML = `${snackIcon}x${snacks}`
+        showPlayerSprites()
+        showEnemySprites()
+        drawItembox()
     }
 
     function initializeGameTeacher() {
         document.getElementById('energy-char2-text').innerHTML = characters.teacher.class
-        teacherTeam.forEach(member => party.push(member))
-        dialogueBoxWrapper.style.opacity = 1
-        dialogueBox.innerHTML = dialoguesTeacher[round][indexOfMessage]
+        teacherTeam.forEach(member => game.player.party.push(member))
+        setDialogue()
         const energyBars = Array.from(document.getElementsByClassName('energybar'))
         energyBars.forEach(bar => show(bar))
         hide(energyBars[0])
         hide(energyBars[2])
         const spriteContainers = Array.from(document.getElementsByClassName('sprite-container'))
         spriteContainers.forEach(sprite => show(sprite))
-        showPlayerspritesTeacher()
-        showEnemysprites()
+        showPlayerSpritesTeacher()
+        showEnemySprites()
         showDialogue = true
-        bombButton.innerHTML = `${bombIcon}x${bombs}`
-        itemButton.innerHTML = `${snackIcon}x${snacks}`
+        drawItembox()
     }
 
-    function showPlayersprites() {
-        party.forEach((element, index) => { 
-            const charSprite = document.getElementById(`char${index + 1}-sprite`) 
-            const spritePosition = spritePositions[element.class].front
-            Object.keys(spritePosition).forEach(key => { 
-                charSprite.style[key] = spritePosition[key] 
-            }) 
-            document.querySelector(`.buttons-char${index + 1}[data-type='strength'] i span`).innerHTML = element.strength
-            document.querySelector(`.buttons-char${index + 1}[data-type='intelligence'] i span`).innerHTML = element.intelligence
-            document.querySelector(`.buttons-char${index + 1}[data-type='assholiness'] i span`).innerHTML = element.assholiness
-        })
+    function setDialogue() {
+        showDialogue = true
+        disableAttackButtons = false
+        show(dialogueBoxWrapper)
+        const selectedDialogue = game.isTeacherMode ? dialoguesTeacher : dialogues
+        dialogueBox.innerHTML = selectedDialogue[game.round][game.messageIndex]
     }
 
-    function showPlayerspritesTeacher() {
-
-            const charSprite = document.getElementById('char2-sprite')
-            const spritePosition = spritePositions.Teacher.front
-            Object.keys(spritePosition).forEach(key => {
-                charSprite.style[key] = spritePosition[key]
-            })
-            document.querySelector(`.buttons-char2[data-type='strength'] i span`).innerHTML = characters.teacher.strength
-            document.querySelector(`.buttons-char2[data-type='intelligence'] i span`).innerHTML = characters.teacher.intelligence
-            document.querySelector(`.buttons-char2[data-type='assholiness'] i span`).innerHTML = characters.teacher.assholiness
-
-            document.getElementById('char1-sprite').style.display = 'none'
-            document.getElementById('char3-sprite').style.display = 'none'
-    }
-
-    function showEnemysprites() {
-        enemyParty.forEach((element, index) => {
-            element.id = index + 1
-            const enemySprite = document.getElementById(`enemy${index + 1}-sprite`) 
-            const spritePosition = spritePositions[element.class].front
-            Object.keys(spritePosition).forEach(key => { 
-                enemySprite.style[key] = spritePosition[key] 
-            })
-            document.getElementById(`energy-enemy${index + 1}-text`).innerHTML = element.class
-        })
-    }
-
-    function selectTarget(event) {
-        if (selectedChar.class === 'Dummy') return
-        document.querySelector(`#char${selectedChar.id} .overflow-wrapper`).classList.add('selected')
-        const enemyWrapper = event.target.closest('.right-party')
-        const id = enemyWrapper.dataset.enemy
-        const enemy = enemyParty[parseInt(id)]
-        const possibleMoves = getPossibleMoves()
-
-        if (attackType !== "") {
-            Array.from(document.getElementsByClassName('open')).forEach(element => {
-                element.classList.add('hidden-buttons')
+    function showButtons(event) {
+        if (!showDialogue && !fightAnimationRunning && !disableAttackButtons) {
+            const element = event.currentTarget
+            if (game.isTeacherMode && (element.id === 'char1' || element.id === 'char3')) return
+            hide(battleTicker)
+            Array.from(document.getElementsByClassName('left-party')).forEach(element => {
                 element.classList.remove('open')
             })
-        }
-
-
-        if (playerTurn && moves.length < possibleMoves && selectedChar !== "" && enemy.energy > 0) {
-            moves.push({ attacker: selectedChar, target: enemy, type: attackType })
-            selectedChar = ""
-            intSelector = ""
-            attackType = ""
-            playSound(confirmSound)
-        }
-
-        if (moves.length === possibleMoves) {
-            runFightanimation()
-            document.querySelectorAll('.hidden-buttons').forEach(element => { 
-                element.classList.remove('hidden-buttons') 
-            })
-            fightSound.play()
+            element.classList.toggle('open')
         }
     }
 
     function selectChar(event) {
         const target = event.currentTarget
         hide(bombContainerWrapper)
-        playSound(confirmSound)
+        playSound(sounds.confirm)
         const index = event.currentTarget.dataset.partymember
-        selectedChar = party[index]
-        intSelector = target.dataset.char
-        attackType = target.dataset.type
+        game.player.selectedChar = game.player.party[index]
+        game.player.selectedCharId = target.dataset.char
+        game.player.selectedAttackType = target.dataset.type
         const indexAttr = target.dataset.index
 
-        if (attackType === "") {
-            selectDefend(selectedChar, intSelector, indexAttr)
+        if (game.player.selectedAttackType === "") {
+            selectDefend(game.player.selectedChar, game.player.selectedCharId, indexAttr)
         }
 
         Array.from(document.getElementsByClassName('open')).forEach(openedElement => {
@@ -1063,93 +1001,61 @@ document.addEventListener('DOMContentLoaded', () => {
         })
     }
 
-    function showButtons(event) {
-        if (!showDialogue && !fightanimationRunning && !disableAttackButtons) {
-            const element = event.currentTarget
-            if (isTeacherMode && (element.id === 'char1' || element.id === 'char3')) return
-            hide(battleTicker)
-            Array.from(document.getElementsByClassName('left-party')).forEach(element => {
+    function selectTarget(event) {
+        if (game.player.selectedChar.class === 'Dummy') return
+        document.querySelector(`#char${game.player.selectedChar.id} .overflow-wrapper`).classList.add('selected')
+        const enemyWrapper = event.target.closest('.right-party')
+        const id = enemyWrapper.dataset.enemy
+        const enemy = game.enemy.party[parseInt(id)]
+        const possibleMoves = getPossibleMoves()
+
+        if (game.player.selectedAttackType !== "") {
+            Array.from(document.getElementsByClassName('open')).forEach(element => {
+                element.classList.add('hidden-buttons')
                 element.classList.remove('open')
             })
-            element.classList.toggle('open')
+        }
 
+        if (game.player.moves.length < possibleMoves && game.player.selectedChar !== "" && enemy.energy > 0) {
+            game.player.moves.push({ attacker: game.player.selectedChar, target: enemy, type: game.player.selectedAttackType })
+            game.player.selectedChar = ""
+            game.player.selectedCharId = ""
+            game.player.selectedAttackType = ""
+            playSound(sounds.confirm)
+        }
+
+        if (game.player.moves.length === possibleMoves) {
+            fight()
         }
     }
 
     function selectDefend(player, int, index) {
-        const openButtons = document.querySelectorAll(`.open`)
-        openButtons.forEach(element => { 
-            element.classList.add("hidden-buttons") 
-            element.classList.remove("open") 
-        })
-        party[index].defends = true
-        moves.push({ attacker: player, target: "", type: "" })
-        playSound(confirmSound)
+        hideMoveSelectButtons()
+        game.player.party[index].defends = true
+        game.player.moves.push({ attacker: player, target: "", type: "" })
+        playSound(sounds.confirm)
 
-        if (moves.length === getPossibleMoves()) {
-            runFightanimation()
-            fightSound.play()
-            setTimeout(() => {
-                document.querySelectorAll('.hidden-buttons').forEach(element => { 
-                    element.classList.remove('hidden-buttons') 
-                })
-            }, 2500)
+        if (game.player.moves.length === getPossibleMoves()) {
+            fight()
         }
-
     }
 
-    function runFightanimation() {
-        const allSelected = document.querySelectorAll('.selected')
-        allSelected.forEach(selected => selected.classList.remove('selected'))
-        overlay.style.zIndex = '999'
-        fightanimationRunning = true
-        punchSounds.playbackRate = 3
-        hide(itemBox)
-        setTimeout(() => punchSounds.play(), 500)
-        document.querySelectorAll(".left-party, .right-party").forEach(element => 
-                element.style.animationDelay = `${Math.floor(Math.random() * 250)}ms`
-        )
-
-
-        document.querySelectorAll(".sprite-container.alive").forEach(element => { 
-            if (element.classList.contains("left-party")) { 
-                element.classList.add("animated-character1") 
-            } else { 
-                element.classList.add("animated-character2") 
-            } 
+    function fight() {
+        document.querySelectorAll('.hidden-buttons').forEach(element => {
+            element.classList.remove('hidden-buttons')
         })
-
-        setTimeout(() => {
-            overlay.style.zIndex = '-1'
-            Array.from(document.getElementsByClassName('animated-character1')).forEach(element => {
-                element.classList.remove('animated-character1')
-            })
-            Array.from(document.getElementsByClassName('animated-character2')).forEach(element => {
-                element.classList.remove('animated-character2')
-            })
-            Array.from(document.getElementsByClassName('buttons-char')).forEach(element => {
-                element.classList.remove('hidden')
-            })
-            setCharactersDefeated()
-        }, 2600)
-        setTimeout(() => {
-            fightanimationRunning = false
-        }, 3000)
-        setTimeout(() => {
-            hide(battleTicker)
-        }, 4000)
         calculateDamage()
-        moves = []
+        runFightAnimation()
     }
 
     function setCharactersDefeated() {
-        enemyParty.forEach(element => {
+        game.enemy.party.forEach(element => {
             if (element.energy <= 0) {
                 const defeated = document.getElementById(`enemy${element.id}`)
                 defeated.classList.add('defeated')
             }
         })
-        party.forEach(element => {
+        game.player.party.forEach(element => {
             if (element.energy <= 0) {
                 const defeated = document.getElementById(`char${element.id}`)
                 defeated.classList.add('defeated')
@@ -1166,18 +1072,18 @@ document.addEventListener('DOMContentLoaded', () => {
             if (randomDefending <= 8 || enemy.energy <= 0) return
 
             enemy.defends = true
-            battleMessages.push("<span class='text-enemy'>Enemy " + enemy.class + " <i class='fas fa-shield-alt'></i>" + "</span><br>")
+            game.battleMessages.push("<span class='text-enemy'>Enemy " + enemy.class + " <i class='fas fa-shield-alt'></i>" + "</span><br>")
         })
     }
 
     function handlePlayerMoves() {
-        moves.forEach(element => {
+        game.player.moves.forEach(element => {
             if (element.attacker.defends) {
-                battleMessages.push("<span class='text-player'>" + element.attacker.class + " <i class='fas fa-shield-alt'></i>" + "</span><br>")
+                game.battleMessages.push("<span class='text-player'>" + element.attacker.class + " <i class='fas fa-shield-alt'></i>" + "</span><br>")
                 return
             }
 
-            battleMessages.push("<span class='text-player'>" + element.attacker.class + '  ' + setBattletickerIcon(element.type) + '  ' + "<span class='text-enemy'>Enemy " + element.target.class + "</span><br>")
+            game.battleMessages.push("<span class='text-player'>" + element.attacker.class + '  ' + setBattletickerIcon(element.type) + '  ' + "<span class='text-enemy'>Enemy " + element.target.class + "</span><br>")
             const selector = element.type
             const attack = element.attacker[selector]
             const defense = getDefenseType(selector, "target")
@@ -1186,28 +1092,29 @@ document.addEventListener('DOMContentLoaded', () => {
             let damage = attack * typeBonus * (100 / (100 + element.target[defense] * 10))
             element.target.takeDamage(damage)
 
-            if (element.target.energy < 0) {
+            if (element.target.energy <= 0) {
                 element.target.energy = 0
-                setTimeout(() => deathcry2.play(), 2500)
+                setTimeout(() => playSound(sounds.deathCry2), 2500)
             }
         })
     }
 
-    function randomAttacktype() {
-        switch (lastMoveTeacher) {
+    function randomAttackType() {
+        let selector
+        switch (game.lastMoveTeacher) {
             case attackTypes.strength: {
                 selector = attackTypes.assholiness
-                lastMoveTeacher = attackTypes.assholiness
+                game.lastMoveTeacher = attackTypes.assholiness
                 break
             }
             case attackTypes.assholiness: {
                 selector = attackTypes.intelligence
-                lastMoveTeacher = attackTypes.intelligence
+                game.lastMoveTeacher = attackTypes.intelligence
                 break
             }
             case attackTypes.intelligence: {
                 selector = attackTypes.strength
-                lastMoveTeacher = attackTypes.strength
+                game.lastMoveTeacher = attackTypes.strength
                 break
             }
         }
@@ -1215,76 +1122,95 @@ document.addEventListener('DOMContentLoaded', () => {
         return selector
     }
 
-    function calculateDamage() {
-        const remainingEnemyParty = getRemainingEnemies()
-        document.getElementById('battle-ticker') .style.display = 'block'
-        battleMessages = []
-        setEnemiesDefending()
-        handlePlayerMoves()
+    function selectTargetForEnemy() {
         const possibleTargets = getRemainingParty()
 
+        const randomNumber = Math.floor(Math.random() * (possibleTargets.length))
+        let energy = 100
+        let target = possibleTargets[0]
+
+        possibleTargets.forEach(element => {
+            if (element.energy <= energy) {
+                energy = element.energy
+                target = element
+            }
+        })
+
+        if (Math.floor(Math.random() * (10)) > 4) {
+            target = possibleTargets[randomNumber]
+        }
+
+        if (target === undefined) target = possibleTargets[0]
+
+        return target
+    }
+
+    function selectEnemyMoves() {
+        const remainingEnemyParty = getRemainingEnemies()
         remainingEnemyParty.forEach(enemy => {
             if (!enemy.defends) {
-                const selector = (enemy.type === attackTypes.teacher || enemy.type === attackTypes.allrounder) 
-                    ? randomAttacktype() : enemy.type
+                const selector = (enemy.type === attackTypes.teacher || enemy.type === attackTypes.allrounder)
+                    ? randomAttackType() : enemy.type
                 const attack = enemy[selector]
-                const randomNumber = Math.floor(Math.random() * (possibleTargets.length))
-                let energy = 100
-                let target = possibleTargets[0]
-
-                possibleTargets.forEach(element => {
-                    if (element.energy <= energy) {
-                        energy = element.energy
-                        target = element
-                    }
-                })
-
-                if (Math.floor(Math.random() * (10)) > 4) {
-                    target = possibleTargets[randomNumber]
-                }
-
+                const target = selectTargetForEnemy()
                 const defense = getDefenseType(selector, target)
                 const typeBonus = getEffectiveness(selector, target.type)
 
-                battleMessages.push("<span class='text-enemy'> Enemy " + enemy.class + "</span>" + setBattletickerIcon(selector) + "<span class='text-player'>" + target.class + "</span><br>")
+                game.battleMessages.push("<span class='text-enemy'> Enemy " + enemy.class + "</span>" + setBattletickerIcon(selector) + "<span class='text-player'>" + target.class + "</span><br>")
                 const damage = attack * typeBonus * (100 / (100 + target[defense] * 10))
                 target.takeDamage(damage)
 
                 if (target.energy <= 0) {
-                    setTimeout(() => deathcry.play(), 2500)
+                    setTimeout(() => playSound(sounds.deathCry), 2500)
                 }
             }
-            updateEnergybars()
-            resetDefending()
         })
+    }
 
-        if (remainingEnemyParty.length > 0 && round <= 8){
-            setTimeout(() => itemBox.style.display = 'block', 2500)
+    function calculateDamage() {
+        const remainingEnemyParty = getRemainingEnemies()
+        document.getElementById('battle-ticker') .style.display = 'block'
+        game.battleMessages = []
+        setEnemiesDefending()
+        handlePlayerMoves()
+        selectEnemyMoves()
+        drawEnergyBars()
+        resetDefending()
+
+        if (remainingEnemyParty.length > 0 && game.round <= 8){
+            setTimeout(() => show(itemBox, 'flex'), 2500)
         }
 
-        if (getPossibleMoves() === 0) {
+        checkGameOver()
+
+        battleTicker.innerHTML = game.battleMessages.join(" ")
+        checkRemainingEnemies()
+    }
+
+    function checkGameOver() {
+        const gameOver = getPossibleMoves() === 0
+
+        if (gameOver) {
             setTimeout(() => {
                 hide(battleTicker)
                 show(titleSelect)
                 titleSelect.innerHTML = gameOverTemplate
                 hide(itemBox)
-                bossmusic.pause()
+                sounds.bossMusic.pause()
             }, 2500)
         }
-        battleTicker.innerHTML = battleMessages.join(" ")
-        checkRemainingEnemies()
     }
 
     function getPossibleMoves() {
-        const remainingChars = party.filter(char => char.energy > 0 && char.class !== 'Dummy')
+        const remainingChars = game.player.party.filter(char => char.energy > 0 && char.class !== 'Dummy')
         return remainingChars.length
     }
 
     function resetDefending() {
-        enemyParty.forEach(enemy => {
+        game.enemy.party.forEach(enemy => {
             enemy.defends = false
         })
-        party.forEach(char => {
+        game.player.party.forEach(char => {
             char.defends = false
         })
     }
@@ -1338,71 +1264,54 @@ document.addEventListener('DOMContentLoaded', () => {
     function checkRemainingEnemies() {
         const remainingEnemies = getRemainingEnemies()
 
-        if (remainingEnemies.length > 0) return
-
+        if (remainingEnemies.length > 0) {
+            setTimeout(() => updateGameState(gameStates.selectTargets), 5000)
+            return
+        }
         checkSurvivors()
-        round += 1
+        game.round += 1
         disableAttackButtons = true
         setTimeout(() => {
             hide(battleTicker)
+            hide(itemBox)
             show(titleSelect)
 
-            if (round < 9) {
+            if (game.round < 9) {
                 titleSelect.innerHTML = nextRoundTemplate
+                if (game.items.moneyEarnedLastRound > 0) document.getElementById('money-placeholder').innerHTML = `Earned $${game.items.moneyEarnedLastRound}`
                 return
             }
 
-            if (!isTeacherMode) localStorage.setItem('lastVictoryTeam', JSON.stringify(party.map(entry => entry.class)))
-            handleTrohies()
-
-            bossmusic.pause()
+            if (!game.isTeacherMode) localStorage.setItem('lastVictoryTeam', JSON.stringify(game.player.party.map(entry => entry.class)))
+            handleTrophies()
+            updateGameState(gameStates.victory)
+            sounds.bossMusic.pause()
             runVictoryAnimation()
             setTimeout(() => {
-                victorySound.play()
-                cheerSound.play()
+                playSound(sounds.victory)
+                playSound(sounds.cheer)
             }, 500)
-            showConfetti()
-            titleSelect.innerHTML = isTeacherMode ? victoryTemplateTeacher : victoryTemplate
+            runConfettiAnimation()
+            titleSelect.innerHTML = game.isTeacherMode ? victoryTemplateTeacher : victoryTemplate
         }, 2600)
     }
 
     function checkSurvivors() {
         hide(itemBox)
-        party.forEach(char => {
-            if (char.energy > 0) {
-                survivalpoints += 1
+        game.items.moneyEarnedLastRound = 0
+        game.player.party.forEach(char => {
+            if (char.energy > 0 && char.class !== 'Dummy') {
+                game.items.moneyEarnedLastRound += 1
             }
         })
+        game.items.money += game.items.moneyEarnedLastRound
+        game.items.moneyEarnedTotal += game.items.moneyEarnedLastRound
 
-        if ((survivalpoints >= 10 && itemsReceived === 1 && round < 8) || (survivalpoints >= 5 && itemsReceived === 0 && round < 9)) {
-            updateItembox()            
-        }
-    }
-
-    function updateItembox(){
-        itemsReceived += 1
-        bombs += 1
-        snacks += 1
-        setTimeout(()=> itemBox.style.display = 'block', 2500)
-        bombButton.setAttribute('disabled', true)
-        bombButton.innerHTML = additionalBombMessageTemplate
-        bombButtonWrapper.classList.add('animated-text')
-        itemButton.setAttribute('disabled', true)
-        itemButton.innerHTML = additionalSnackMessageTemplate
-        itemButtonWrapper.classList.add('animated-text')
-        setTimeout(()=>{
-            hide(itemBox)
-            bombButton.removeAttribute('disabled')
-            itemButton.removeAttribute('disabled')
-            bombButton.innerHTML = `<i class="fas fa-bomb"></i>x${bombs}`
-            itemButton.innerHTML = `${snackIcon}x${snacks}`
-            bombButtonWrapper.classList.remove('animated-text')
-            itemButtonWrapper.classList.remove('animated-text')
-        },6000)
+        if (game.items.moneyEarnedLastRound > 0) runReceivedItemAnimation('money')
     }
     
     function changeBackground() {
-        switch (round) {
+        switch (game.round) {
             case 0: {
                 backgroundElement.style.backgroundImage = "url('images_schoolfight/background1.jpg')"
                 break
@@ -1413,7 +1322,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             case 5: {
                 runningBackground.style.display = 'block'
-                const spritePosition = spritePositions[party[1].class].front
+                const spritePosition = spritePositions[game.player.party[1].class].front
                 runningSprite.style.top = spritePosition.top
                 runningSprite.style.left = spritePosition.left
                 break
@@ -1431,120 +1340,108 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function startNextRound() { 
-        activateFade() 
-        hide(itemBox) 
+    function setUpNextRound() {
+        activateFade()
+        hide(itemBox)
         hide(bombContainerWrapper) 
-        setTimeout(() => changeBackground(), 500) 
-        setTimeout(() => { 
-            showDialogue = true 
-            disableAttackButtons = false 
-            show(dialogueBoxWrapper) 
-            const dialogueBox = document.getElementById("dialogue-box")
-            const currentDialogues = isTeacherMode ? dialoguesTeacher : dialogues
-            dialogueBox.innerHTML = currentDialogues[round][indexOfMessage]
+        setTimeout(() => changeBackground(), 1000)
+        setTimeout(() => {
+            setDialogue()
             document.querySelectorAll(".sprite-container").forEach(sprite => { 
                 sprite.classList.remove("hidden-buttons") 
             }) 
-            schoolbell.play()
-            party.forEach(element => element.energy = 100)
-            enemyParty = isTeacherMode ? setTeamsTeacher()[round] : setTeams[round]
-            enemyParty.forEach((element, index) => { 
-                element.id = index + 1 
-                if (element.class === "Dummy") { 
-                    hide(document.getElementById(`energybar-enemy${element.id}`)) 
-                    return 
-                } 
-                document.getElementById(`energy-enemy${element.id}-text`).innerHTML = element.class 
-            })
-            party.forEach((element, index) => {
-                element.id = index + 1
-                if (element.class === "Dummy") {
-                    hide(document.getElementById(`energybar-enemy${element.id}`))
-                    return
-                }
-                document.getElementById(`energy-enemy${element.id}-text`).innerHTML = element.class
-            })
-            drawEnergybars() 
+            playSound(sounds.schoolBell)
+            game.player.party.forEach(element => element.energy = 100)
+            game.enemy.party = game.isTeacherMode ? setTeamsTeacher()[game.round] : setTeams[game.round]
+            drawEnergyBars()
             document.querySelectorAll(".defeated").forEach(element => { 
                 element.classList.remove("defeated") 
             }) 
-            showPlayersprites() 
-            showEnemysprites() 
+            showPlayerSprites()
+            showEnemySprites()
             hide(document.getElementById("next-button")) 
-            titleSelect.innerHTML = "" 
-            if (round === 3) {
-                hideAll('energybar')
-                const energyBars = Array.from(document.getElementsByClassName('energybar'))
-                show(energyBars[1])
-                show(document.getElementById("rope-skipping-game"))
-                hideAll('left-party') 
-                const ropeSprite = document.getElementById("rope-sprite")
-                const spritePosition = isTeacherMode ? spritePositions.Teacher.front : spritePositions[party[2].class].front
-                ropeSprite.style.top = spritePosition.top
-                ropeSprite.style.left = spritePosition.left
-            } 
-            if (round === 5) {
-                hideAll('energybar') 
-                hideAll('left-party')
+            titleSelect.innerHTML = ""
+
+            if (game.round === 3) {
+                setupForRopeGame()
             }
 
-            if (round !== 3 && round !== 5) { 
-                hide(document.getElementById("rope-skipping-game"))
-                showAll('left-party')
-                showAll('energybar')
-                const energyBars = Array.from(document.getElementsByClassName('energybar'))
-                energyBars.forEach(bar => show(bar))
+            if (game.round === 5) {
+                setupRunningGame()
+            }
 
-                if (isTeacherMode) {
-                    hide(energyBars[0])
-                    hide(energyBars[2])
-                }
+            if (game.round !== 3 && game.round !== 5) {
+                setupRegularRound()
             } 
             
-            if (round === 8) { 
-                music.pause()
-                if (!isTeacherMode) {
-                    hide(document.getElementById("energybar-enemy1"))
-                    hide(document.getElementById("energybar-enemy3"))
-                }
+            if (game.round === 8) {
+                setupBossRound()
             } 
         }, 1000) 
     }
 
-    function drawEnergybars() { 
+    function setupForRopeGame() {
+        hideAll('energybar')
+        const energyBars = Array.from(document.getElementsByClassName('energybar'))
+        show(energyBars[1])
+        show(document.getElementById("rope-skipping-game"))
+        hideAll('left-party')
+        const ropeSprite = document.getElementById("rope-sprite")
+        const spritePosition = game.isTeacherMode ? spritePositions.Teacher.front : spritePositions[game.player.party[1].class].front
+        ropeSprite.style.top = spritePosition.top
+        ropeSprite.style.left = spritePosition.left
+    }
+
+    function setupRunningGame() {
+        hideAll('energybar')
+        hideAll('left-party')
+    }
+
+    function setupRegularRound() {
+        hide(document.getElementById("rope-skipping-game"))
+        showAll('left-party')
+        showAll('energybar')
+        const energyBars = Array.from(document.getElementsByClassName('energybar'))
+        energyBars.forEach(bar => show(bar))
+
+        if (game.isTeacherMode) {
+            hide(energyBars[0])
+            hide(energyBars[2])
+        }
+    }
+
+    function setupBossRound() {
+        sounds.music.pause()
+        if (!game.isTeacherMode) {
+            hide(document.getElementById("energybar-enemy1"))
+            hide(document.getElementById("energybar-enemy3"))
+        }
+    }
+
+    function drawEnergyBars() {
         for (let i = 0; i <= 2; i++) { 
             const charEnergyBar = document.getElementById(`energy-char${i + 1}`)
-            charEnergyBar.style.width = party[i].energy + "%"
-            charEnergyBar.style.background = party[i].energy < 30 ? "red" : "green"
-            if (party[i].class !== 'Dummy')show(charEnergyBar)
+            charEnergyBar.style.width = game.player.party[i].energy + "%"
+            charEnergyBar.style.background = game.player.party[i].energy < 30 ? "red" : "green"
+            if (game.player.party[i].class !== 'Dummy')show(charEnergyBar)
             const enemyEnergyBar = document.getElementById(`energy-enemy${i + 1}`)
-            enemyEnergyBar.style.width = enemyParty[i].energy + "%"
-            enemyEnergyBar.style.background = enemyParty[i].energy < 30 ? "red" : "green"
+            enemyEnergyBar.style.width = game.enemy.party[i].energy + "%"
+            enemyEnergyBar.style.background = game.enemy.party[i].energy < 30 ? "red" : "green"
             show(enemyEnergyBar)
         }
-        if (!isTeacherMode) return
+        if (!game.isTeacherMode) return
         const energyBars = Array.from(document.getElementsByClassName('energybar'))
         hide(energyBars[0])
         hide(energyBars[2])
     }
 
-    function updateEnergybars() { 
-        for (let i = 0; i <= 2; i++) { 
-            const charEnergyBar = document.getElementById(`energy-char${i + 1}`) 
-            charEnergyBar.style.width = party[i].energy + "%"
-            charEnergyBar.style.background = party[i].energy < 30 ? "red" : "green"
-            const enemyEnergyBar = document.getElementById(`energy-enemy${i + 1}`)
-            enemyEnergyBar.style.width = enemyParty[i].energy + "%"
-            enemyEnergyBar.style.background = enemyParty[i].energy < 30 ? "red" : "green"
-        }
-    }   
     const body = document.querySelector('body')
     const actions = {
-        '#char1.victory': () => playSound(clapSound), 
-        '#char2.victory': () => playSound(laughSound), 
-        '#char3.victory': () => playSound(screamSound), 
-        '#next-button': startNextRound 
+        '#char1.victory': () => playSound(sounds.clap),
+        '#char2.victory': () => playSound(sounds.laugh),
+        '#char3.victory': () => playSound(sounds.scream),
+        '#next-button': setUpNextRound,
+        '#open-shop-button': openShop,
     }
     body.addEventListener('click', (event) => {
         for (const selector in actions) { 
@@ -1577,139 +1474,84 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const switchSelectScreenButtons = document.querySelectorAll('.selectscreen-button')
     switchSelectScreenButtons.forEach(element => {
-        element.addEventListener('click', switchSelectscreen)
+        element.addEventListener('click', switchSelectScreen)
     })
 
-    function showConfetti() {
-        for (let i = 0; i < 100; i++) {
-            const confetti = document.createElement("div")
-            confetti.className = "confetti"
-            const colorNumber = Math.floor(Math.random() * 360)
-            const color = `hsl(${colorNumber}, 50%, 50%)`
-            const animationDelay = Math.random() * 20 + "s"
-            const xPosition = Math.random() * 100
-            confetti.style.animationDelay = animationDelay 
-            confetti.style.backgroundColor = color 
-            confetti.style.left = xPosition + "%"
-            backgroundElement.append(confetti)
-        }
-    }
-
-    function showBomb(){
-        bombContainerWrapper.style.display = 'block'
-        for (let i = 0; i < 100; i++) {
-            let cloud = document.createElement("div")
-            cloud.className = "bombcloud"
-            let animationDelay = Math.random() * 5 + "s"
-            let xPosition = Math.random() * 100
-            cloud.style.animationDelay = animationDelay 
-            cloud.style.top = "-150px" 
-            cloud.style.left = (xPosition - 50) + "px"
-            bombContainer.append(cloud)
-        }
-        setTimeout(()=>{
-            document.querySelectorAll('.right-party:not(.defeated)').forEach(element => {
-                element.classList.add('bombed-enemy')
-            })
-            stinkSound.play()
-        },2000)
-        setTimeout(()=>{
-            document.querySelectorAll('.right-party:not(.defeated)').forEach(element => {
-                element.classList.remove('bombed-enemy')
-            })
-        },3500)
-        setTimeout(()=>{
-            hide(bombContainerWrapper)
-        },7000)
-    }
-
-    function runVictoryAnimation() {
-        hideAll('energybar')
-        char1.style.top = '200px'
-        char1.style.left = '150px'
-        char2.style.top = '200px'
-        char2.style.left = '250px'
-        char3.style.top = '200px'
-        char3.style.left = '350px'
-        char1.classList.add('victory')
-        char2.classList.add('victory')
-        char3.classList.add('victory')
-
-        setTimeout(function () {
-            Array.from(document.getElementsByClassName('left-party')).forEach(element => {
-                element.classList.remove('defeated')
-            })
-        }, 100)
-    }
-
-    document.getElementById('item-button').addEventListener('click', eatSnack)
-    document.getElementById('bomb-button').addEventListener('click', throwBomb)
-
-    function eatSnack() {
-        if (party.length === 0 || snacks === 0) return
-        itemsUsed += 1
-        itemUsed = true
-        const aliveLeftParty = document.querySelectorAll('.left-party:not(.defeated)')
-        aliveLeftParty.forEach(element => element.classList.add('eating-snack'))
-        setTimeout(()=>{ 
-            aliveLeftParty.forEach(element => element.classList.remove('eating-snack'))
-        },1000)
-        battleTicker.innerHTML = snackMessageTemplate
-        battleTicker.style.display = 'block'
-        eatingSound.play()
-        hide(itemBox)
-        snacks -= 1
-        party.forEach(char => {
-            if (char.energy <= 0) return
-            
-            char.energy += 30
-
-            if (char.energy > 100) char.energy = 100
-        })
-        updateEnergybars()
-        itemButton.innerHTML = `${snackIcon}x${snacks}`
-    }
-
-    function throwBomb() { 
-        if (bombs <= 0 || enemyParty.length === 0) return
-        itemsUsed += 1
-        itemUsed = true
-        battleTicker.innerHTML = bombMessageTemplate
-        battleTicker.style.display = 'block' 
-        
-        showBomb()
-        hide(itemBox) 
-
-        bombs -= 1 
-        bombButton.innerHTML = `${bombIcon}x${bombs}` 
-        
-        if (getRemainingEnemies().length === 0) return 
-        
-        enemyParty.forEach(enemy => { 
-            enemy.energy -= 30
-            if(enemy.energy <= 0) enemy.energy = 0 
-            updateEnergybars() 
-            checkRemainingEnemies()
-            setTimeout(() => { 
-                setCharactersDefeated()
-            }, 5000) 
-        }) 
-    }
-
     function getRemainingEnemies() {
-        return enemyParty.filter(enemy => enemy.energy > 0)
+        return game.enemy.party.filter(enemy => enemy.energy > 0)
     }
 
     function getRemainingParty() {
-        return party.filter(char => char.energy > 0 && char.class !== 'Dummy')
+        return game.player.party.filter(char => char.energy > 0 && char.class !== 'Dummy')
     }
 
-    function switchSelectscreen(event) {
-        const maximumIndex = selectScreens.length - 1
+    document.getElementById('fullscreen-button').addEventListener('click', setFullscreen)
+    function setFullscreen() {
+        if (!document.fullscreenElement) document.body.requestFullscreen().catch()
+        else document.exitFullscreen().catch()
+    }
 
-        const parentElement = document.getElementById('select-screen3')
-        const sprites = parentElement.getElementsByClassName('selectsprite')
-        const descBoxes = parentElement.getElementsByClassName('desc-box')
+    if (game.lastVictoryTeam && game.lastVictoryTeam.length >=1) vendettaButton.style.display = 'block'
+
+    /*
+    DRAW SPRITES
+     */
+
+    function showPlayerSprites() {
+        game.player.party.forEach((element, index) => {
+            const charSprite = document.getElementById(`char${index + 1}-sprite`)
+            const spritePosition = spritePositions[element.class].front
+            Object.keys(spritePosition).forEach(key => {
+                charSprite.style[key] = spritePosition[key]
+            })
+            document.querySelector(`.buttons-char${index + 1}[data-type='strength'] i span`).innerHTML = element.strength
+            document.querySelector(`.buttons-char${index + 1}[data-type='intelligence'] i span`).innerHTML = element.intelligence
+            document.querySelector(`.buttons-char${index + 1}[data-type='assholiness'] i span`).innerHTML = element.assholiness
+        })
+    }
+
+    function showPlayerSpritesTeacher() {
+
+        const charSprite = document.getElementById('char2-sprite')
+        const spritePosition = spritePositions.Teacher.front
+        Object.keys(spritePosition).forEach(key => {
+            charSprite.style[key] = spritePosition[key]
+        })
+        document.querySelector(`.buttons-char2[data-type='strength'] i span`).innerHTML = characters.teacher.strength
+        document.querySelector(`.buttons-char2[data-type='intelligence'] i span`).innerHTML = characters.teacher.intelligence
+        document.querySelector(`.buttons-char2[data-type='assholiness'] i span`).innerHTML = characters.teacher.assholiness
+
+        document.getElementById('char1-sprite').style.display = 'none'
+        document.getElementById('char3-sprite').style.display = 'none'
+    }
+
+    function showEnemySprites() {
+        game.enemy.party.forEach((element, index) => {
+            element.id = index + 1
+            const enemySprite = document.getElementById(`enemy${index + 1}-sprite`)
+            const spritePosition = spritePositions[element.class].front
+            Object.keys(spritePosition).forEach(key => {
+                enemySprite.style[key] = spritePosition[key]
+            })
+            document.getElementById(`energy-enemy${index + 1}-text`).innerHTML = element.class
+        })
+    }
+
+    /*
+    SCREEN HANDLING
+     */
+
+    titleButton.addEventListener('click', () => startGame(false))
+    vendettaButton.addEventListener('click', () => startGame(true))
+
+    const selectScreens = [selectScreen, selectScreen2, selectScreen3]
+
+    function displayUnlockableCharacters() {
+        const screen3 = document.getElementById('select-screen3')
+        const sprites = screen3.getElementsByClassName('select-sprite')
+        const descBoxes = screen3.getElementsByClassName('desc-box')
+
+        const amountTrophies = Object.values(game.trophies).filter(trophy => trophy.unlocked).length
 
         if (amountTrophies >= 2) hide(document.getElementById('unlockables-message'))
         if (amountTrophies < 2) {
@@ -1722,31 +1564,386 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (amountTrophies < 6) {
             hide(sprites[2])
-            hide(descBoxes[2])        
+            hide(descBoxes[2])
         }
+    }
+
+    function switchSelectScreen(event) {
+        const maximumIndex = selectScreens.length - 1
+
+        displayUnlockableCharacters()
 
         if (event.currentTarget.classList.contains('right-button')) {
-            displayedSelectScreenIndex += 1
+            game.displayedSelectScreenIndex += 1
         }
 
         if (event.currentTarget.classList.contains('left-button')) {
-            displayedSelectScreenIndex -= 1
+            game.displayedSelectScreenIndex -= 1
         }
 
-        if (displayedSelectScreenIndex < 0) displayedSelectScreenIndex = maximumIndex
-        if (displayedSelectScreenIndex > maximumIndex) displayedSelectScreenIndex = 0
+        if (game.displayedSelectScreenIndex < 0) game.displayedSelectScreenIndex = maximumIndex
+        if (game.displayedSelectScreenIndex > maximumIndex) game.displayedSelectScreenIndex = 0
 
         selectScreens.forEach((screen, index) => {
-            screen.style.display = index === displayedSelectScreenIndex ? 'grid' : 'none'
+            screen.style.display = index === game.displayedSelectScreenIndex ? 'grid' : 'none'
         })
 
-        clicksound.play()
+        playSound(sounds.click)
     }
 
-    document.getElementById('fullscreen-button').addEventListener('click', setFullscreen)
-    function setFullscreen() {
-        if (!document.fullscreenElement) document.body.requestFullscreen().catch()
-        else document.exitFullscreen().catch()
+    function showTrophiesScreen () {
+        playSound(sounds.confirm)
+        show(trophiesScreen)
+        hide(titleButton)
+        hide(howToPlayButton)
+        hide(displayTrophiesButton)
+        hide(vendettaButton)
+        hide(title)
+    }
+
+    function displayAlreadyUnlockedTrophy(trophy) {
+        if (trophy.unlocked) trophy.element.classList.remove('not-received')
+    }
+
+    displayTrophiesButton.addEventListener('click', showTrophiesScreen)
+
+    document.getElementById('how-to-play-button').addEventListener('click', toggleTutorial)
+
+    document.getElementById('tutorial-screen').addEventListener('click', function(event) {
+        if (event.target && event.target.id === 'back-button') {
+            toggleTutorial()
+        }
+
+        if (event.target && event.target.id === 'toggle-tutorial-button') {
+            switchTutorialPage()
+        }
+    })
+
+    function toggleTutorial() {
+        playSound(sounds.confirm)
+        game.showTutorial = !game.showTutorial
+
+        if (game.showTutorial) {
+            hide(title)
+            hide(titleButton)
+            hide(vendettaButton)
+            show(tutorialScreen)
+            show(backButton)
+            hide(howToPlayButton)
+            hide(displayTrophiesButton)
+            return
+        }
+
+        location.reload()
+    }
+
+    let showFirstPageTutorial = true
+
+    function switchTutorialPage() {
+        showFirstPageTutorial = !showFirstPageTutorial
+        tutorialScreen.innerHTML = showFirstPageTutorial ? tutorialPage1template : tutorialPage2template
+    }
+
+    /*
+    USE ITEMS
+     */
+
+    document.getElementById('item-button').addEventListener('click', eatSnack)
+    document.getElementById('bomb-button').addEventListener('click', throwBomb)
+
+    function eatSnack() {
+        if (game.player.party.length === 0 || game.items.snacks === 0) return
+        game.itemsUsed += 1
+        game.itemUsed = true
+        runSnackAnimation()
+        game.items.snacks -= 1
+        game.player.party.forEach(char => {
+            char.eatSnack()
+        })
+        drawEnergyBars()
+        drawItembox()
+    }
+
+    function throwBomb() {
+        if (game.items.bombs <= 0 || game.enemy.party.length === 0) return
+        hideMoveSelectButtons()
+        game.itemsUsed += 1
+        game.itemUsed = true
+        battleTicker.innerHTML = bombMessageTemplate
+        show(battleTicker)
+
+        runBombAnimation()
+        hide(itemBox)
+
+        game.items.bombs -= 1
+        drawItembox()
+
+        game.enemy.party.forEach(enemy => {
+            enemy.takeBombDamage()
+        })
+
+        drawEnergyBars()
+        checkRemainingEnemies()
+
+        setTimeout(() => {
+            setCharactersDefeated()
+            updateGameState(gameStates.selectTargets)
+        }, 5000)
+    }
+
+    function drawItembox() {
+        bombButton.innerHTML = `<i class="fas fa-bomb"></i>x${game.items.bombs}`
+        itemButton.innerHTML = `${snackIcon}x${game.items.snacks}`
+        document.getElementById('money').innerHTML = `$${game.items.money}`
+    }
+
+/*
+    ANIMATIONS
+ */
+
+    const fadeOutElement = document.getElementById('fade-out')
+
+    function activateFade() {
+        playSound(sounds.fade)
+        fadeOutElement.classList.remove('hidden', 'fade-out')
+        fadeOutElement.classList.add('fade-out')
+        setTimeout(() => fadeOutElement.classList.add('hidden'), 2000)
+    }
+
+    function activateFadeGameover() {
+        playSound(sounds.fade)
+        fadeOutElement.classList.remove('hidden', 'fade-out')
+        fadeOutElement.classList.add('fade-out-red')
+    }
+
+    function runSnackAnimation() {
+        const aliveLeftParty = document.querySelectorAll('.left-party:not(.defeated)')
+        aliveLeftParty.forEach(element => element.classList.add('eating-snack'))
+        setTimeout(()=>{
+            aliveLeftParty.forEach(element => element.classList.remove('eating-snack'))
+        },1000)
+
+        battleTicker.innerHTML = snackMessageTemplate
+        battleTicker.style.display = 'block'
+        playSound(sounds.eating)
+        hide(itemBox)
+    }
+
+    function runVictoryAnimation() {
+        const chars = [char1,char2,char3]
+        hideAll('energybar')
+        hideMoveSelectButtons()
+        chars.forEach((char, index) => {
+            char.style.top = '200px'
+            char.style.left = `${150 + 100 * index}px`
+            char.classList.add('victory')
+        })
+
+        setTimeout(function () {
+            chars.forEach(char => char.classList.remove('defeated'))
+        }, 100)
+    }
+
+    function runFightAnimation() {
+        updateGameState(gameStates.battleAnimation)
+        playSound(sounds.fight)
+        const allSelected = document.querySelectorAll('.selected')
+        allSelected.forEach(selected => selected.classList.remove('selected'))
+        overlay.style.zIndex = '999'
+        fightAnimationRunning = true
+        sounds.punch.playbackRate = 3
+        hide(itemBox)
+        setTimeout(() => playSound(sounds.punch), 500)
+        document.querySelectorAll(".left-party, .right-party").forEach(element =>
+            element.style.animationDelay = `${Math.floor(Math.random() * 250)}ms`
+        )
+
+
+        document.querySelectorAll(".sprite-container.alive").forEach(element => {
+            if (element.classList.contains("left-party")) {
+                element.classList.add("animated-character1")
+            } else {
+                element.classList.add("animated-character2")
+            }
+        })
+
+        setTimeout(() => {
+            overlay.style.zIndex = '-1'
+            Array.from(document.getElementsByClassName('animated-character1')).forEach(element => {
+                element.classList.remove('animated-character1')
+            })
+            Array.from(document.getElementsByClassName('animated-character2')).forEach(element => {
+                element.classList.remove('animated-character2')
+            })
+            Array.from(document.getElementsByClassName('buttons-char')).forEach(element => {
+                element.classList.remove('hidden')
+            })
+            setCharactersDefeated()
+        }, 2600)
+        setTimeout(() => {
+            updateGameState(gameStates.selectTargets)
+            fightAnimationRunning = false
+        }, 3000)
+        setTimeout(() => {
+            hide(battleTicker)
+        }, 4000)
+        game.player.moves = []
+    }
+
+    function runConfettiAnimation() {
+        for (let i = 0; i < 100; i++) {
+            const confetti = document.createElement('div')
+            confetti.className = 'confetti'
+            const colorNumber = Math.floor(Math.random() * 360)
+            const color = `hsl(${colorNumber}, 50%, 50%)`
+            const animationDelay = Math.random() * 20 + 's'
+            const xPosition = Math.random() * 100
+            confetti.style.animationDelay = animationDelay
+            confetti.style.backgroundColor = color
+            confetti.style.left = xPosition + '%'
+            backgroundElement.append(confetti)
+        }
+    }
+
+    function runBombAnimation(){
+        bombContainerWrapper.style.display = 'block'
+        for (let i = 0; i < 100; i++) {
+            const cloud = document.createElement('div')
+            cloud.className = 'bombcloud'
+            const animationDelay = Math.random() * 5 + 's'
+            const xPosition = Math.random() * 100
+            cloud.style.animationDelay = animationDelay
+            cloud.style.top = '-150px'
+            cloud.style.left = (xPosition - 50) + 'px'
+            bombContainer.append(cloud)
+        }
+        setTimeout(()=>{
+            document.querySelectorAll('.right-party:not(.defeated)').forEach(element => {
+                element.classList.add('bombed-enemy')
+            })
+            playSound(sounds.stink)
+        },2000)
+        setTimeout(()=>{
+            document.querySelectorAll('.right-party:not(.defeated)').forEach(element => {
+                element.classList.remove('bombed-enemy')
+            })
+        },3500)
+        setTimeout(()=>{
+            hide(bombContainerWrapper)
+        },7000)
+    }
+
+    function runReceivedItemAnimation(item) {
+        show(itemBox, 'flex')
+        Array.from(document.getElementsByClassName('shop-button')).forEach(button => button.setAttribute('disabled', 'true'))
+        if (item === 'bomb') {
+            bombButton.innerHTML = additionalBombMessageTemplate
+            bombButtonWrapper.classList.add('animated-text')
+        }
+
+        if (item === 'snack') {
+            itemButton.innerHTML = additionalSnackMessageTemplate
+            itemButtonWrapper.classList.add('animated-text')
+        }
+
+        if (item === 'money') {
+            document.getElementById('money').innerHTML = `$${game.items.money}`
+            document.getElementById('money').classList.add('animated-text')
+        }
+
+        setTimeout(()=>{
+            drawItembox()
+            bombButtonWrapper.classList.remove('animated-text')
+            itemButtonWrapper.classList.remove('animated-text')
+            document.getElementById('money').classList.remove('animated-text')
+        },1500)
+        setTimeout(() => {
+            checkForAffordableItems()
+            hide(itemBox)
+        }, 2500)
+    }
+
+    /*
+    *
+    * SHOP
+    *
+     */
+
+    function openShop() {
+        updateMoneyAmountInShop()
+        activateFade()
+        hide(titleSelect)
+        hideAll('energybar')
+        hideAll('left-party')
+        setTimeout(() => {
+            document.getElementById('shop').style.display = 'block'
+            document.getElementById('shop-dialogue-box-wrapper').style.display = 'block'
+        }, 1000)
+    }
+
+    function updateMoneyAmountInShop() {
+        const moneyAmountElement = document.getElementById('current-amount-money')
+        moneyAmountElement.innerHTML = `You have $${game.items.money}`
+    }
+
+    document.getElementById('leave-shop-button').addEventListener('click', leaveShop)
+    function leaveShop() {
+        activateFade()
+        setTimeout(() => {
+            show(titleSelect)
+            showAll('energybar')
+            showAll('left-party')
+            document.getElementById('shop').style.display = 'none'
+        }, 1000)
+    }
+    document.getElementById('upgrade-intelligence-button').addEventListener('click', () => upgrade(attackTypes.intelligence))
+    document.getElementById('upgrade-strength-button').addEventListener('click', () => upgrade(attackTypes.strength))
+    document.getElementById('upgrade-assholiness-button').addEventListener('click', () => upgrade(attackTypes.assholiness))
+    document.getElementById('buy-snack-button').addEventListener('click', () => updateItemBox('snack'))
+    document.getElementById('buy-bomb-button').addEventListener('click', () => updateItemBox('bomb'))
+
+    function upgrade(attackType) {
+        playSound(sounds.powerUp)
+        document.getElementById('upgrade-message-wrapper').innerHTML = ''
+        game.items.money -= prices.upgrade
+        updateMoneyAmountInShop()
+        Array.from(document.getElementsByClassName('shop-button')).forEach(button => button.setAttribute('disabled', 'true'))
+        document.getElementById('shop-dialogue-box-wrapper').style.display = 'none'
+        game.player.party.forEach(member => member[attackType] += 1)
+        const message = document.createElement('div')
+        message.classList.add('upgrade-message')
+        const icon = () => {
+            if (attackType === attackTypes.strength) return strengthIcon
+            if (attackType === attackTypes.intelligence) return intelligenceIcon
+            if (attackType === attackTypes.assholiness) return assholinessIcon
+        }
+        message.innerHTML = `<div class="animated-text">${icon()} +1</div>`
+        drawItembox()
+        document.getElementById('upgrade-message-wrapper').appendChild(message)
+        setTimeout(() => {
+            checkForAffordableItems()
+            document.getElementById('upgrade-message-wrapper').innerHTML = ''
+        }, 2000)
+    }
+
+    function checkForAffordableItems() {
+        Array.from(document.getElementsByClassName('shop-button')).forEach(element => element.removeAttribute('disabled'))
+        if (game.items.money < prices.item) {
+            Array.from(document.getElementsByClassName('item-button')).forEach(element => element.setAttribute('disabled', true))
+        }
+        if (game.items.money < prices.upgrade) {
+            Array.from(document.getElementsByClassName('upgrade-button')).forEach(element => element.setAttribute('disabled', true))
+        }
+    }
+
+    function updateItemBox(item){
+        if (item !== 'money') game.items.money -= prices.item
+        playSound(sounds.eating)
+        updateMoneyAmountInShop()
+        document.getElementById('shop-dialogue-box-wrapper').style.display = 'none'
+        if (item !== 'money') game.items.received += 1
+        if (item === 'bomb') game.items.bombs += 1
+        if (item === 'snack') game.items.snacks += 1
+        runReceivedItemAnimation(item)
     }
 })
-
