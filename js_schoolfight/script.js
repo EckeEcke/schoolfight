@@ -27,10 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const itemBox = document.getElementById('item-box')
     const itemButtonWrapper = document.getElementById('item-button-wrapper')
     const itemButton = document.getElementById('item-button')
-    const enemyRunning = document.getElementById('enemy-running')
-    const characterRunning = document.getElementById('character-running')
     const titleSelect = document.getElementById('title-select')
-    const runningBackgroundText = document.querySelector('#running-background h2')
     const selectScreen = document.getElementById('select-screen')
     const selectScreen2 = document.getElementById('select-screen2')
     const selectScreen3 = document.getElementById('select-screen3')
@@ -200,6 +197,86 @@ document.addEventListener('DOMContentLoaded', () => {
         game.state = newState // currently not used
     }
 
+    class Trophy {
+        constructor(name, message, elementId) {
+            this.name = name
+            this.message = message
+            this.elementId = elementId
+            this.unlocked = false
+            this.element = document.getElementById(this.elementId)
+            this.trophyMessagesContainer = document.getElementById('trophy-messages-container')
+        }
+
+        isUnlocked() {
+            return this.unlocked
+        }
+
+        unlock() {
+            if (!this.unlocked) {
+                this.unlocked = true
+                this.displayTrophyToast()
+                this.updateElement()
+            }
+        }
+
+        displayTrophyToast() {
+            const trophyMessageDiv = document.createElement('div')
+            trophyMessageDiv.innerHTML =
+                `<div class="trophy-icon-wrapper">
+                <i class='fas fa-trophy'></i>
+            </div>
+            <div>${this.message}</div>`
+
+            trophyMessageDiv.classList.add('trophy', 'trophy-message')
+            this.trophyMessagesContainer.appendChild(trophyMessageDiv)
+        }
+
+        updateElement() {
+            if (this.element) {
+                this.element.classList.remove('not-received')
+            }
+        }
+    }
+
+    const trophies = {
+        beatenGame: new Trophy(
+            'beatenGame',
+            'Beaten the game',
+            'trophy-beaten',
+        ),
+        allAssholes: new Trophy(
+            'allAssholes',
+            'Beat game assholes only',
+            'all-assholes',
+        ),
+        allStrength: new Trophy(
+            'allStrength',
+            'Beat game strength only',
+            'all-strength',
+        ),
+        allIntelligence: new Trophy(
+            'allIntelligence',
+            'Beat game intel. only',
+            'all-intelligence',
+        ),
+        sixItems: new Trophy(
+            'hasSixItems',
+            'Use six items in a run',
+            'six-items',
+        ),
+        noItems: new Trophy(
+            'hasNoItems',
+            'Beat game without items',
+            'itemless',
+        )
+    }
+
+    const allTrophies = Object.values(trophies)
+
+    if (parsedTrophies) {
+        allTrophies.forEach(trophy => displayAlreadyUnlockedTrophy(trophy))
+    }
+
     const game = {
         state: gameStates.title,
         round: 0,
@@ -213,17 +290,8 @@ document.addEventListener('DOMContentLoaded', () => {
         enemy: {
             party: [],
         },
-        items: {
-            bombs: 1,
-            snacks: 1,
-            received: 0,
-            money: 0,
-            moneyEarnedLastRound: 0,
-            moneyEarnedTotal: 0,
-        },
         battleMessages: [],
         messageIndex: 0,
-        itemUsed: false,
         itemsUsed: 0,
         isTeacherMode: false,
         lastVictoryTeam: JSON.parse(localStorage.getItem('lastVictoryTeam')),
@@ -231,114 +299,170 @@ document.addEventListener('DOMContentLoaded', () => {
         showTutorial: false,
         displayedSelectScreenIndex: 0,
         lastMoveTeacher: 'intelligence',
-        miniGames: {
-            ropeSkip: {
-                moveRopeDownwards: false,
-                ropeY: 270,
-                skips: 0,
-                speed: 100,
-                characterJumps: false,
-                points: 0,
-                interval: null,
-            },
-            running: {
-                bg1Left: 0,
-                bg2Left: 313,
-                bg3Left: 616,
-                characterLeft: 100,
-                enemyLeft: 350,
-                moveBackgroundInterval: null,
-            }
-        },
-        trophies: {
-            beatenGame: {
-                unlocked: parsedTrophies && 'beatenGame' in parsedTrophies,
-                element: document.getElementById('trophy-beaten'),
-                message: 'Beaten the game',
-            },
-            allAssholes: {
-                unlocked: parsedTrophies && 'allAssholes' in parsedTrophies,
-                element: document.getElementById('all-assholes'),
-                message: 'All Assholes',
-            },
-            allStrength: {
-                unlocked: parsedTrophies && 'allStrength' in parsedTrophies,
-                element: document.getElementById('all-strength'),
-                message: 'All Strength',
-            },
-            allIntelligence: {
-                unlocked: parsedTrophies && 'allIntelligence' in parsedTrophies,
-                element: document.getElementById('all-intelligence'),
-                message: 'All Intelligence',
-            },
-            sixItems: {
-                unlocked: parsedTrophies && 'hasSixItems' in parsedTrophies,
-                element: document.getElementById('six-items'),
-                message: 'Use six items',
-            },
-            noItems: {
-                unlocked: parsedTrophies && 'hasNoItems' in parsedTrophies,
-                element: document.getElementById('itemless'),
-                message: 'Beat game without items',
-            },
-        }
     }
 
     let fightAnimationRunning = false
-    let bombAnimationRunning = false
 
-    /**
-     * 
-     * Sprite positions
-     * 
-     */
+    /*
+    *
+    * Item Manager
+    *
+    */
 
-    const spritePositions = {
-        Bully: {
-            front: { top: "-425px", left: "-340px" },
-            side: { top: "-425px", left: "-410px" },
-        },
-        Squealer: {
-            front: { top: "-320px", left: "-42px" },
-            side: { top: "-320px", left: "-108px" },
-        },
-        Nerd: {
-            front: { top: "-425px", left: "-42px" },
-            side: { top: "-425px", left: "-108px" },
-        },
-        Wally: {
-            front: { top: "-105px", left: "-340px" },
-            side: { top: "-105px", left: "-410px" },
-        },
-        Dummy: {
-            front: { top: "10000px", left: "10000px" },
-            side: { top: "10000px", left: "10000px" }
-        },
-        Sportskid: {
-            front: { top: "-320px", left: "-340px" },
-            side: { top: "-320px", left: "-410px" },
-        },
-        Richkid: {
-            front: { top: "-215px", left: "-340px" },
-            side: { top: "-215px", left: "-410px" },
-        },
-        Teacher: {
-            front: { top: "-215px", left: "-42px" },
-            side: { top: "-215px", left: "-108px" },
-        },
-        Weirdo: {
-            front: { top: "-105px", left: "-42px" },
-            side: { top: "-105px", left: "-108px" },
-        },
-        Wolfkid: {
-            front: { top: "-532px", left: "-340px" },
-            side: undefined,
-        },
-        Normie: {
-            front: { top: "0px", left: "-42px" },
-            side: { top: "0px", left: "-108px" },
+    class ItemManager {
+        constructor() {
+            this.bombs = 1
+            this.snacks = 1
+            this.money = 0
+            this.moneyEarnedLastRound = 0
+            this.moneyEarnedTotal = 0
+            this.itemUsed = false
+            this.itemsUsed = 0
+        }
+
+        eatSnack() {
+            if (game.player.party.length === 0 || this.snacks === 0) return
+            this.itemsUsed += 1
+            this.itemUsed = true
+            this.runSnackAnimation()
+            this.snacks -= 1
+            game.player.party.forEach(char => {
+                char.recoverPartially()
+            })
+            drawEnergyBars()
+            this.drawItemBox()
+        }
+
+        throwBomb() {
+            if (this.bombs <= 0 || game.enemy.party.length === 0) return
+            this.itemsUsed += 1
+            this.itemUsed = true
+            battleTicker.innerHTML = bombMessageTemplate
+            show(battleTicker)
+
+            this.runBombAnimation()
+            hide(itemBox)
+
+            this.bombs -= 1
+            this.drawItemBox()
+
+            game.enemy.party.forEach(enemy => {
+                enemy.takeBombDamage()
+            })
+
+            drawEnergyBars()
+            checkRemainingEnemies()
+
+            setTimeout(() => {
+                setCharactersDefeated()
+                updateGameState(gameStates.selectTargets)
+            }, 5000)
+        }
+
+        drawItemBox() {
+            bombButton.innerHTML = `<i class="fas fa-bomb"></i>x${this.bombs}`
+            itemButton.innerHTML = `${snackIcon}x${this.snacks}`
+            document.getElementById('money').innerHTML = `$${this.money}`
+        }
+
+        runSnackAnimation() {
+            const aliveLeftParty = document.querySelectorAll('.left-party:not(.defeated)')
+            aliveLeftParty.forEach(element => element.classList.add('eating-snack'))
+            setTimeout(()=>{
+                aliveLeftParty.forEach(element => element.classList.remove('eating-snack'))
+            },1000)
+
+            battleTicker.innerHTML = snackMessageTemplate
+            battleTicker.style.display = 'block'
+            playSound(sounds.eating)
+            hide(itemBox)
+        }
+
+        runBombAnimation(){
+            bombContainerWrapper.style.display = 'block'
+            for (let i = 0; i < 100; i++) {
+                const cloud = document.createElement('div')
+                cloud.className = 'bombcloud'
+                const animationDelay = Math.random() * 5 + 's'
+                const xPosition = Math.random() * 100
+                cloud.style.animationDelay = animationDelay
+                cloud.style.top = '-150px'
+                cloud.style.left = (xPosition - 50) + 'px'
+                bombContainer.append(cloud)
+            }
+            setTimeout(()=>{
+                document.querySelectorAll('.right-party:not(.defeated)').forEach(element => {
+                    element.classList.add('bombed-enemy')
+                })
+                playSound(sounds.stink)
+            },2000)
+            setTimeout(()=>{
+                document.querySelectorAll('.right-party:not(.defeated)').forEach(element => {
+                    element.classList.remove('bombed-enemy')
+                })
+            },3500)
+            setTimeout(()=>{
+                hide(bombContainerWrapper)
+            },7000)
+        }
+
+        runReceivedItemAnimation(item) {
+            show(itemBox, 'flex')
+            Array.from(document.getElementsByClassName('shop-button')).forEach(button => button.setAttribute('disabled', 'true'))
+            if (item === 'bomb') {
+                bombButton.innerHTML = additionalBombMessageTemplate
+                bombButtonWrapper.classList.add('animated-text')
+            }
+
+            if (item === 'snack') {
+                itemButton.innerHTML = additionalSnackMessageTemplate
+                itemButtonWrapper.classList.add('animated-text')
+            }
+
+            setTimeout(()=>{
+                this.drawItemBox()
+                bombButtonWrapper.classList.remove('animated-text')
+                itemButtonWrapper.classList.remove('animated-text')
+            },1500)
+            setTimeout(() => {
+                this.checkForAffordableItems()
+                hide(itemBox)
+            }, 2500)
+        }
+
+        checkForAffordableItems() {
+            Array.from(document.getElementsByClassName('shop-button')).forEach(element => element.removeAttribute('disabled'))
+            if (this.money < prices.item) {
+                Array.from(document.getElementsByClassName('item-button')).forEach(element => element.setAttribute('disabled', true))
+            }
+            if (this.money < prices.upgrade) {
+                Array.from(document.getElementsByClassName('upgrade-button')).forEach(element => element.setAttribute('disabled', true))
+            }
+        }
+
+        buyItem(item){
+            if (item !== 'money') this.money -= prices.item
+            playSound(sounds.eating)
+            updateMoneyAmountInShop()
+            document.getElementById('shop-dialogue-box-wrapper').style.display = 'none'
+            if (item === 'bomb') this.bombs += 1
+            if (item === 'snack') this.snacks += 1
+            this.runReceivedItemAnimation(item)
+        }
+
+        updateMoney(amount) {
+            this.money += amount
+        }
+
+        updateMoneyEarnedTotal(amount) {
+            this.moneyEarnedTotal += amount
         }
     }
+
+    const itemManager = new ItemManager()
+
+    document.getElementById('item-button').addEventListener('click', () => itemManager.eatSnack())
+    document.getElementById('bomb-button').addEventListener('click', () => itemManager.throwBomb())
 
     /*
     * 
@@ -356,110 +480,140 @@ document.addEventListener('DOMContentLoaded', () => {
             this.intelligence = type.intelligence
             this.assholiness = type.assholiness
             this.defends = false
+            this.frontSprite = type.frontSprite
+            this.sideSprite = type.sideSprite
         }
         takeDamage(damage) {
             this.energy -= this.defends ? damage : damage * 2
             if (this.energy < 0) this.energy = 0
         }
-        eatSnack() {
+        recoverPartially() {
             if (this.energy <= 0) return
             this.energy += 30
             if (this.energy > 100) this.energy = 100
+        }
+        recoverFull() {
+            this.energy = 100
         }
         takeBombDamage() {
             this.energy -= 30
             if (this.energy < 0) this.energy = 0
         }
+        upgradeStat(stat) {
+            this[stat] += 1
+        }
     }
 
     const characters = {
         bully: {
-            class: "Bully",
+            class: 'Bully',
             type: attackTypes.assholiness,
             energy: 100,
             strength: 12,
             intelligence: 0,
             assholiness: 14,
+            frontSprite: 'bully-front',
+            sideSprite: 'bully-side',
         },
         squealer: {
-            class: "Squealer",
+            class: 'Squealer',
             energy: 100,
             type: attackTypes.assholiness,
             strength: 0,
             intelligence: 0,
             assholiness: 20,
+            frontSprite: 'squealer-front',
+            sideSprite: 'squealer-side',
         },
         nerd: {
-            class: "Nerd",
+            class: 'Nerd',
             type: attackTypes.intelligence,
             energy: 100,
             strength: 0,
             intelligence: 20,
             assholiness: 0,
+            frontSprite: 'nerd-front',
+            sideSprite: 'nerd-side',
         },
         wally: {
-            class: "Wally",
+            class: 'Wally',
             type: attackTypes.strength,
             energy: 100,
             strength: 20,
             intelligence: 0,
             assholiness: 0,
+            frontSprite: 'wally-front',
+            sideSprite: 'wally-side',
         },
         richkid: {
-            class: "Richkid",
+            class: 'Richkid',
             type: attackTypes.intelligence,
             energy: 100,
             strength: 0,
             intelligence: 14,
             assholiness: 12,
+            frontSprite: 'richkid-front',
+            sideSprite: 'richkid-side',
         },
         sportskid: {
-            class: "Sportskid",
+            class: 'Sportskid',
             type: attackTypes.strength,
             energy: 100,
             strength: 14,
             intelligence: 12,
             assholiness: 0,
+            frontSprite: 'sportskid-front',
+            sideSprite: 'sportskid-side',
         },
         normie: {
-            class: "Normie",
+            class: 'Normie',
             type: attackTypes.allrounder,
             energy: 100,
             strength: 8,
             intelligence: 8,
             assholiness: 8,
+            frontSprite: 'normie-front',
+            sideSprite: 'normie-side',
         },
         weirdo: {
-            class: "Weirdo",
+            class: 'Weirdo',
             type: attackTypes.intelligence,
             energy: 100,
             strength: 6,
             intelligence: 14,
             assholiness: 6,
+            frontSprite: 'weirdo-front',
+            sideSprite: 'weirdo-side',
         },
         wolf: {
-            class: "Wolfkid",
+            class: 'Wolfkid',
             type: attackTypes.strength,
             energy: 100,
             strength: 16,
             intelligence: 0,
             assholiness: 10,
+            frontSprite: 'wolfkid-front',
+            sideSprite: 'wolfkid-side',
         },
         dummy: {
-            class: "Dummy",
+            class: 'Dummy',
             type: attackTypes.strength,
             energy: 0,
             strength: 0,
             intelligence: 0,
             assholiness: 0,
+            frontSprite: 'dummy-front',
+            sideSprite: 'dummy-side',
         },
         teacher: {
-            class: "Teacher",
+            class: 'Teacher',
             type: attackTypes.teacher,
             energy: 100,
             strength: 34,
             intelligence: 34,
             assholiness: 34,
+            frontSprite: 'teacher-front',
+            sideSprite: 'teacher-side',
         }
     }
 
@@ -495,6 +649,229 @@ document.addEventListener('DOMContentLoaded', () => {
         Object.assign(new Character(characters.teacher), { id: 2 }),
         Object.assign(new Character(characters.dummy), { id: 3 })
     ]
+
+
+    /**
+     *
+     * Minigame Running
+     *
+     */
+
+    class RunningMinigame {
+        constructor() {
+            this.bg1Left = 0
+            this.bg2Left = 313
+            this.bg3Left = 616
+            this.characterLeft = 100
+            this.enemyLeft = 350
+            this.moveBackgroundInterval = null
+            this.runningBackgroundText = document.querySelector('#running-background h2')
+            this.characterRunning = document.getElementById('character-running')
+            this.enemyRunning = document.getElementById('enemy-running')
+        }
+
+        start() {
+            this.moveBackgroundInterval = setInterval(this.moveBackground.bind(this), 1000 / 120)
+            sounds.steps.playbackRate = 2
+            sounds.steps.loop = true
+            sounds.steps.play().catch()
+            runningSprite.className = game.player.party[1].sideSprite
+            this.characterRunning.classList.add('running')
+            this.enemyRunning.classList.add('running')
+            hide(itemBox)
+        }
+
+        run() {
+            this.characterLeft -= 4
+        }
+
+        moveBackground() {
+            this.bg1Left += 1
+            this.bg2Left += 1
+            this.bg3Left += 1
+
+            if (this.bg1Left >= 616) this.bg1Left = -313
+            if (this.bg2Left >= 616) this.bg2Left = -313
+            if (this.bg3Left >= 616) this.bg3Left = -313
+
+            this.characterLeft += 0.1
+            this.enemyLeft -= 0.2
+
+            const distance = this.enemyLeft - this.characterLeft
+
+            if (distance < 160 && !this.runningBackgroundText.classList.contains('animated-text')) {
+                this.runningBackgroundText.innerHTML = 'Run faster!!! He almost got you!'
+                this.runningBackgroundText.classList.add('animated-text')
+                playSound(sounds.evilLaugh)
+            }
+
+            if (this.enemyLeft < this.characterLeft + 20) {
+                this.gameOver()
+                return
+            }
+
+            if (this.characterLeft < -60) {
+                this.nextRound()
+                return
+            }
+
+            document.getElementById('running-bg-1').style.left = this.bg1Left + 'px'
+            document.getElementById('running-bg-2').style.left = this.bg2Left + 'px'
+            document.getElementById('running-bg-3').style.left = this.bg3Left + 'px'
+            this.characterRunning.style.left = this.characterLeft + 'px'
+            this.enemyRunning.style.left = this.enemyLeft + 'px'
+        }
+
+        gameOver() {
+            clearInterval(this.moveBackgroundInterval)
+            playSound(sounds.evilLaugh)
+            sounds.steps.pause()
+            titleSelect.style.display = 'block'
+            titleSelect.innerHTML = gameOverTemplate
+            this.characterRunning.classList.remove('running')
+            this.enemyRunning.classList.remove('running')
+            hide(this.runningBackgroundText)
+            runFadeGameOver()
+        }
+
+        nextRound() {
+            clearInterval(this.moveBackgroundInterval)
+            this.characterRunning.classList.remove('running')
+            this.enemyRunning.classList.remove('running')
+            hide(this.runningBackgroundText)
+            playSound(sounds.deathCry)
+            game.round += 1
+            this.enemyRunning.classList.add('defeated')
+            sounds.steps.pause()
+            titleSelect.style.display = 'block'
+            titleSelect.innerHTML = nextRoundTemplate
+            if (itemManager.moneyEarnedLastRound > 0) {
+                document.getElementById('money-placeholder').innerHTML = `Earned $${itemManager.moneyEarnedLastRound}`
+            }
+            document.getElementById('open-shop-button').style.display = 'none'
+        }
+    }
+
+    const runningMiniGame = new RunningMinigame()
+    document.getElementById('overlay-running').addEventListener('click', () => runningMiniGame.run())
+
+    /**
+     *
+     * Minigame Ropeskip
+     *
+     */
+
+    class RopeSkipMiniGame {
+        constructor() {
+            this.moveRopeDownwards = false
+            this.ropeY = 270
+            this.skips = 0
+            this.speed = 100
+            this.characterJumps = false
+            this.points = 0
+            this.interval = null
+        }
+
+        start() {
+            this.interval = setInterval(() => this.moveRope(), 1000 / this.speed)
+        }
+
+        moveRope() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+            ctx.beginPath()
+            ctx.moveTo(150, 200)
+            ctx.bezierCurveTo(150, this.ropeY, 400, this.ropeY, 400, 200)
+            ctx.lineWidth = this.moveRopeDownwards ? 2 : 4
+            ctx.stroke()
+
+            if (this.moveRopeDownwards && this.ropeY < 280) {
+                this.ropeY += 2
+            }
+
+            if (!this.moveRopeDownwards && this.ropeY > 20) {
+                this.ropeY -= 2
+            }
+
+            if (this.ropeY >= 280 || this.ropeY <= 80) {
+                this.moveRopeDownwards = !this.moveRopeDownwards
+                this.skips += .5
+                canvas.style.zIndex = this.moveRopeDownwards ? '1' : '3'
+
+                if (this.skips % 3 === 0) {
+                    clearInterval(this.interval)
+                    this.speed *= 1.1
+                    this.interval = setInterval(() => this.moveRope(), 1000 / this.speed)
+                }
+
+                if (this.ropeY >= 240) {
+                    this.characterJumps && game.player.party[1].energy > 0 ? this.getPointRope() : this.getHitRope()
+                }
+            }
+        }
+
+        nextRound() {
+            game.round += 1
+            document.getElementById('girl-left').classList.add('defeated')
+            document.getElementById('girl-right').classList.add('defeated')
+            clearInterval(this.interval)
+            playSound(sounds.girl)
+            document.getElementById('rope-skips').innerHTML = ''
+            titleSelect.style.display = 'block'
+            titleSelect.innerHTML = nextRoundTemplate
+            if (itemManager.moneyEarnedLastRound > 0) document.getElementById('money-placeholder').innerHTML = `Earned $${itemManager.moneyEarnedLastRound}`
+            document.getElementById('open-shop-button').style.display = 'none'
+            hide(canvas)
+            hide(clickOverlay)
+        }
+
+        gameOver() {
+            clearInterval(this.interval)
+            playSound(sounds.deathCry)
+            hide(canvas)
+            hide(clickOverlay)
+            show(titleSelect)
+            titleSelect.innerHTML = gameOverTemplate
+        }
+
+        getPointRope() {
+            this.points += 1
+            playSound(sounds.confirm)
+            const ropeSkips = document.getElementById('rope-skips')
+            ropeSkips.innerHTML = `Skips: ${this.points}/20`
+            if (this.points === 20) {
+                this.nextRound()
+            }
+        }
+
+        getHitRope() {
+            game.player.party[1].energy -= 30
+            playSound(sounds.fail)
+            const energyBars = Array.from(document.getElementsByClassName('energybar'))
+            energyBars[1].querySelector('#energy-char2').style.width = game.player.party[1].energy + '%'
+            energyBars[1].querySelector('#energy-char2').style.background = game.player.party[1].energy < 30 ? 'red' : 'green'
+            if (game.player.party[1].energy <= 0) {
+                box.classList.add('defeated')
+                setTimeout(() => {
+                    this.gameOver()
+                }, 200)
+            }
+        }
+
+        jump() {
+            if (!this.characterJumps) {
+                this.characterJumps = true
+                playSound(sounds.jump)
+                box.style.top = '140px'
+                setTimeout(() => {
+                    this.characterJumps = false
+                    box.style.top = '170px'
+                }, 300)
+            }
+        }
+    }
+
+    const ropeSkipMiniGame = new RopeSkipMiniGame()
+    document.getElementById('click-overlay').addEventListener('click', () => ropeSkipMiniGame.jump())
 
     /**
      * 
@@ -535,71 +912,55 @@ document.addEventListener('DOMContentLoaded', () => {
      * 
      */
 
-    const allTrophies = Object.values(game.trophies)
-
-    allTrophies.forEach(trophy => displayAlreadyUnlockedTrophy(trophy))
-
     function handleTrophies() {
         const trophiesToUnlock = []
-        if (!game.trophies.beatenGame.unlocked) {
-            trophiesToUnlock.push(game.trophies.beatenGame)
+        if (!trophies.beatenGame.isUnlocked()) {
+            trophiesToUnlock.push(trophies.beatenGame)
         }
         parsedTrophies.beatenGame = true
 
         if (allOneType(attackTypes.strength)) {
-            if(!game.trophies.allStrength.unlocked) {
-                trophiesToUnlock.push(game.trophies.allStrength)
+            if(!trophies.allStrength.isUnlocked()) {
+                trophiesToUnlock.push(trophies.allStrength)
             }
             parsedTrophies.allStrength = true
         }
         if (allOneType(attackTypes.assholiness)) {
-            if(!game.trophies.allAssholes.unlocked) {
-                trophiesToUnlock.push(game.trophies.allAssholes)
+            if(!trophies.allAssholes.isUnlocked()) {
+                trophiesToUnlock.push(trophies.allAssholes)
             }
             parsedTrophies.allAssholes = true
         }
         if (allOneType(attackTypes.intelligence)) {
-            if(!game.trophies.allIntelligence.unlocked) {
-                trophiesToUnlock.push(game.trophies.allIntelligence)
+            if(!trophies.allIntelligence.isUnlocked()) {
+                trophiesToUnlock.push(trophies.allIntelligence)
             }
             parsedTrophies.allIntelligence = true
         }
-        if (!game.itemUsed) {
-            if(!game.trophies.noItems.unlocked) {
-                trophiesToUnlock.push(game.trophies.noItems)
+        if (!itemManager.itemUsed) {
+            if(!trophies.noItems.isUnlocked()) {
+                trophiesToUnlock.push(trophies.noItems)
             }
             parsedTrophies.hasNoItems = true
         }
-        if (game.itemsUsed >= 6) {
-            if(!game.trophies.sixItems.unlocked) {
-                trophiesToUnlock.push(game.trophies.sixItems)
+        if (itemManager.itemsUsed >= 6) {
+            if(!trophies.sixItems.isUnlocked()) {
+                trophiesToUnlock.push(trophies.sixItems)
             }
             parsedTrophies.hasSixItems = true
         }
         trophiesToUnlock.forEach((trophy, index) => {
             setTimeout(() => {
                 playSound(sounds.trophy)
-                displayTrophyToast(trophy)
+                trophy.unlock()
             }, index * 500)
         })
         setTimeout(() => hideAll('trophy'), 5000)
         localStorage.setItem('trophies', JSON.stringify(parsedTrophies))
     }
 
-    function displayTrophyToast(trophy) {
-        const trophyMessageDiv = document.createElement('div');
-        trophyMessageDiv.innerHTML = `
-            <div class="trophy-icon-wrapper">
-                <i class='fas fa-trophy'></i>
-            </div>
-            <div>${trophy.message}</div>
-        `
-        trophyMessageDiv.classList.add('trophy', 'trophy-message')
-        document.getElementById('trophy-messages-container').appendChild(trophyMessageDiv)
-    }
-
     function allOneType(type) {
-        return game.player.party.every(char => char.type === type)
+        return game.player.party.every(char => char.type === type) && game.player.party.length === 3
     }
 
     /**
@@ -648,180 +1009,6 @@ document.addEventListener('DOMContentLoaded', () => {
         })
     }
 
-
-    /**
-     * 
-     * Running Minigame
-     * 
-     */
-
-    function moveBackground() {
-        const gameData = game.miniGames.running
-
-        gameData.bg1Left += 1
-        gameData.bg2Left += 1
-        gameData.bg3Left += 1
-
-        if (gameData.bg1Left >= 616) gameData.bg1Left = -313
-        if (gameData.bg2Left >= 616) gameData.bg2Left = -313
-        if (gameData.bg3Left >= 616) gameData.bg3Left = -313
-
-        gameData.characterLeft += 0.1
-        gameData.enemyLeft -= 0.2
-        const distance = gameData.enemyLeft - gameData.characterLeft
-
-        if (distance < 160 && !runningBackgroundText.classList.contains('animated-text')) {
-            runningBackgroundText.innerHTML = 'Run faster!!! He almost got you!'
-            runningBackgroundText.classList.add('animated-text')
-            playSound(sounds.evilLaugh)
-        } 
-        if (gameData.enemyLeft < gameData.characterLeft + 20) {
-            gameOverRunningGame() 
-            return 
-        } 
-        if (gameData.characterLeft < -60) {
-            nextRoundRunningGame() 
-            return 
-        } 
-        document.getElementById('running-bg-1').style.left = gameData.bg1Left + 'px'
-        document.getElementById('running-bg-2').style.left = gameData.bg2Left + 'px'
-        document.getElementById('running-bg-3').style.left = gameData.bg3Left + 'px'
-        document.getElementById('character-running').style.left = gameData.characterLeft + 'px'
-        document.getElementById('enemy-running').style.left = gameData.enemyLeft + 'px'
-    }
-
-    function gameOverRunningGame() { 
-        clearInterval(game.miniGames.running.moveBackgroundInterval)
-        playSound(sounds.evilLaugh)
-        sounds.steps.pause()
-        titleSelect.style.display = 'block' 
-        titleSelect.innerHTML = gameOverTemplate 
-        characterRunning.classList.remove('running') 
-        enemyRunning.classList.remove('running') 
-        hide(runningBackgroundText) 
-        activateFadeGameover() 
-    }
-
-    function nextRoundRunningGame() {
-        clearInterval(game.miniGames.running.moveBackgroundInterval)
-        characterRunning.classList.remove('running')
-        enemyRunning.classList.remove('running')
-        hide(runningBackgroundText) 
-        playSound(sounds.deathCry)
-        game.round += 1
-        enemyRunning.classList.add('defeated')
-        sounds.steps.pause()
-        titleSelect.style.display = 'block'
-        titleSelect.innerHTML =
-            nextRoundTemplate
-        if (game.items.moneyEarnedLastRound > 0) document.getElementById('money-placeholder').innerHTML = `Earned $${game.items.moneyEarnedLastRound}`
-        document.getElementById('open-shop-button').style.display = 'none'
-    }
-
-    document.getElementById('overlay-running').addEventListener('click', () => game.miniGames.running.characterLeft -= 4)
-
-    /**
-     * 
-     * Rope Skip Minigame
-     * 
-     */
-
-    document.getElementById('click-overlay').addEventListener('click', jump)
-
-    function moveRope() {
-        const ropeSkip = game.miniGames.ropeSkip
-        ctx.clearRect(0, 0, canvas.width, canvas.height)
-        ctx.beginPath()
-        ctx.moveTo(150, 200)
-        ctx.bezierCurveTo(150, ropeSkip.ropeY, 400, ropeSkip.ropeY, 400, 200)
-        ctx.lineWidth = ropeSkip.moveRopeDownwards ? 2 : 4
-        ctx.stroke()
-
-        if (ropeSkip.moveRopeDownwards && ropeSkip.ropeY < 280) {
-            ropeSkip.ropeY += 2
-        }
-
-        if (!ropeSkip.moveRopeDownwards && ropeSkip.ropeY > 20) {
-            ropeSkip.ropeY -= 2
-        }
-
-        if (ropeSkip.ropeY >= 280 || ropeSkip.ropeY <= 80) {
-            ropeSkip.moveRopeDownwards = !ropeSkip.moveRopeDownwards
-            ropeSkip.skips += .5
-            canvas.style.zIndex = ropeSkip.moveRopeDownwards ? '1' : '3'
-
-            if (ropeSkip.skips % 3 === 0) {
-                clearInterval(ropeSkip.interval)
-                ropeSkip.speed *= 1.1
-                ropeSkip.interval = setInterval(moveRope, 1000 / ropeSkip.speed)
-            }
-
-            if (ropeSkip.ropeY >= 240) {
-                ropeSkip.characterJumps && game.player.party[1].energy > 0 ? getPointRope() : getHitRope()
-            }
-        }
-    }
-
-    function nextRoundRope() {
-        game.round += 1
-        document.getElementById('girl-left').classList.add('defeated')
-        document.getElementById('girl-right').classList.add('defeated')
-        clearInterval(game.miniGames.ropeSkip.interval)
-        playSound(sounds.girl)
-        document.getElementById('rope-skips').innerHTML = ''
-        titleSelect.style.display = 'block'
-        titleSelect.innerHTML = nextRoundTemplate
-        if (game.items.moneyEarnedLastRound > 0) document.getElementById('money-placeholder').innerHTML = `Earned $${game.items.moneyEarnedLastRound}`
-        document.getElementById('open-shop-button').style.display = 'none'
-        hide(canvas)
-        hide(clickOverlay)
-    }
-
-    function gameOverRope() {
-        clearInterval(game.miniGames.ropeSkip.interval)
-        playSound(sounds.deathCry)
-        hide(canvas)
-        hide(clickOverlay)
-        show(titleSelect)
-        titleSelect.innerHTML = gameOverTemplate
-    }
-
-    function getPointRope() {
-        game.miniGames.ropeSkip.points += 1
-        playSound(sounds.confirm)
-        const ropeSkips = document.getElementById('rope-skips')
-        ropeSkips.innerHTML = `Skips: ${game.miniGames.ropeSkip.points}/20`
-        if (game.miniGames.ropeSkip.points === 20) {
-            nextRoundRope()
-        }
-    }
-
-    function getHitRope() {
-        game.player.party[1].energy -= 30
-        playSound(sounds.fail)
-        const energyBars = Array.from(document.getElementsByClassName('energybar'))
-        energyBars[1].querySelector('#energy-char2').style.width = game.player.party[1].energy + "%"
-        energyBars[1].querySelector('#energy-char2').style.background = game.player.party[1].energy < 30 ? "red" : "green"
-        if (game.player.party[1].energy <= 0) {
-            box.classList.add('defeated')
-            setTimeout(() => {
-                gameOverRope()
-            }, 200)
-        }
-    }
-
-    function jump() {
-        if (!game.miniGames.ropeSkip.characterJumps) {
-            game.miniGames.ropeSkip.characterJumps = true
-            playSound(sounds.jump)
-            box.style.top = '140px'
-            setTimeout(() => {
-                game.miniGames.ropeSkip.characterJumps = false
-                box.style.top = '170px'
-            }, 300)
-        }
-    }
-
 /*
 *
 * General Game
@@ -848,21 +1035,36 @@ document.addEventListener('DOMContentLoaded', () => {
         game.enemy.party = setTeams[game.round]
     }
 
-    dialogueBoxWrapper.addEventListener('click', nextDialogue)
+    function initializeGame() {
+        updateGameState(gameStates.dialogue)
+        hide(selectScreen)
+        hide(selectScreen2)
+        hide(selectScreen3)
+        hide(titleSelect)
+        setDialogue()
+        const energyBars = Array.from(document.getElementsByClassName('energybar'))
+        energyBars.forEach(bar => show(bar))
+        const spriteContainers = Array.from(document.getElementsByClassName('sprite-container'))
+        spriteContainers.forEach(sprite => show(sprite))
+        showPlayerSprites()
+        showEnemySprites()
+        itemManager.drawItemBox()
+    }
 
-    function nextDialogue() {
-        if (showDialogue && game.messageIndex === 0) {
-            game.messageIndex = 1
-            setDialogue()
-            return
-        }
-
-        game.messageIndex = 0
-        hide(dialogueBoxWrapper)
-        show(itemBox, 'flex')
-        showDialogue = false
-        startNextRound()
-
+    function initializeGameTeacher() {
+        document.getElementById('energy-char2-text').innerHTML = characters.teacher.class
+        teacherTeam.forEach(member => game.player.party.push(member))
+        setDialogue()
+        const energyBars = Array.from(document.getElementsByClassName('energybar'))
+        energyBars.forEach(bar => show(bar))
+        hide(energyBars[0])
+        hide(energyBars[2])
+        const spriteContainers = Array.from(document.getElementsByClassName('sprite-container'))
+        spriteContainers.forEach(sprite => show(sprite))
+        showPlayerSpritesTeacher()
+        showEnemySprites()
+        showDialogue = true
+        itemManager.drawItemBox()
     }
 
     function startNextRound() {
@@ -875,7 +1077,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (game.round === 5) {
-            startRunningGame()
+            runningMiniGame.start()
         }
 
         if (game.round === 8) {
@@ -885,21 +1087,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function startRopeGame() {
         updateGameState(gameStates.ropeSkip)
-        game.miniGames.ropeSkip.interval = setInterval(moveRope, 1000 / game.miniGames.ropeSkip.speed)
-        hide(itemBox)
-    }
-
-    function startRunningGame() {
-        updateGameState(gameStates.lockerRoom)
-        game.miniGames.running.moveBackgroundInterval = setInterval(moveBackground, 1000 / 120)
-        sounds.steps.playbackRate = 2
-        sounds.steps.loop = true
-        sounds.steps.play().catch()
-        const spritePosition = spritePositions[game.player.party[1].class].side
-        runningSprite.style.top = spritePosition.top
-        runningSprite.style.left = spritePosition.left
-        characterRunning.classList.add('running')
-        enemyRunning.classList.add('running')
+        ropeSkipMiniGame.start()
         hide(itemBox)
     }
 
@@ -923,43 +1111,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (game.player.party.length === 3) {
             showDialogue = true
-            activateFade()
+            runFadeAnimation()
             setTimeout(() => {
                 initializeGame()
             }, 1000)
         }
     }
 
-    function initializeGame() {
-        updateGameState(gameStates.dialogue)
-        hide(selectScreen)
-        hide(selectScreen2)
-        hide(selectScreen3)
-        hide(titleSelect)
-        setDialogue()
-        const energyBars = Array.from(document.getElementsByClassName('energybar'))
-        energyBars.forEach(bar => show(bar))
-        const spriteContainers = Array.from(document.getElementsByClassName('sprite-container'))
-        spriteContainers.forEach(sprite => show(sprite))
-        showPlayerSprites()
-        showEnemySprites()
-        drawItembox()
-    }
+    dialogueBoxWrapper.addEventListener('click', nextDialogue)
 
-    function initializeGameTeacher() {
-        document.getElementById('energy-char2-text').innerHTML = characters.teacher.class
-        teacherTeam.forEach(member => game.player.party.push(member))
-        setDialogue()
-        const energyBars = Array.from(document.getElementsByClassName('energybar'))
-        energyBars.forEach(bar => show(bar))
-        hide(energyBars[0])
-        hide(energyBars[2])
-        const spriteContainers = Array.from(document.getElementsByClassName('sprite-container'))
-        spriteContainers.forEach(sprite => show(sprite))
-        showPlayerSpritesTeacher()
-        showEnemySprites()
-        showDialogue = true
-        drawItembox()
+    function nextDialogue() {
+        if (showDialogue && game.messageIndex === 0) {
+            game.messageIndex = 1
+            setDialogue()
+            return
+        }
+
+        game.messageIndex = 0
+        hide(dialogueBoxWrapper)
+        show(itemBox, 'flex')
+        showDialogue = false
+        startNextRound()
+
     }
 
     function setDialogue() {
@@ -971,15 +1144,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showButtons(event) {
-        if (showDialogue || fightAnimationRunning || disableAttackButtons || bombAnimationRunning) return
-        
-        const element = event.currentTarget
-        if (game.isTeacherMode && (element.id === 'char1' || element.id === 'char3')) return
-        hide(battleTicker)
-        Array.from(document.getElementsByClassName('left-party')).forEach(element => {
-            element.classList.remove('open')
-        })
-        element.classList.toggle('open')
+        if (!showDialogue && !fightAnimationRunning && !disableAttackButtons) {
+            const element = event.currentTarget
+            if (game.isTeacherMode && (element.id === 'char1' || element.id === 'char3')) return
+            hide(battleTicker)
+            Array.from(document.getElementsByClassName('left-party')).forEach(element => {
+                element.classList.remove('open')
+            })
+            element.classList.toggle('open')
+        }
     }
 
     function selectChar(event) {
@@ -1003,7 +1176,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function selectTarget(event) {
-        if (game.player.selectedChar.class === 'Dummy') return
+        if (game.player.selectedChar.class === 'Dummy' || game.player.selectedChar === '' ) return
         document.querySelector(`#char${game.player.selectedChar.id} .overflow-wrapper`).classList.add('selected')
         const enemyWrapper = event.target.closest('.right-party')
         const id = enemyWrapper.dataset.enemy
@@ -1084,7 +1257,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return
             }
 
-            game.battleMessages.push("<span class='text-player'>" + element.attacker.class + '  ' + setBattletickerIcon(element.type) + '  ' + "<span class='text-enemy'>Enemy " + element.target.class + "</span><br>")
+            game.battleMessages.push("<span class='text-player'>" + element.attacker.class + '  ' + setBattleTickerIcon(element.type) + '  ' + "<span class='text-enemy'>Enemy " + element.target.class + "</span><br>")
             const selector = element.type
             const attack = element.attacker[selector]
             const defense = getDefenseType(selector, "target")
@@ -1096,6 +1269,28 @@ document.addEventListener('DOMContentLoaded', () => {
             if (element.target.energy <= 0) {
                 element.target.energy = 0
                 setTimeout(() => playSound(sounds.deathCry2), 2500)
+            }
+        })
+    }
+
+    function handleEnemyMoves() {
+        const remainingEnemyParty = getRemainingEnemies()
+        remainingEnemyParty.forEach(enemy => {
+            if (!enemy.defends) {
+                const selector = (enemy.type === attackTypes.teacher || enemy.type === attackTypes.allrounder)
+                    ? randomAttackType() : enemy.type
+                const attack = enemy[selector]
+                const target = selectTargetForEnemy()
+                const defense = getDefenseType(selector, target)
+                const typeBonus = getEffectiveness(selector, target.type)
+
+                game.battleMessages.push("<span class='text-enemy'> Enemy " + enemy.class + "</span>" + setBattleTickerIcon(selector) + "<span class='text-player'>" + target.class + "</span><br>")
+                const damage = attack * typeBonus * (100 / (100 + target[defense] * 10))
+                target.takeDamage(damage)
+
+                if (target.energy <= 0) {
+                    setTimeout(() => playSound(sounds.deathCry), 2500)
+                }
             }
         })
     }
@@ -1146,35 +1341,13 @@ document.addEventListener('DOMContentLoaded', () => {
         return target
     }
 
-    function selectEnemyMoves() {
-        const remainingEnemyParty = getRemainingEnemies()
-        remainingEnemyParty.forEach(enemy => {
-            if (!enemy.defends) {
-                const selector = (enemy.type === attackTypes.teacher || enemy.type === attackTypes.allrounder)
-                    ? randomAttackType() : enemy.type
-                const attack = enemy[selector]
-                const target = selectTargetForEnemy()
-                const defense = getDefenseType(selector, target)
-                const typeBonus = getEffectiveness(selector, target.type)
-
-                game.battleMessages.push("<span class='text-enemy'> Enemy " + enemy.class + "</span>" + setBattletickerIcon(selector) + "<span class='text-player'>" + target.class + "</span><br>")
-                const damage = attack * typeBonus * (100 / (100 + target[defense] * 10))
-                target.takeDamage(damage)
-
-                if (target.energy <= 0) {
-                    setTimeout(() => playSound(sounds.deathCry), 2500)
-                }
-            }
-        })
-    }
-
     function calculateDamage() {
         const remainingEnemyParty = getRemainingEnemies()
         document.getElementById('battle-ticker') .style.display = 'block'
         game.battleMessages = []
         setEnemiesDefending()
         handlePlayerMoves()
-        selectEnemyMoves()
+        handleEnemyMoves()
         drawEnergyBars()
         resetDefending()
 
@@ -1248,7 +1421,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return defense
     }
 
-    function setBattletickerIcon(selector) {
+    function setBattleTickerIcon(selector) {
         let icon = " <i class='fas fa-hand-rock'></i> "
 
         if (selector === attackTypes.intelligence) {
@@ -1279,7 +1452,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (game.round < 9) {
                 titleSelect.innerHTML = nextRoundTemplate
-                if (game.items.moneyEarnedLastRound > 0) document.getElementById('money-placeholder').innerHTML = `Earned $${game.items.moneyEarnedLastRound}`
+                if (itemManager.moneyEarnedLastRound > 0) document.getElementById('money-placeholder').innerHTML = `Earned $${itemManager.moneyEarnedLastRound}`
                 return
             }
 
@@ -1299,16 +1472,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function checkSurvivors() {
         hide(itemBox)
-        game.items.moneyEarnedLastRound = 0
+        let moneyEarnedLastRound = 0
         game.player.party.forEach(char => {
             if (char.energy > 0 && char.class !== 'Dummy') {
-                game.items.moneyEarnedLastRound += 1
+                moneyEarnedLastRound += 1
             }
         })
-        game.items.money += game.items.moneyEarnedLastRound
-        game.items.moneyEarnedTotal += game.items.moneyEarnedLastRound
-
-        if (game.items.moneyEarnedLastRound > 0) runReceivedItemAnimation('money')
+        itemManager.updateMoney(moneyEarnedLastRound)
+        itemManager.updateMoneyEarnedTotal(moneyEarnedLastRound)
+        itemManager.moneyEarnedLastRound = moneyEarnedLastRound
     }
     
     function changeBackground() {
@@ -1323,9 +1495,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             case 5: {
                 runningBackground.style.display = 'block'
-                const spritePosition = spritePositions[game.player.party[1].class].front
-                runningSprite.style.top = spritePosition.top
-                runningSprite.style.left = spritePosition.left
+                runningSprite.className = game.player.party[1].frontSprite
                 break
             }
             case 6: {
@@ -1342,7 +1512,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function setUpNextRound() {
-        activateFade()
+        runFadeAnimation()
         hide(itemBox)
         hide(bombContainerWrapper) 
         setTimeout(() => changeBackground(), 1000)
@@ -1352,7 +1522,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 sprite.classList.remove("hidden-buttons") 
             }) 
             playSound(sounds.schoolBell)
-            game.player.party.forEach(element => element.energy = 100)
+            game.player.party.forEach(element => element.recoverFull())
             game.enemy.party = game.isTeacherMode ? setTeamsTeacher()[game.round] : setTeams[game.round]
             drawEnergyBars()
             document.querySelectorAll(".defeated").forEach(element => { 
@@ -1388,9 +1558,7 @@ document.addEventListener('DOMContentLoaded', () => {
         show(document.getElementById("rope-skipping-game"))
         hideAll('left-party')
         const ropeSprite = document.getElementById("rope-sprite")
-        const spritePosition = game.isTeacherMode ? spritePositions.Teacher.front : spritePositions[game.player.party[1].class].front
-        ropeSprite.style.top = spritePosition.top
-        ropeSprite.style.left = spritePosition.left
+        ropeSprite.classList.add(game.player.party[1].frontSprite)
     }
 
     function setupRunningGame() {
@@ -1499,25 +1667,18 @@ document.addEventListener('DOMContentLoaded', () => {
      */
 
     function showPlayerSprites() {
-        game.player.party.forEach((element, index) => {
+        game.player.party.forEach((char, index) => {
             const charSprite = document.getElementById(`char${index + 1}-sprite`)
-            const spritePosition = spritePositions[element.class].front
-            Object.keys(spritePosition).forEach(key => {
-                charSprite.style[key] = spritePosition[key]
-            })
-            document.querySelector(`.buttons-char${index + 1}[data-type='strength'] i span`).innerHTML = element.strength
-            document.querySelector(`.buttons-char${index + 1}[data-type='intelligence'] i span`).innerHTML = element.intelligence
-            document.querySelector(`.buttons-char${index + 1}[data-type='assholiness'] i span`).innerHTML = element.assholiness
+            charSprite.className = `player-sprite ${char.frontSprite}`
+            document.querySelector(`.buttons-char${index + 1}[data-type='strength'] i span`).innerHTML = char.strength
+            document.querySelector(`.buttons-char${index + 1}[data-type='intelligence'] i span`).innerHTML = char.intelligence
+            document.querySelector(`.buttons-char${index + 1}[data-type='assholiness'] i span`).innerHTML = char.assholiness
         })
     }
 
     function showPlayerSpritesTeacher() {
-
         const charSprite = document.getElementById('char2-sprite')
-        const spritePosition = spritePositions.Teacher.front
-        Object.keys(spritePosition).forEach(key => {
-            charSprite.style[key] = spritePosition[key]
-        })
+        charSprite.className = `player-sprite ${characters.teacher.frontSprite}`
         document.querySelector(`.buttons-char2[data-type='strength'] i span`).innerHTML = characters.teacher.strength
         document.querySelector(`.buttons-char2[data-type='intelligence'] i span`).innerHTML = characters.teacher.intelligence
         document.querySelector(`.buttons-char2[data-type='assholiness'] i span`).innerHTML = characters.teacher.assholiness
@@ -1527,14 +1688,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showEnemySprites() {
-        game.enemy.party.forEach((element, index) => {
-            element.id = index + 1
-            const enemySprite = document.getElementById(`enemy${index + 1}-sprite`)
-            const spritePosition = spritePositions[element.class].front
-            Object.keys(spritePosition).forEach(key => {
-                enemySprite.style[key] = spritePosition[key]
-            })
-            document.getElementById(`energy-enemy${index + 1}-text`).innerHTML = element.class
+        game.enemy.party.forEach((char, index) => {
+            char.id = index + 1
+            const enemySprite = document.getElementById(`enemy${char.id}-sprite`)
+            enemySprite.className = `enemy-sprite ${char.frontSprite}`
+            document.getElementById(`energy-enemy${index + 1}-text`).innerHTML = char.class
         })
     }
 
@@ -1552,7 +1710,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const sprites = screen3.getElementsByClassName('select-sprite')
         const descBoxes = screen3.getElementsByClassName('desc-box')
 
-        const amountTrophies = Object.values(game.trophies).filter(trophy => trophy.unlocked).length
+        const amountTrophies = Object.values(trophies).filter(trophy => trophy.isUnlocked()).length
 
         if (amountTrophies >= 2) hide(document.getElementById('unlockables-message'))
         if (amountTrophies < 2) {
@@ -1603,7 +1761,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function displayAlreadyUnlockedTrophy(trophy) {
-        if (trophy.unlocked) trophy.element.classList.remove('not-received')
+        if (trophy.name in parsedTrophies) {
+            trophy.unlocked = true
+            trophy.element.classList.remove('not-received')
+        }
     }
 
     displayTrophiesButton.addEventListener('click', showTrophiesScreen)
@@ -1645,58 +1806,6 @@ document.addEventListener('DOMContentLoaded', () => {
         tutorialScreen.innerHTML = showFirstPageTutorial ? tutorialPage1template : tutorialPage2template
     }
 
-    /*
-    USE ITEMS
-     */
-
-    document.getElementById('item-button').addEventListener('click', eatSnack)
-    document.getElementById('bomb-button').addEventListener('click', throwBomb)
-
-    function eatSnack() {
-        if (game.player.party.length === 0 || game.items.snacks === 0) return
-        game.itemsUsed += 1
-        game.itemUsed = true
-        runSnackAnimation()
-        game.items.snacks -= 1
-        game.player.party.forEach(char => {
-            char.eatSnack()
-        })
-        drawEnergyBars()
-        drawItembox()
-    }
-
-    function throwBomb() {
-        if (game.items.bombs <= 0 || game.enemy.party.length === 0) return
-        hideMoveSelectButtons()
-        game.itemsUsed += 1
-        game.itemUsed = true
-        battleTicker.innerHTML = bombMessageTemplate
-        show(battleTicker)
-
-        runBombAnimation()
-        hide(itemBox)
-
-        game.items.bombs -= 1
-        drawItembox()
-
-        game.enemy.party.forEach(enemy => {
-            enemy.takeBombDamage()
-        })
-
-        drawEnergyBars()
-        checkRemainingEnemies()
-
-        setTimeout(() => {
-            setCharactersDefeated()
-            updateGameState(gameStates.selectTargets)
-        }, 5000)
-    }
-
-    function drawItembox() {
-        bombButton.innerHTML = `<i class="fas fa-bomb"></i>x${game.items.bombs}`
-        itemButton.innerHTML = `${snackIcon}x${game.items.snacks}`
-        document.getElementById('money').innerHTML = `$${game.items.money}`
-    }
 
 /*
     ANIMATIONS
@@ -1704,30 +1813,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const fadeOutElement = document.getElementById('fade-out')
 
-    function activateFade() {
+    function runFadeAnimation() {
         playSound(sounds.fade)
         fadeOutElement.classList.remove('hidden', 'fade-out')
         fadeOutElement.classList.add('fade-out')
         setTimeout(() => fadeOutElement.classList.add('hidden'), 2000)
     }
 
-    function activateFadeGameover() {
+    function runFadeGameOver() {
         playSound(sounds.fade)
         fadeOutElement.classList.remove('hidden', 'fade-out')
         fadeOutElement.classList.add('fade-out-red')
-    }
-
-    function runSnackAnimation() {
-        const aliveLeftParty = document.querySelectorAll('.left-party:not(.defeated)')
-        aliveLeftParty.forEach(element => element.classList.add('eating-snack'))
-        setTimeout(()=>{
-            aliveLeftParty.forEach(element => element.classList.remove('eating-snack'))
-        },1000)
-
-        battleTicker.innerHTML = snackMessageTemplate
-        battleTicker.style.display = 'block'
-        playSound(sounds.eating)
-        hide(itemBox)
     }
 
     function runVictoryAnimation() {
@@ -1806,75 +1902,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function runBombAnimation(){
-        bombAnimationRunning = true
-        bombContainerWrapper.style.display = 'block'
-        for (let i = 0; i < 100; i++) {
-            const cloud = document.createElement('div')
-            cloud.className = 'bombcloud'
-            const animationDelay = Math.random() * 5 + 's'
-            const xPosition = Math.random() * 100
-            cloud.style.animationDelay = animationDelay
-            cloud.style.top = '-150px'
-            cloud.style.left = (xPosition - 50) + 'px'
-            bombContainer.append(cloud)
-        }
-        setTimeout(()=>{
-            document.querySelectorAll('.right-party:not(.defeated)').forEach(element => {
-                element.classList.add('bombed-enemy')
-            })
-            playSound(sounds.stink)
-        },2000)
-        setTimeout(()=>{
-            document.querySelectorAll('.right-party:not(.defeated)').forEach(element => {
-                element.classList.remove('bombed-enemy')
-            })
-        },3500)
-        setTimeout(()=>{
-            bombAnimationRunning = false
-            hide(bombContainerWrapper)
-        },7000)
-    }
-
-    function runReceivedItemAnimation(item) {
-        show(itemBox, 'flex')
-        Array.from(document.getElementsByClassName('shop-button')).forEach(button => button.setAttribute('disabled', 'true'))
-        if (item === 'bomb') {
-            bombButton.innerHTML = additionalBombMessageTemplate
-            bombButtonWrapper.classList.add('animated-text')
-        }
-
-        if (item === 'snack') {
-            itemButton.innerHTML = additionalSnackMessageTemplate
-            itemButtonWrapper.classList.add('animated-text')
-        }
-
-        if (item === 'money') {
-            document.getElementById('money').innerHTML = `$${game.items.money}`
-            document.getElementById('money').classList.add('animated-text')
-        }
-
-        setTimeout(()=>{
-            drawItembox()
-            bombButtonWrapper.classList.remove('animated-text')
-            itemButtonWrapper.classList.remove('animated-text')
-            document.getElementById('money').classList.remove('animated-text')
-        },1500)
-        setTimeout(() => {
-            checkForAffordableItems()
-            hide(itemBox)
-        }, 2500)
-    }
-
     /*
     *
-    * SHOP
+    * Shop
     *
      */
 
     function openShop() {
         updateMoneyAmountInShop()
-        activateFade()
+        itemManager.checkForAffordableItems()
+        runFadeAnimation()
         hide(titleSelect)
         hideAll('energybar')
         hideAll('left-party')
@@ -1886,12 +1923,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateMoneyAmountInShop() {
         const moneyAmountElement = document.getElementById('current-amount-money')
-        moneyAmountElement.innerHTML = `You have $${game.items.money}`
+        moneyAmountElement.innerHTML = `You have $${itemManager.money}`
     }
 
     document.getElementById('leave-shop-button').addEventListener('click', leaveShop)
     function leaveShop() {
-        activateFade()
+        runFadeAnimation()
         setTimeout(() => {
             show(titleSelect)
             showAll('energybar')
@@ -1899,20 +1936,20 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('shop').style.display = 'none'
         }, 1000)
     }
-    document.getElementById('upgrade-intelligence-button').addEventListener('click', () => upgrade(attackTypes.intelligence))
-    document.getElementById('upgrade-strength-button').addEventListener('click', () => upgrade(attackTypes.strength))
-    document.getElementById('upgrade-assholiness-button').addEventListener('click', () => upgrade(attackTypes.assholiness))
-    document.getElementById('buy-snack-button').addEventListener('click', () => updateItemBox('snack'))
-    document.getElementById('buy-bomb-button').addEventListener('click', () => updateItemBox('bomb'))
+    document.getElementById('upgrade-intelligence-button').addEventListener('click', () => buyUpgrade(attackTypes.intelligence))
+    document.getElementById('upgrade-strength-button').addEventListener('click', () => buyUpgrade(attackTypes.strength))
+    document.getElementById('upgrade-assholiness-button').addEventListener('click', () => buyUpgrade(attackTypes.assholiness))
+    document.getElementById('buy-snack-button').addEventListener('click', () => itemManager.buyItem('snack'))
+    document.getElementById('buy-bomb-button').addEventListener('click', () => itemManager.buyItem('bomb'))
 
-    function upgrade(attackType) {
+    function buyUpgrade(attackType) {
         playSound(sounds.powerUp)
         document.getElementById('upgrade-message-wrapper').innerHTML = ''
-        game.items.money -= prices.upgrade
+        itemManager.money -= prices.upgrade
         updateMoneyAmountInShop()
         Array.from(document.getElementsByClassName('shop-button')).forEach(button => button.setAttribute('disabled', 'true'))
         document.getElementById('shop-dialogue-box-wrapper').style.display = 'none'
-        game.player.party.forEach(member => member[attackType] += 1)
+        game.player.party.forEach(member => member.upgradeStat(attackType))
         const message = document.createElement('div')
         message.classList.add('upgrade-message')
         const icon = () => {
@@ -1921,32 +1958,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (attackType === attackTypes.assholiness) return assholinessIcon
         }
         message.innerHTML = `<div class="animated-text">${icon()} +1</div>`
-        drawItembox()
         document.getElementById('upgrade-message-wrapper').appendChild(message)
         setTimeout(() => {
-            checkForAffordableItems()
+            itemManager.checkForAffordableItems()
             document.getElementById('upgrade-message-wrapper').innerHTML = ''
         }, 2000)
-    }
-
-    function checkForAffordableItems() {
-        Array.from(document.getElementsByClassName('shop-button')).forEach(element => element.removeAttribute('disabled'))
-        if (game.items.money < prices.item) {
-            Array.from(document.getElementsByClassName('item-button')).forEach(element => element.setAttribute('disabled', true))
-        }
-        if (game.items.money < prices.upgrade) {
-            Array.from(document.getElementsByClassName('upgrade-button')).forEach(element => element.setAttribute('disabled', true))
-        }
-    }
-
-    function updateItemBox(item){
-        if (item !== 'money') game.items.money -= prices.item
-        playSound(sounds.eating)
-        updateMoneyAmountInShop()
-        document.getElementById('shop-dialogue-box-wrapper').style.display = 'none'
-        if (item !== 'money') game.items.received += 1
-        if (item === 'bomb') game.items.bombs += 1
-        if (item === 'snack') game.items.snacks += 1
-        runReceivedItemAnimation(item)
     }
 })

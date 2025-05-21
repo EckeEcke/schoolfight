@@ -1,0 +1,143 @@
+/* Bully */
+.bully-front {
+    position: absolute;
+    top: -425px;
+    left: -340px;
+}
+
+.bully-side {
+    position: absolute;
+    top: -425px;
+    left: -410px;
+}
+
+/* Squealer */
+.squealer-front {
+    position: absolute;
+    top: -320px;
+    left: -42px;
+}
+
+.squealer-side {
+    position: absolute;
+    top: -320px;
+    left: -108px;
+}
+
+/* Nerd */
+.nerd-front {
+    position: absolute;
+    top: -425px;
+    left: -42px;
+}
+
+.nerd-side {
+    position: absolute;
+    top: -425px;
+    left: -108px;
+}
+
+/* Wally */
+.wally-front {
+    position: absolute;
+    top: -105px;
+    left: -340px;
+}
+
+.wally-side {
+    position: absolute;
+    top: -105px;
+    left: -410px;
+}
+
+/* Dummy */
+.dummy-front {
+    position: absolute;
+    top: 10000px;
+    left: 10000px;
+}
+
+.dummy-side {
+    position: absolute;
+    top: 10000px;
+    left: 10000px;
+}
+
+/* Sportskid */
+.sportskid-front {
+    position: absolute;
+    top: -320px;
+    left: -340px;
+}
+
+.sportskid-side {
+    position: absolute;
+    top: -320px;
+    left: -410px;
+}
+
+/* Richkid */
+.richkid-front {
+    position: absolute;
+    top: -215px;
+    left: -340px;
+}
+
+.richkid-side {
+    position: absolute;
+    top: -215px;
+    left: -410px;
+}
+
+/* Teacher */
+.teacher-front {
+    position: absolute;
+    top: -215px;
+    left: -42px;
+}
+
+.teacher-side {
+    position: absolute;
+    top: -215px;
+    left: -108px;
+}
+
+/* Weirdo */
+.weirdo-front {
+    position: absolute;
+    top: -105px;
+    left: -42px;
+}
+
+.weirdo-side {
+    position: absolute;
+    top: -105px;
+    left: -108px;
+}
+
+/* Wolfkid */
+.wolfkid-front {
+    position: absolute;
+    top: -532px;
+    left: -340px;
+}
+
+/* Normie */
+.normie-front {
+    position: absolute;
+    top: 0;
+    left: -42px;
+}
+
+.normie-side {
+    position: absolute;
+    top: 0;
+    left: -108px;
+}
+
+/* Girl */
+.girl-front {
+    position: absolute;
+    top: -532px;
+    left: -42px;
+}
