@@ -318,6 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.moneyEarnedTotal = 0
             this.itemUsed = false
             this.itemsUsed = 0
+            this.bombAnimationRunning = false
         }
 
         eatSnack() {
@@ -335,6 +336,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         throwBomb() {
             if (this.bombs <= 0 || game.enemy.party.length === 0) return
+            this.bombAnimationRunning = true
             this.itemsUsed += 1
             this.itemUsed = true
             battleTicker.innerHTML = bombMessageTemplate
@@ -354,6 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
             checkRemainingEnemies()
 
             setTimeout(() => {
+                this.bombAnimationRunning = false
                 setCharactersDefeated()
                 updateGameState(gameStates.selectTargets)
             }, 5000)
@@ -1144,15 +1147,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showButtons(event) {
-        if (!showDialogue && !fightAnimationRunning && !disableAttackButtons) {
-            const element = event.currentTarget
-            if (game.isTeacherMode && (element.id === 'char1' || element.id === 'char3')) return
-            hide(battleTicker)
-            Array.from(document.getElementsByClassName('left-party')).forEach(element => {
-                element.classList.remove('open')
-            })
-            element.classList.toggle('open')
-        }
+        if (showDialogue || fightAnimationRunning || disableAttackButtons || itemManager.bombAnimationRunning) return
+
+        const element = event.currentTarget
+        if (game.isTeacherMode && (element.id === 'char1' || element.id === 'char3')) return
+        hide(battleTicker)
+        Array.from(document.getElementsByClassName('left-party')).forEach(element => {
+            element.classList.remove('open')
+        })
+        element.classList.toggle('open')
     }
 
     function selectChar(event) {
