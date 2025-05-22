@@ -291,7 +291,6 @@ document.addEventListener('DOMContentLoaded', () => {
             party: [],
         },
         battleMessages: [],
-        messageIndex: 0,
         itemsUsed: 0,
         isTeacherMode: false,
         lastVictoryTeam: JSON.parse(localStorage.getItem('lastVictoryTeam')),
@@ -882,6 +881,37 @@ document.addEventListener('DOMContentLoaded', () => {
      * 
      */
 
+    class DialogueManager {
+        constructor(dialogues) {
+            this.messageIndex = 0
+            this.dialogues = dialogues
+            this.showsDialogue = false
+        }
+
+        showDialogue() {
+            this.showsDialogue = true
+            disableAttackButtons = false
+            show(dialogueBoxWrapper)
+            dialogueBox.innerHTML = this.dialogues[game.round][this.messageIndex]
+        }
+
+        nextDialogue() {
+            if (this.showsDialogue && this.messageIndex === 0) {
+                this.messageIndex = 1
+                this.showDialogue()
+                return
+            }
+    
+            this.messageIndex = 0
+            hide(dialogueBoxWrapper)
+            show(itemBox, 'flex')
+            this.showsDialogue = false
+            startNextRound()
+        }
+    }
+
+    dialogueBoxWrapper.addEventListener('click', () => dialogueManager.nextDialogue())
+
     const dialogues = [
         ["YOU think you can become the kings of school?", "We will flush your heads in the toilet after beating you up."],
         ["Our friend in the middle may not be the smartest.", "But he is the strongest kid around. Ready for a beating?"],
@@ -906,7 +936,6 @@ document.addEventListener('DOMContentLoaded', () => {
         ["How dare you coming back here?!", "Whatever, we will beat you up once again!"]
     ]
 
-    let showDialogue = false
     let disableAttackButtons = false
 
       /**
@@ -1017,6 +1046,7 @@ document.addEventListener('DOMContentLoaded', () => {
 * General Game
 *
 */
+    let dialogueManager
 
     function startGame(isTeacherMode) {
         game.isTeacherMode = isTeacherMode
@@ -1039,12 +1069,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function initializeGame() {
+        dialogueManager = new DialogueManager(dialogues)
         updateGameState(gameStates.dialogue)
         hide(selectScreen)
         hide(selectScreen2)
         hide(selectScreen3)
         hide(titleSelect)
-        setDialogue()
+        dialogueManager.showDialogue()
+        dialogueManager.showsDialogue = true
         const energyBars = Array.from(document.getElementsByClassName('energybar'))
         energyBars.forEach(bar => show(bar))
         const spriteContainers = Array.from(document.getElementsByClassName('sprite-container'))
@@ -1055,9 +1087,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function initializeGameTeacher() {
+        dialogueManager = new DialogueManager(dialoguesTeacher)
         document.getElementById('energy-char2-text').innerHTML = characters.teacher.class
         teacherTeam.forEach(member => game.player.party.push(member))
-        setDialogue()
+        dialogueManager.showDialogue()
+        dialogueManager.showsDialogue = true
         const energyBars = Array.from(document.getElementsByClassName('energybar'))
         energyBars.forEach(bar => show(bar))
         hide(energyBars[0])
@@ -1066,7 +1100,6 @@ document.addEventListener('DOMContentLoaded', () => {
         spriteContainers.forEach(sprite => show(sprite))
         showPlayerSpritesTeacher()
         showEnemySprites()
-        showDialogue = true
         itemManager.drawItemBox()
     }
 
@@ -1113,7 +1146,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (game.player.party.length === 3) {
-            showDialogue = true
             runFadeAnimation()
             setTimeout(() => {
                 initializeGame()
@@ -1121,33 +1153,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    dialogueBoxWrapper.addEventListener('click', nextDialogue)
-
-    function nextDialogue() {
-        if (showDialogue && game.messageIndex === 0) {
-            game.messageIndex = 1
-            setDialogue()
-            return
-        }
-
-        game.messageIndex = 0
-        hide(dialogueBoxWrapper)
-        show(itemBox, 'flex')
-        showDialogue = false
-        startNextRound()
-
-    }
-
-    function setDialogue() {
-        showDialogue = true
-        disableAttackButtons = false
-        show(dialogueBoxWrapper)
-        const selectedDialogue = game.isTeacherMode ? dialoguesTeacher : dialogues
-        dialogueBox.innerHTML = selectedDialogue[game.round][game.messageIndex]
-    }
-
     function showButtons(event) {
-        if (showDialogue || fightAnimationRunning || disableAttackButtons || itemManager.bombAnimationRunning) return
+        if (dialogueManager.showsDialogue || fightAnimationRunning || disableAttackButtons || itemManager.bombAnimationRunning) return
 
         const element = event.currentTarget
         if (game.isTeacherMode && (element.id === 'char1' || element.id === 'char3')) return
@@ -1520,7 +1527,7 @@ document.addEventListener('DOMContentLoaded', () => {
         hide(bombContainerWrapper) 
         setTimeout(() => changeBackground(), 1000)
         setTimeout(() => {
-            setDialogue()
+            dialogueManager.showDialogue()
             document.querySelectorAll(".sprite-container").forEach(sprite => { 
                 sprite.classList.remove("hidden-buttons") 
             }) 
