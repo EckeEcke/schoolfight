@@ -1,0 +1,81 @@
+#bomb-button,
+#snack-button {
+    background:transparent;
+    font-size:24px;
+    border:none;
+    color:white;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+}
+
+#snack-button-wrapper,
+#bomb-button-wrapper {
+    z-index: 1;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+    position: relative;
+}
+
+#bomb-button-wrapper .plus1,
+#snack-button-wrapper .plus1 {
+    display: none;
+    color: limegreen;
+    position: absolute;
+    top: -28px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#bomb-button-wrapper.animated-text .plus1,
+#snack-button-wrapper.animated-text .plus1{
+    display: block;
+}
+
+#item-box div button:hover {
+    color: orange!important;
+    transform: scale(1.1)
+}
+
+.bombcloud {
+    animation: risingCloud 2s;
+    animation-direction: reverse;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: green;
+    opacity: 0.7;
+    position: absolute;
+}
+
+#bomb-container {
+    animation: thrownBombY 1.5s forwards ease-in-out;
+    height:100%;
+    width:100%;
+    position:relative;
+    border-radius:50%;
+    background-image: url('../images_schoolfight/grenade.png');
+    background-size: 35px 35px;
+}
+
+#item-box {
+    position: absolute;
+    bottom: 8px;
+    width: 100%;
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    align-items: center;
+}
+
+.eating-snack {
+    animation: eating 1s forwards;
+}
+
+#bomb-container-wrapper {
+    animation: thrownBombX 1.5s forwards ease-in-out;
+    position: absolute;
+    right: 110px;
+    bottom:40px;
+    height:35px;
+    width:35px;
+    transform: rotate(180deg);
+    filter:blur(0.5px);
+}

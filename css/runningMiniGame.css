@@ -1,0 +1,62 @@
+#animated-pointer {
+    animation: flickering-pointer .5s infinite;
+}
+
+#running-background-wrapper {
+    position: absolute;
+    top:0;
+    left:0;
+}
+
+#running-background {
+    height: 314px;
+    width: 550px;
+    overflow:hidden;
+    position: relative;
+}
+
+#running-warning {
+    position: absolute;
+    width: 300px;
+    left: calc(50% - 150px);
+    top: 50px;
+    text-align:center;
+    color:white;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+}
+
+#character-running {
+    position: absolute;
+    height: 100px;
+    width: 70px;
+    left:80px;
+    bottom:10px;
+    transition:.2s;
+}
+
+#enemy-running {
+    position: absolute;
+    height: 100px;
+    width: 70px;
+    left:350px;
+    bottom:10px;
+    transform:scale(1.1);
+}
+
+#running-sprite-enemy {
+    position: absolute;
+    top: -535px;
+    left: -410px;
+}
+
+#overlay-running {
+    position: absolute;
+    top:0;
+    left:0;
+    height:100%;
+    width:100%;
+}
+
+.running {
+    animation: running-animation .5s infinite;
+}

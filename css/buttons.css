@@ -1,0 +1,353 @@
+button {
+    transition: .3s;
+}
+
+#start-button {
+    position: absolute;
+    width: 200px;
+    left: 0;
+    right:0;
+    margin: 0 auto;
+    top: 40%;
+    padding: 16px 0;
+    background: orange;
+    color: white;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+    border: 2px solid white;
+    border-radius: 8px;
+}
+
+#how-to-play-button {
+    position: absolute;
+    width: 200px;
+    left: 65px;
+    top: 60%;
+    padding: 16px 0;
+    background: orange;
+    border: 2px solid white;
+    border-radius: 8px;
+    color: white;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+}
+
+#trophies-button {
+    position: absolute;
+    width: 200px;
+    left: 285px;
+    top: 60%;
+    padding: 16px 0;
+    background: orange;
+    border: 2px solid white;
+    border-radius: 8px;
+    color: white;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+}
+
+#vendetta-button {
+    position: absolute;
+    width: 200px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    top: 80%;
+    padding: 16px 0;
+    background: orange;
+    border: 2px solid white;
+    border-radius: 8px;
+    color: white;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+}
+
+#back-button, #back-button-trophies, #toggle-tutorial-button {
+    background: none;
+    color: white;
+    position: absolute;
+    bottom: 12px;
+    border: 2px solid white;
+    border-radius: 8px;
+    padding: 8px;
+    width: 180px;
+    display: block;
+    transition: .3s;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+}
+
+#toggle-tutorial-button {
+    right: 56px;
+}
+
+#back-button:hover, #back-button-trophies:hover, #toggle-tutorial-button:hover {
+    background: white;
+    color: black;
+    transform: scale(1.1);
+    text-shadow: none;
+}
+
+#start-button:hover,
+#how-to-play-button:hover,
+#trophies-button:hover,
+.add-button:hover,
+#vendetta-button:hover {
+    background: rgb(255, 123, 0);
+    color: white;
+    transform: scale(1.1);
+}
+
+.select-screen-button {
+    position: absolute;
+    top: 30%;
+    height: 40%;
+    width: 30px;
+    background: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 20px;
+}
+
+#next-button,
+#refresh-button,
+#open-shop-button {
+    border: 2px solid white;
+    position: fixed;
+    width: 140px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    top: 40%;
+    background: orange;
+    color: white;
+    font-size: 16px;
+    padding: 16px;
+    border-radius: 8px;
+    z-index: 99;
+}
+
+#open-shop-button {
+    top: 60%;
+}
+
+#next-button,
+#start-button {
+    box-shadow: rgba(0, 0, 0, 0.12) 0 1px 3px, rgba(0, 0, 0, 0.24) 0 1px 2px;
+}
+
+#next-button:hover,
+#refresh-button:hover,
+#open-shop-button:hover,
+.select-screen-button:hover {
+    transform: scale(1.1);
+}
+
+.add-button {
+    display: block;
+    background: orange;
+    border: 2px solid white;
+    border-radius: 8px;
+    color: white;
+    padding: 4px;
+    width: 100%;
+    margin: 8px auto 0;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+}
+
+.shop-buttons-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    padding: 16px;
+}
+
+.shop-buttons-wrapper * {
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+}
+
+.shop-buttons-wrapper button {
+    background: orange;
+    border: 2px solid white;
+    border-radius: 8px;
+    color: white;
+    padding: 4px;
+    transition: 0.3s;
+    position: relative;
+}
+
+.shop-buttons-wrapper button span {
+    position: absolute;
+    top: -10px;
+    right: 0;
+    background: limegreen;
+    padding: 8px;
+    border-radius: 50%;
+    border: 1px solid white;
+    transform: rotate(20deg);
+}
+
+.shop-buttons-wrapper button:hover {
+    cursor: pointer;
+    background: rgb(255, 123, 0);
+    opacity: 1;
+    transform: scale(1.02)
+}
+
+.shop-buttons-wrapper button:disabled {
+    opacity: 0.6;
+}
+
+button {
+    cursor: pointer;
+}
+
+.control-button-wrapper {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    pointer-events: none;
+    display: flex;
+    justify-content: space-between;
+}
+
+#sound-control-button,
+#fullscreen-button {
+    pointer-events: auto;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    margin: 4px;
+    border: none;
+    background: rgb(0, 0, 0, .6);
+    color: white;
+    transition: 0.3s all;
+    opacity: 0.5;
+}
+
+#sound-control-button:hover,
+#fullscreen-button:hover {
+    opacity: 1;
+    background: orange;
+    transform: scale(1.1);
+}
+
+#sound-control-button.muted .fa-volume-up {
+    display: none;
+}
+
+#sound-control-button:not(.muted) .fa-volume-mute {
+    display: none;
+}
+
+.sprite-container div button {
+    display: inline-block;
+    background-color: orange;
+    border: none;
+    font-size: 2rem;
+    color: white;
+    z-index: 1;
+    width: 60px;
+    height: 50px;
+    opacity: .95;
+    margin: 1px;
+    transition: all 0.3s;
+}
+
+.sprite-container button {
+    display: none;
+    background: rgb(0, 0, 0, .2);
+    font-size: 1rem;
+    color: white;
+    z-index: 10;
+    width: 60px;
+    height: 50px;
+    opacity: .8;
+}
+
+.sprite-container .buttons-wrapper {
+    display: inline-block;
+}
+
+.sprite-container div button:first-of-type {
+    top: 0;
+}
+
+.sprite-container div button:nth-of-type(2) {
+    top: 50px;
+}
+
+
+.buttons-char {
+    border-radius: 4px;
+}
+
+.buttons-char:hover {
+    cursor: pointer;
+    background: rgb(255, 123, 0);
+    opacity: 1;
+    transform: scale(1.02)
+}
+
+.buttons-wrapper {
+    background: rgb(0,0,0,0.6);
+    box-shadow: rgba(0, 0, 0, 0.12) 0 1px 3px, rgba(0, 0, 0, 0.24) 0 1px 2px;
+    border-radius: 8px;
+    padding: 4px 8px;
+    display: none;
+    width: 124px;
+    transform: translateY(-10px);
+    position: absolute;
+    top: -136px;
+    left: -38px;
+    font-size: 0;
+}
+
+.buttons-wrapper:after {
+    content: '';
+    display: block;
+    margin: 4px auto 0;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid white;
+}
+
+.buttons-wrapper:before {
+    content: 'Choose action';
+    font-size: 12px;
+    color: white;
+    display: block;
+    text-align: center;
+    margin-bottom: 4px;
+}
+
+.buttons-char:focus {
+    opacity: 1;
+    color: orange;
+    background: rgb(0, 0, 0, 1);
+}
+
+.buttons-char:focus span {
+    color: orange;
+}
+
+.buttons-char i {
+    position: relative;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+}
+
+.buttons-char span {
+    position: absolute;
+    top: -9px;
+    right: -10px;
+    font-size: 12px;
+    color: white;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+}
+
+.left-button {
+    left: -34px;
+    border: 2px solid black;
+}
+
+.right-button {
+    right: -34px;
+    border: 2px solid black;
+}

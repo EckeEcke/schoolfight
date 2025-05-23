@@ -1,0 +1,76 @@
+#trophy-messages-container {
+    display: flex;
+    gap: 8px;
+    flex-direction: column-reverse;
+    align-items: flex-end;
+    position:absolute;
+    bottom: 0;
+    right: 0;
+    z-index: 10;
+    margin-bottom: 8px;
+}
+
+.trophy-message {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-start;
+    background: rgba(0, 0, 0, .6);
+    width: 160px;
+    border-bottom-left-radius: 8px;
+    border-top-left-radius: 8px;
+    padding: 4px;
+    font-size: 12px!important;
+    margin-right: -180px;
+    animation: slideIn 0.3s ease-out forwards;
+}
+
+.trophy-message .trophy-icon-wrapper {
+    margin: 8px;
+}
+
+#trophies {
+    display: none;
+    background: rgb(0, 0, 0, .5);
+    padding: 8px 8px 20px;
+    color: white;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+    width: 80%;
+    margin: 8px auto;
+    height: 274px;
+}
+
+#trophies h2 {
+    text-align: center;
+    margin: 8px;
+}
+
+.trophies-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.trophy {
+    text-align: center;
+    text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black;
+    color: white;
+    font-size: 14px
+}
+
+.trophy-icon-wrapper {
+    background: orange;
+    width: 20px;
+    padding: 8px;
+    border-radius: 50%;
+    margin: 8px auto;
+}
+
+.trophy.not-received {
+    opacity: 0.6;
+}
+
+.trophy.not-received .trophy-icon-wrapper {
+    background: white;
+}

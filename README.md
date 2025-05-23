@@ -6,7 +6,7 @@ School Fight is a turn based fighting game. Choose your party and battle it out 
 There are three types of characters: strength, intelligence and assholiness. The mechanics work by a rock paper scissors principle: 
 strength is effective against intelligence, intelligence is effective against assholiness and assholiness is effective against strength
 All characters (including the opponent party) attack at the same time. This gives the fights a unique dynamic.
-Use items to deal damage or repleanish your health. Beat all nine levels including two mini games and a boss battle.
+Use items to deal damage or replenish your health. New items and stat upgrades can be purchased in the shop in between battles. You earn $1 per character who survived a level. Beat all nine levels including two mini games and a boss battle.
 
 ## How to play
 

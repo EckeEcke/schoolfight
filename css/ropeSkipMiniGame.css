@@ -1,0 +1,62 @@
+canvas {
+    z-index: 3;
+    position: absolute;
+}
+
+.girl-sprite {
+    position: absolute;
+    width: 60px;
+    height: 100px;
+    left: 110px;
+    top: 150px;
+    background: transparent;
+    z-index:4;
+}
+
+#girl-left {
+    left: 110px;
+}
+
+#girl-right {
+    left: 380px;
+}
+
+.girl-sprite-sheet-wrapper {
+    position: relative;
+    height:100%;
+    width: 100%;
+    overflow:hidden;
+}
+
+#rope-skipping-game {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+#rope-skips {
+    position: absolute;
+    left: 225px;
+    top:60px;
+    width:110px;
+    text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black;
+    color: white;
+}
+
+#jump-box {
+    width: 60px;
+    height: 100px;
+    background: transparent;
+    position: absolute;
+    left: 255px;
+    top: 170px;
+    transition: .4s;
+    z-index: 2;
+}
+
+#overlay-jumping {
+    position: absolute;
+    height: 314px;
+    width: 550px;
+    z-index: 10;
+}

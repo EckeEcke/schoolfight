@@ -1,0 +1,64 @@
+#shop {
+    background-image: url("../images_schoolfight/backgroundShop.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: 100%;
+}
+
+#upgrade-message-wrapper {
+    position: absolute;
+    left: 50%;
+    bottom: 5%;
+    z-index: 12;
+}
+
+.upgrade-message {
+    transform: translateX(-50%);
+    color: limegreen;
+    text-shadow: 1px 1px black;
+    font-size: 24px;
+}
+
+.shop-sprite {
+    position: absolute;
+    bottom: -10%;
+    left: 30%;
+    zoom: 1.2;
+    overflow: hidden;
+    width: 60px;
+    height: 100px;
+}
+
+#shop-dialogue-box-wrapper {
+    position: absolute;
+    bottom: 25%;
+    width: 40%;
+    right: 15%;
+    background: white;
+    min-height: 10%;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: .8rem;
+    z-index: 11;
+    color: black;
+}
+
+#shop-dialogue-box-triangle {
+    position: absolute;
+    bottom: -30px;
+    left: 5%;
+    width: 0;
+    height: 0;
+    border-left: 25px solid transparent;
+    border-right: 25px solid transparent;
+    border-top: 50px solid white;
+    transform: rotate(37deg);
+    z-index: -1;
+}
+
+#current-amount-money {
+    color: white;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+    text-align: center;
+    padding-top: 16px;
+}

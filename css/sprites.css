@@ -1,0 +1,88 @@
+.sprite-container {
+    position: absolute;
+    width: 60px;
+    height: 100px;
+    transition: .3s;
+}
+
+.sprite-container:hover,
+.sprite-container:focus-within {
+    width: 300px;
+}
+
+.sprite-container.player2 div button {
+    transform: scaleX(-1);
+}
+
+.sprite-container div:hover button {
+    display: inline-block;
+}
+
+.sprite-container:hover {
+    width: 188px;
+    z-index: 5;
+}
+
+.sprite-container:hover button {
+    display: inline-block;
+}
+
+.select-sprite {
+    animation: selectscreen-animation 2.5s infinite;
+    margin: 0 auto;
+    overflow: hidden;
+    width: 60px;
+    height: 100px;
+}
+
+.sprite-container.victory {
+    animation: victoryAnimation 3s infinite;
+}
+
+.bombed-enemy {
+    filter: grayscale(100%) sepia(100%) hue-rotate(90deg) blur(1px);
+    transform: scaleX(-1) rotate(-10deg)!important;
+}
+
+.sprite-container div:hover img,
+.sprite-container div.selected img {
+    filter: brightness(0.5) sepia(1) saturate(100%);
+}
+
+.sprite-sheet-wrapper {
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+}
+
+.left-party.defeated,
+#jump-box.defeated,
+#girl-left.defeated {
+    filter: brightness(0.5) sepia(1) saturate(10000%);
+    /*transform: scaleX(-1) rotate(90deg) !important;*/
+    animation: kickoutCharacters1 1s forwards;
+}
+
+.right-party.defeated,
+#girl-right.defeated,
+#enemy-running.defeated {
+    filter: brightness(0.5) sepia(1) saturate(10000%);
+    animation: kickoutCharacters2 1s forwards;
+}
+
+.animated-character1 {
+    animation: moveCharacters1 2.5s normal forwards
+}
+
+.animated-character2 {
+    animation: moveCharacters2 2.5s normal forwards
+}
+
+.overflow-wrapper {
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    height: 100px;
+    width:60px;
+}
