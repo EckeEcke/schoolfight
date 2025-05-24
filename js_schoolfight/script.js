@@ -411,8 +411,8 @@ document.addEventListener('DOMContentLoaded', () => {
     */
 
     class Character {
-        constructor(type) {
-            this.id = undefined
+        constructor(type, id) {
+            this.id = id
             this.class = type.class
             this.type = type.type
             this.energy = type.energy
@@ -558,36 +558,36 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const setTeams = [
-        [new Character(characters.bully), new Character(characters.nerd), new Character(characters.normie)], //1
-        [new Character(characters.squealer), new Character(characters.wally), new Character(characters.richkid)], //2
-        [new Character(characters.sportskid), new Character(characters.sportskid), new Character(characters.sportskid)], //3
-        [new Character(characters.dummy), new Character(characters.dummy), new Character(characters.dummy)], //4 (rope skipping)
-        [new Character(characters.richkid), new Character(characters.nerd), new Character(characters.bully)], //5
-        [new Character(characters.dummy), new Character(characters.dummy), new Character(characters.dummy)], //6 (running)
-        [new Character(characters.richkid), new Character(characters.richkid), new Character(characters.richkid)],  //6
-        [new Character(characters.nerd), new Character(characters.nerd), new Character(characters.nerd)], //7
-        [new Character(characters.dummy), new Character(characters.teacher), new Character(characters.dummy)], //8
+        [new Character(characters.bully, 0), new Character(characters.nerd, 1), new Character(characters.normie, 2)], //1
+        [new Character(characters.squealer, 0), new Character(characters.wally, 1), new Character(characters.richkid, 2)], //2
+        [new Character(characters.sportskid, 0), new Character(characters.sportskid, 1), new Character(characters.sportskid, 2)], //3
+        [new Character(characters.dummy, 0), new Character(characters.dummy, 1), new Character(characters.dummy, 2)], //4 (rope skipping)
+        [new Character(characters.richkid, 0), new Character(characters.nerd, 1), new Character(characters.bully, 2)], //5
+        [new Character(characters.dummy, 0), new Character(characters.dummy, 1), new Character(characters.dummy, 2)], //6 (running)
+        [new Character(characters.richkid, 0), new Character(characters.richkid, 1), new Character(characters.richkid, 2)],  //6
+        [new Character(characters.nerd, 0), new Character(characters.nerd, 1), new Character(characters.nerd, 2)], //7
+        [new Character(characters.dummy, 0), new Character(characters.teacher, 1), new Character(characters.dummy, 2)], //8
     ]
 
     const setTeamsTeacher = () => [
-        [new Character(characters.bully), new Character(characters.nerd), new Character(characters.normie)], //1
-        [new Character(characters.squealer), new Character(characters.wally), new Character(characters.richkid)], //2
-        [new Character(characters.sportskid), new Character(characters.sportskid), new Character(characters.sportskid)], //3
-        [new Character(characters.dummy), new Character(characters.dummy), new Character(characters.dummy)], //4 (rope skipping)
-        [new Character(characters.richkid), new Character(characters.nerd), new Character(characters.bully)], //5
-        [new Character(characters.dummy), new Character(characters.dummy), new Character(characters.dummy)], //6 (running)
-        [new Character(characters.richkid), new Character(characters.richkid), new Character(characters.richkid)],  //6
-        [new Character(characters.nerd), new Character(characters.nerd), new Character(characters.nerd)], //7
+        [new Character(characters.bully, 0), new Character(characters.nerd, 1), new Character(characters.normie, 2)], //1
+        [new Character(characters.squealer, 0), new Character(characters.wally, 1), new Character(characters.richki0d, 2)], //2
+        [new Character(characters.sportskid, 0), new Character(characters.sportskid, 1), new Character(characters.sportskid, 2)], //3
+        [new Character(characters.dummy, 0), new Character(characters.dummy, 1), new Character(characters.dummy, 2)], //4 (rope skipping)
+        [new Character(characters.richkid, 0), new Character(characters.nerd, 1), new Character(characters.bully, 2)], //5
+        [new Character(characters.dummy, 0), new Character(characters.dummy, 1), new Character(characters.dummy, 2)], //6 (running)
+        [new Character(characters.richkid, 0), new Character(characters.richkid, 1), new Character(characters.richkid, 2)],  //6
+        [new Character(characters.nerd, 0), new Character(characters.nerd, 1), new Character(characters.nerd, 2)], //7
         [
-            new Character(characters[game.lastVictoryTeam[0].toLowerCase()]),
-            new Character(characters[game.lastVictoryTeam[1].toLowerCase()]),
-            new Character(characters[game.lastVictoryTeam[2].toLowerCase()])], //8
+            new Character(characters[game.lastVictoryTeam[0].toLowerCase()], 0),
+            new Character(characters[game.lastVictoryTeam[1].toLowerCase()], 1),
+            new Character(characters[game.lastVictoryTeam[2].toLowerCase()], 2)], //8
     ]
 
     const teacherTeam = [
-        Object.assign(new Character(characters.dummy), { id: 1 }),
-        Object.assign(new Character(characters.teacher), { id: 2 }),
-        Object.assign(new Character(characters.dummy), { id: 3 })
+        Object.assign(new Character(characters.dummy, 1)),
+        Object.assign(new Character(characters.teacher, 2)),
+        Object.assign(new Character(characters.dummy, 3))
     ]
 
 
@@ -666,10 +666,8 @@ document.addEventListener('DOMContentLoaded', () => {
             clearInterval(this.moveBackgroundInterval)
             playSound(sounds.evilLaugh)
             sounds.steps.pause()
-            addHidden(document.getElementById('next-round-message'))
-            removeHidden(document.getElementById('communication-container'))
-            removeHidden(document.getElementById('game-over-message'))
-            removeHidden(document.getElementById('refresh-button'))
+            sounds.music.pause()
+            showGameOverScreen()
             this.characterRunning.classList.remove('running')
             this.enemyRunning.classList.remove('running')
             hide(this.runningBackgroundText)
@@ -768,10 +766,8 @@ document.addEventListener('DOMContentLoaded', () => {
             playSound(sounds.deathCry)
             hide(canvas)
             hide(overlayJumping)
-            addHidden(document.getElementById('next-round-message'))
-            removeHidden(document.getElementById('communication-container'))
-            removeHidden(document.getElementById('game-over-message'))
-            removeHidden(document.getElementById('refresh-button'))
+            sounds.music.pause()
+            showGameOverScreen()
         }
 
         getPointRope() {
@@ -1062,13 +1058,23 @@ document.addEventListener('DOMContentLoaded', () => {
         sounds.bossMusic.play().catch()
     }
 
+    function showGameOverScreen() {
+        runFadeGameOver()
+        addHidden(battleTicker)
+        addHidden(document.getElementById('next-round-message'))
+        removeHidden(document.getElementById('communication-container'))
+        removeHidden(document.getElementById('game-over-message'))
+        removeHidden(document.getElementById('refresh-button'))
+        addHidden(itemBox)
+    }
+
     function addCharacter(event) {
         const character = event.currentTarget.dataset.character
-        const obj = new Character(characters[character])
+        const id = game.player.party.length + 1
+        const obj = new Character(characters[character], id)
 
         if (game.player.party.length < 3) {
             playSound(sounds.confirm)
-            obj.id = game.player.party.length + 1
             game.player.party.push(obj)
             titleSelect.innerHTML = `Add characters to your party ${game.player.party.length}/3`
             document.getElementById(`energy-char${obj.id}-text`).innerHTML = obj.class
@@ -1099,8 +1105,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (dialogueManager.showsDialogue || fightAnimationRunning || disableAttackButtons || itemManager.bombAnimationRunning) return
 
         const element = event.currentTarget
-
         if (element.classList.contains('selected')) return
+        if (!element.querySelector('.buttons-wrapper').classList.contains('hidden')) return
         if (game.isTeacherMode && (element.id === 'char1' || element.id === 'char3')) return
         addHidden(battleTicker)
 
@@ -1119,15 +1125,13 @@ document.addEventListener('DOMContentLoaded', () => {
         game.player.selectedChar = game.player.party[index]
         game.player.selectedCharId = target.dataset.char
         game.player.selectedAttackType = target.dataset.type
-        const indexAttr = target.dataset.index
 
         if (game.player.selectedAttackType === '') {
-            selectDefend(game.player.selectedChar, game.player.selectedCharId, indexAttr)
+            selectDefend(game.player.selectedChar)
         }
 
-        Array.from(document.getElementsByClassName('open')).forEach(openedElement => {
-            openedElement.classList.remove('open')
-            openedElement.classList.add('hidden')
+        Array.from(document.getElementsByClassName('buttons-wrapper')).forEach(element => {
+            element.classList.add('hidden')
         })
     }
 
@@ -1158,12 +1162,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function selectDefend(player, int, index) {
+    function selectDefend(player) {
         Array.from(document.getElementsByClassName('buttons-wrapper')).forEach(element => {
             element.classList.add('hidden')
         })
-        game.player.party[index].defends = true
+        game.player.party.find(char => char.id === player.id).defends = true
         game.player.moves.push({ attacker: player, target: '', type: '' })
+        document.querySelector(`#char${player.id}`).classList.add('selected')
         playSound(sounds.confirm)
 
         if (game.player.moves.length === getPossibleMoves()) {
@@ -1193,13 +1198,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function setEnemiesDefending() {
         const remainingEnemyParty = getRemainingEnemies()
-        remainingEnemyParty.forEach(enemy => {
+        remainingEnemyParty.forEach((enemy) => {
             const randomDefending = Math.floor(Math.random() * (10))
-            enemy.defends = false
+            game.enemy.party.find(entry => entry.id === enemy.id).defends = false
 
             if (randomDefending <= 8 || enemy.energy <= 0) return
 
-            enemy.defends = true
+            game.enemy.party.find(entry => entry.id === enemy.id).defends = true
             game.battleMessages.push("<span class='text-enemy'>Enemy " + enemy.class + " <i class='fas fa-shield-alt'></i>" + "</span><br>")
         })
     }
@@ -1320,14 +1325,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (gameOver) {
             setTimeout(() => {
-                addHidden(battleTicker)
-                addHidden(document.getElementById('next-round-message'))
-                removeHidden(document.getElementById('communication-container'))
-                removeHidden(document.getElementById('game-over-message'))
-                addHidden(itemBox)
+                showGameOverScreen()
+                sounds.music.pause()
                 sounds.bossMusic.pause()
             }, 2500)
-        }
+        }     
     }
 
     function getPossibleMoves() {
@@ -1859,7 +1861,9 @@ document.addEventListener('DOMContentLoaded', () => {
     })
 
     leftPartyElements.forEach(element => {
-        element.addEventListener('click', showButtons)
+        element.addEventListener('click', (event) => {
+            showButtons(event)
+        })
     })
 
     document.querySelectorAll('.add-button').forEach(element => {
