@@ -3,8 +3,8 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 800px;
-    height: 800px;
+    width: 1000px;
+    height: 1000px;
     background: transparent;
     z-index: 999;
     border-radius: 50%;
@@ -17,8 +17,8 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 800px;
-    height: 800px;
+    width: 1000px;
+    height: 1000px;
     background: transparent;
     z-index: 999;
     border-radius: 50%;
@@ -322,8 +322,8 @@
 @keyframes fade-out-animation {
     0% {
         z-index: 999;
-        width: 800px;
-        height: 800px;
+        width: 1000px;
+        height: 1000px;
     }
     40% {
         z-index: 999;
@@ -339,8 +339,8 @@
 
     100% {
         z-index: 999;
-        width: 800px;
-        height: 800px;
+        width: 1000px;
+        height: 1000px;
     }
 }
 
@@ -348,8 +348,8 @@
     0% {
         opacity: 0;
         z-index: 9;
-        width: 800px;
-        height: 800px;
+        width: 1000px;
+        height: 1000px;
     }
     100% {
         opacity: 1;

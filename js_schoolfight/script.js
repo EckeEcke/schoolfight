@@ -275,9 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.itemsUsed += 1
             this.itemUsed = true
             updateBattleTicker('bomb')
-            Array.from(document.getElementsByClassName('buttons-wrapper')).forEach(element => {
-                element.classList.add('hidden')
-            })
+            hideAll('buttons-wrapper')
 
             this.runBombAnimation()
             addHidden(itemBox)
@@ -310,9 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 element => !element.classList.contains('defeated')
             )
             aliveLeftParty.forEach(element => element.classList.add('eating-snack'))
-            Array.from(document.getElementsByClassName('buttons-wrapper')).forEach(element => {
-                element.classList.add('hidden')
-            })
+            hideAll('buttons-wrapper')
             setTimeout(()=>{
                 aliveLeftParty.forEach(element => element.classList.remove('eating-snack'))
             },1000)
@@ -426,6 +422,7 @@ document.addEventListener('DOMContentLoaded', () => {
         takeDamage(damage) {
             this.energy -= this.defends ? damage : damage * 2
             if (this.energy < 0) this.energy = 0
+            return this.defends ? damage : damage * 2
         }
         recoverPartially() {
             if (this.energy <= 0) return
@@ -962,13 +959,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function hideAll(className) {
         Array.from(document.getElementsByClassName(className)).forEach(element => {
-            element.style.display = 'none'
+            element.classList.add('hidden')
         })
     }
 
     function showAll(className) {
         Array.from(document.getElementsByClassName(className)).forEach(element => {
-            element.style.display = 'block'
+            element.classList.remove('hidden')
         })
     }
 
@@ -981,7 +978,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function startGame(isTeacherMode) {
         game.isTeacherMode = isTeacherMode
-        Array.from(document.getElementsByClassName('title-screen')).forEach(element => addHidden(element))
+        hideAll('title-screen')
         playSound(sounds.schoolBell)
         playMusic()
         if (isTeacherMode) {
@@ -998,7 +995,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function initializeGame() {
         dialogueManager = new DialogueManager(dialogues)
         updateGameState(gameStates.dialogue)
-        Array.from(document.getElementsByClassName('select-screen')).forEach(element => addHidden(element))
+        hideAll('select-screen')
         dialogueManager.showDialogue()
         dialogueManager.showsDialogue = true
         const energyBars = Array.from(document.getElementsByClassName('energy-bar-wrapper'))
@@ -1144,9 +1141,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const possibleMoves = getPossibleMoves()
 
         if (game.player.selectedAttackType !== '') {
-            Array.from(document.getElementsByClassName('buttons-wrapper')).forEach(element => {
-                element.classList.add('hidden')
-            })
+            hideAll('buttons-wrapper')
         }
 
         if (game.player.moves.length < possibleMoves && game.player.selectedChar !== "" && enemy.energy > 0) {
@@ -1163,9 +1158,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function selectDefend(player) {
-        Array.from(document.getElementsByClassName('buttons-wrapper')).forEach(element => {
-            element.classList.add('hidden')
-        })
+        hideAll('buttons-wrapper')
         game.player.party.find(char => char.id === player.id).defends = true
         game.player.moves.push({ attacker: player, target: '', type: '' })
         document.querySelector(`#char${player.id}`).classList.add('selected')
@@ -1205,26 +1198,24 @@ document.addEventListener('DOMContentLoaded', () => {
             if (randomDefending <= 8 || enemy.energy <= 0) return
 
             game.enemy.party.find(entry => entry.id === enemy.id).defends = true
-            game.battleMessages.push("<span class='text-enemy'>Enemy " + enemy.class + " <i class='fas fa-shield-alt'></i>" + "</span><br>")
+            buildBattleTickerText(enemy, enemy, '', 0, false)    
         })
     }
 
     function handlePlayerMoves() {
         game.player.moves.forEach(element => {
             if (element.attacker.defends) {
-                game.battleMessages.push("<span class='text-player'>" + element.attacker.class + " <i class='fas fa-shield-alt'></i>" + "</span><br>")
+                buildBattleTickerText(element.attacker, element.target, 0, 0, true)                
                 return
             }
-
-            game.battleMessages.push("<span class='text-player'>" + element.attacker.class + '  ' + setBattleTickerIcon(element.type) + '  ' + "<span class='text-enemy'>Enemy " + element.target.class + "</span><br>")
             const selector = element.type
             const attack = element.attacker[selector]
             const defense = getDefenseType(selector, 'target')
             const typeBonus = getEffectiveness(selector, element.target.type)
+            const damage = Math.floor(attack * typeBonus * (100 / (100 + element.target[defense] * 10)))
+            const receivedDamage = element.target.takeDamage(damage)
 
-            let damage = attack * typeBonus * (100 / (100 + element.target[defense] * 10))
-            element.target.takeDamage(damage)
-
+            buildBattleTickerText(element.attacker, element.target, selector, receivedDamage, true)          
             if (element.target.energy <= 0) {
                 element.target.energy = 0
                 setTimeout(() => playSound(sounds.deathCry2), 2500)
@@ -1242,16 +1233,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 const target = selectTargetForEnemy()
                 const defense = getDefenseType(selector, target)
                 const typeBonus = getEffectiveness(selector, target.type)
-
-                game.battleMessages.push("<span class='text-enemy'> Enemy " + enemy.class + "</span>" + setBattleTickerIcon(selector) + "<span class='text-player'>" + target.class + "</span><br>")
-                const damage = attack * typeBonus * (100 / (100 + target[defense] * 10))
-                target.takeDamage(damage)
+                const damage = Math.floor(attack * typeBonus * (100 / (100 + target[defense] * 10)))
+                const receivedDamage = target.takeDamage(damage)
+                buildBattleTickerText(enemy, target, selector, receivedDamage, false)
 
                 if (target.energy <= 0) {
                     setTimeout(() => playSound(sounds.deathCry), 2500)
                 }
             }
         })
+    }
+
+    function buildBattleTickerText(attacker, target, type, damage, isPlayer) {
+        if (isPlayer) {
+            if (attacker.defends) {
+                game.battleMessages.push("<div><span class='text-player'>" + attacker.class + " <i class='fas fa-shield-alt'></i>" + "</span></div>")
+            } else {
+                game.battleMessages.push("<div><span class='text-player'>" + attacker.class + '  ' + setBattleTickerIcon(type) + '  ' + "<span class='text-enemy'>Enemy " + target.class + "</span>" + ` <span class="damage-text"> -${damage}%</span></div>`)
+            }
+        } else {
+            if (attacker.defends) {
+                game.battleMessages.push("<div><span class='text-enemy'>Enemy " + attacker.class + " <i class='fas fa-shield-alt'></i>" + "</span></div>")
+            } else {
+                game.battleMessages.push("<div><span class='text-enemy'>Enemy " + attacker.class + '  ' + setBattleTickerIcon(type) + '  ' + "<span class='text-player'> " + target.class + "</span>" + ` <span class="damage-text"> -${damage}%</span></div>`)
+            }
+        }
+        
     }
 
     function randomAttackType() {
@@ -1280,6 +1287,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function selectTargetForEnemy() {
         const possibleTargets = getRemainingParty()
 
+        if (possibleTargets.length === 0) return null
+
         const randomNumber = Math.floor(Math.random() * (possibleTargets.length))
         let energy = 100
         let target = possibleTargets[0]
@@ -1291,9 +1300,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         })
 
-        if (Math.floor(Math.random() * (10)) > 4) {
-            target = possibleTargets[randomNumber]
-        }
+        if (target === undefined && possibleTargets.length > 0) target = possibleTargets[0]
+        target = possibleTargets[randomNumber]
 
         if (target === undefined) target = possibleTargets[0]
 
@@ -1305,8 +1313,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('battle-ticker') .style.display = 'block'
         game.battleMessages = []
         setEnemiesDefending()
-        handlePlayerMoves()
         handleEnemyMoves()
+        handlePlayerMoves()
         drawEnergyBars()
         resetDefending()
 
@@ -1530,7 +1538,6 @@ document.addEventListener('DOMContentLoaded', () => {
         showAll('left-party')
         showAll('energy-bar-wrapper')
         const energyBars = Array.from(document.getElementsByClassName('energy-bar-wrapper'))
-        energyBars.forEach(bar => removeHidden(bar))
 
         if (game.isTeacherMode) {
             addHidden(energyBars[0])
@@ -1551,7 +1558,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const charEnergyBar = document.getElementById(`energy-char${i + 1}`)
             charEnergyBar.style.width = game.player.party[i].energy + '%'
             charEnergyBar.style.background = game.player.party[i].energy < 30 ? 'red' : 'green'
-            if (game.player.party[i].class !== 'Dummy')show(charEnergyBar)
+            if (game.player.party[i].class !== 'Dummy') show(charEnergyBar)
             const enemyEnergyBar = document.getElementById(`energy-enemy${i + 1}`)
             enemyEnergyBar.style.width = game.enemy.party[i].energy + '%'
             enemyEnergyBar.style.background = game.enemy.party[i].energy < 30 ? 'red' : 'green'
@@ -1583,7 +1590,7 @@ document.addEventListener('DOMContentLoaded', () => {
      */
 
     function showPlayerSprites() {
-        Array.from(document.getElementsByClassName('left-party')).forEach(element => removeHidden(element))
+        showAll('left-party')
         game.player.party.forEach((char, index) => {
             const charSprite = document.getElementById(`char${index + 1}-sprite`)
             charSprite.className = `player-sprite ${char.frontSprite}`
@@ -1607,7 +1614,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showEnemySprites() {
-        Array.from(document.getElementsByClassName('right-party')).forEach(element => removeHidden(element))
+        showAll('right-party')
         game.enemy.party.forEach((char, index) => {
             char.id = index + 1
             const enemySprite = document.getElementById(`enemy${char.id}-sprite`)
@@ -1672,7 +1679,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function showTrophiesScreen () {
         playSound(sounds.confirm)
         show(trophiesScreen)
-        Array.from(document.getElementsByClassName('title-screen')).forEach(element => addHidden(element))
+        hideAll('title-screen')
     }
 
     function displayAlreadyUnlockedTrophy(trophy) {
@@ -1685,7 +1692,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function showTutorialPage() {
         playSound(sounds.confirm)
         removeHidden(tutorialScreen)
-        Array.from(document.getElementsByClassName('title-screen')).forEach(element => addHidden(element))
+        hideAll('title-screen')
     }
 
     function switchTutorialPage() {
@@ -1715,9 +1722,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function runVictoryAnimation() {
         const chars = [char1,char2,char3]
         hideAll('energy-bar-wrapper')
-        Array.from(document.getElementsByClassName('buttons-wrapper')).forEach(element => {
-            element.classList.add('hidden')
-        })
+        hideAll('buttons-wrapper')
         chars.forEach((char, index) => {
             char.style.top = '200px'
             char.style.left = `${150 + 100 * index}px`
@@ -1733,9 +1738,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateGameState(gameStates.battleAnimation)
         updateBattleTicker('battle')
         playSound(sounds.fight)
-        Array.from(document.getElementsByClassName('buttons-wrapper')).forEach(element => {
-            element.classList.add('hidden')
-        })
+        hideAll('buttons-wrapper')
         const allSelected = document.querySelectorAll('.selected')
         allSelected.forEach(selected => selected.classList.remove('selected'))
         overlay.style.zIndex = '999'
@@ -1764,9 +1767,7 @@ document.addEventListener('DOMContentLoaded', () => {
             Array.from(document.getElementsByClassName('animated-character2')).forEach(element => {
                 element.classList.remove('animated-character2')
             })
-            Array.from(document.getElementsByClassName('buttons-char')).forEach(element => {
-                element.classList.remove('hidden')
-            })
+            showAll('buttons-char')
             setCharactersDefeated()
         }, 2600)
         setTimeout(() => {
@@ -1822,8 +1823,8 @@ document.addEventListener('DOMContentLoaded', () => {
         runFadeAnimation()
         setTimeout(() => {
             removeHidden(document.getElementById('communication-container'))
-            showAll('energy-bar-wrapper')
             showAll('left-party')
+            showAll('energy-bar-wrapper')
             addHidden(shop)
         }, 1000)
     }

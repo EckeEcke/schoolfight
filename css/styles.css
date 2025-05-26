@@ -176,7 +176,8 @@ i,
     position: absolute;
     top: 3%;
     width: 40%;
-    left: 28%;
+    left: 50%;
+    transform: translateX(-50%);
     background: rgb(0, 0, 0, .5);
     min-height: 10%;
     color: white;
@@ -184,6 +185,23 @@ i,
     border-radius: 8px;
     font-size: .8rem;
     z-index: 11;
+}
+
+#battle-ticker {
+    min-width: 45%;
+}
+
+.damage-text {
+    color: red;
+}
+
+#battle-ticker * {
+    text-shadow: 1px 1px 1px black;
+}
+
+#battle-ticker #battle-messages {
+    display: flex;
+    flex-direction: column-reverse;
 }
 
 #dialogue-box-wrapper {
