@@ -154,6 +154,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.unlocked = true
                 this.displayTrophyToast()
                 this.updateElement()
+                parsedTrophies[this.name] = true
+                localStorage.setItem('trophies', JSON.stringify(parsedTrophies))
             }
         }
 
@@ -206,7 +208,22 @@ document.addEventListener('DOMContentLoaded', () => {
             'hasNoItems',
             'Beat game without items',
             'itemless',
-        )
+        ),
+        ropeSkipNoMistakes: new Trophy(
+            'ropeSkipNoMistakes',
+            'Beat rope skip without mistakes',
+            'rope-skip-no-mistakes',
+        ),
+        richKid: new Trophy(
+            'richKid',
+            'Own at least $20 in a run',
+            'rich-kid',
+        ),
+        openShop: new Trophy(
+            'openShop',
+            'Open the shop for the first time',
+            'open-shop',
+        ),
     }
 
     const allTrophies = Object.values(trophies)
@@ -254,6 +271,8 @@ document.addEventListener('DOMContentLoaded', () => {
             this.itemUsed = false
             this.itemsUsed = 0
             this.bombAnimationRunning = false
+            this.unlocksTrophy = true
+            this.alreadyHasTrophy = parsedTrophies && parsedTrophies.richKid ? true : false
         }
 
         eatSnack() {
@@ -391,6 +410,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         updateMoney(amount) {
             this.money += amount
+            if (this.unlocksTrophy && !this.alreadyHasTrophy && this.money > 12) {
+                trophies.richKid.unlock()
+                this.unlocksTrophy = false
+            }
+            console.log(this.money)
+            this.drawItemBox()
         }
 
         updateMoneyEarnedTotal(amount) {
@@ -705,6 +730,8 @@ document.addEventListener('DOMContentLoaded', () => {
             this.characterJumps = false
             this.points = 0
             this.interval = null
+            this.alreadyHasTrophy = parsedTrophies && parsedTrophies.ropeSkipNoMistakes ? true : false
+            this.unlocksTrophy = true
         }
 
         start() {
@@ -745,14 +772,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         nextRound() {
+            if (this.unlocksTrophy && !this.alreadyHasTrophy) {
+                trophies.ropeSkipNoMistakes.unlock()
+                setTimeout(() => document.getElementById('trophy-message-container').innerHTML = '', 1000)
+            }
             game.round += 1
+            itemManager.updateMoney(3)
+            document.getElementById('money-placeholder').innerHTML = 'Earned $3'
             document.getElementById('girl-left').classList.add('defeated')
             document.getElementById('girl-right').classList.add('defeated')
             clearInterval(this.interval)
             playSound(sounds.girl)
             document.getElementById('rope-skips').innerHTML = ''
             removeHidden(document.getElementById('communication-container'))
-            if (itemManager.moneyEarnedLastRound > 0) document.getElementById('money-placeholder').innerHTML = `Earned $${itemManager.moneyEarnedLastRound}`
             addHidden(document.getElementById('open-shop-button'))
             hide(canvas)
             hide(overlayJumping)
@@ -783,6 +815,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('energy-char2').style.width = game.player.party[1].energy + '%'
             document.getElementById('energy-char2').style.background = game.player.party[1].energy < 30 ? 'red' : 'green'
             if (game.player.party[1].energy <= 0) {
+                this.unlocksTrophy = false
                 jumpBox.classList.add('defeated')
                 setTimeout(() => {
                     this.gameOver()
@@ -916,7 +949,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }, index * 500)
         })
         setTimeout(() => hideAll('trophy'), 5000)
-        localStorage.setItem('trophies', JSON.stringify(parsedTrophies))
     }
 
     function allOneType(type) {
@@ -1801,7 +1833,17 @@ document.addEventListener('DOMContentLoaded', () => {
     *
      */
 
+    let hasOpenShopTrophy = parsedTrophies && parsedTrophies.openShop ? true : false
+    let hasOpenedShop = false
+
     function openShop() {
+        if (!hasOpenedShop) {
+            hasOpenedShop = true
+            if(!hasOpenShopTrophy) {
+                trophies.openShop.unlock()
+                setTimeout(() => document.getElementById('trophy-message-container').innerHTML = '', 1000)
+            }
+        }
         updateMoneyAmountInShop()
         itemManager.checkForAffordableItems()
         runFadeAnimation()
