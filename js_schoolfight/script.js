@@ -774,7 +774,7 @@ document.addEventListener('DOMContentLoaded', () => {
         nextRound() {
             if (this.unlocksTrophy && !this.alreadyHasTrophy) {
                 trophies.ropeSkipNoMistakes.unlock()
-                setTimeout(() => document.getElementById('trophy-message-container').innerHTML = '', 1000)
+                setTimeout(() => document.getElementById('trophy-messages-container').innerHTML = '', 1000)
             }
             game.round += 1
             itemManager.updateMoney(3)
@@ -1841,7 +1841,7 @@ document.addEventListener('DOMContentLoaded', () => {
             hasOpenedShop = true
             if(!hasOpenShopTrophy) {
                 trophies.openShop.unlock()
-                setTimeout(() => document.getElementById('trophy-message-container').innerHTML = '', 1000)
+                setTimeout(() => document.getElementById('trophy-messages-container').innerHTML = '', 1000)
             }
         }
         updateMoneyAmountInShop()
