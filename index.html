@@ -85,7 +85,9 @@
           <div>Open the shop for the first time</div>
         </div>
       </div>
-      <button id="back-button-trophies" onclick="location.reload()">Back</button>
+      <div class="page-button-wrapper">
+        <button id="back-button-trophies" onclick="location.reload()">Back</button>
+      </div>
     </div>
     <div id="running-background-wrapper" class="hidden">
       <div id="running-background">
@@ -385,7 +387,7 @@
         </p>
       </div>
       <div class="tutorial-page hidden">
-        <img src="./images_schoolfight/tutorial.png" alt="tutorial" style="width: 100%">
+        <img src="./images_schoolfight/tutorial.png" alt="tutorial">
         <div class="tutorial-info" style="top: 138px; left: 90px;">
           <div>1. Click your character</div>
         </div>
@@ -396,8 +398,10 @@
           <div>3. Choose target</div>
         </div>
       </div>
-      <button id="back-button" onclick="location.reload()">Back</button>
-      <button id="toggle-tutorial-button">More</button>
+      <div class="page-button-wrapper">
+        <button id="back-button" onclick="location.reload()">Back</button>
+        <button id="toggle-tutorial-button">More</button>
+      </div>
     </div>
 
     <div id="battle-ticker" class="hidden">
@@ -537,8 +541,7 @@
       </div>
     </div>
 
-    <div id="enemy1" class="sprite-container right-party alive hidden" data-enemy="0"
-         style="position: absolute; top: 150px; left: 340px; overflow: hidden; width: 60px; height: 100px; transform: scaleX(-1);">
+    <div id="enemy1" class="sprite-container right-party alive hidden" data-enemy="0">
       <div class="sprite-sheet-wrapper">
         <img
                 id="enemy1-sprite"
@@ -549,8 +552,7 @@
       </div>
     </div>
 
-    <div id="enemy2" class="sprite-container right-party alive hidden" data-enemy="1"
-         style="position: absolute; top: 175px; left: 390px; overflow: hidden; width: 60px; height: 100px; transform: scaleX(-1);">
+    <div id="enemy2" class="sprite-container right-party alive hidden" data-enemy="1">
       <div class="sprite-sheet-wrapper">
         <img
                 id="enemy2-sprite"
@@ -561,8 +563,7 @@
       </div>
     </div>
 
-    <div id="enemy3" class="sprite-container right-party alive hidden" data-enemy="2"
-         style="position: absolute; top: 200px; left: 440px; overflow: hidden; width: 60px; height: 100px; transform: scaleX(-1);">
+    <div id="enemy3" class="sprite-container right-party alive hidden" data-enemy="2">
       <div class="sprite-sheet-wrapper">
         <img
                 id="enemy3-sprite"

@@ -61,6 +61,15 @@ i,
     color: white;
 }
 
+.tutorial-page {
+    height: 244px;
+}
+
+.tutorial-page img {
+    width: 100%;
+    border-radius: 8px;
+}
+
 #tutorial-screen {
     background: rgb(0, 0, 0, .5);
     padding: 8px 8px 20px;
@@ -82,8 +91,9 @@ i,
 }
 
 #tutorial-screen p {
-    font-size: 12px;
+    font-size: 11px;
     color: white;
+    padding: 0 16px;
 }
 
 #select-screen,
@@ -174,11 +184,12 @@ i,
     display: block;
     transition: .5s;
     position: absolute;
-    top: 3%;
+    top: 10px;
     width: 40%;
     left: 50%;
     transform: translateX(-50%);
     background: rgb(0, 0, 0, .5);
+    backdrop-filter: blur(1px);
     min-height: 10%;
     color: white;
     padding: 12px;
@@ -189,6 +200,7 @@ i,
 
 #battle-ticker {
     min-width: 45%;
+    border: 2px solid white;
 }
 
 .damage-text {

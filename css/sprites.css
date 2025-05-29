@@ -86,3 +86,33 @@
     height: 100px;
     width:60px;
 }
+
+#enemy1 {
+    position: absolute;
+    top: 150px;
+    left: 340px;
+    overflow: hidden;
+    width: 60px;
+    height: 100px;
+    transform: scaleX(-1);
+}
+
+#enemy2 {
+    position: absolute;
+    top: 175px;
+    left: 390px;
+    overflow: hidden;
+    width: 60px;
+    height: 100px;
+    transform: scaleX(-1);
+}
+
+#enemy3 {
+    position: absolute;
+    top: 200px;
+    left: 440px;
+    overflow: hidden;
+    width: 60px;
+    height: 100px;
+    transform: scaleX(-1);
+}

@@ -414,7 +414,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 trophies.richKid.unlock()
                 this.unlocksTrophy = false
             }
-            console.log(this.money)
             this.drawItemBox()
         }
 
@@ -593,7 +592,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const setTeamsTeacher = () => [
         [new Character(characters.bully, 0), new Character(characters.nerd, 1), new Character(characters.normie, 2)], //1
-        [new Character(characters.squealer, 0), new Character(characters.wally, 1), new Character(characters.richki0d, 2)], //2
+        [new Character(characters.squealer, 0), new Character(characters.wally, 1), new Character(characters.richkid, 2)], //2
         [new Character(characters.sportskid, 0), new Character(characters.sportskid, 1), new Character(characters.sportskid, 2)], //3
         [new Character(characters.dummy, 0), new Character(characters.dummy, 1), new Character(characters.dummy, 2)], //4 (rope skipping)
         [new Character(characters.richkid, 0), new Character(characters.nerd, 1), new Character(characters.bully, 2)], //5
@@ -603,7 +602,8 @@ document.addEventListener('DOMContentLoaded', () => {
         [
             new Character(characters[game.lastVictoryTeam[0].toLowerCase()], 0),
             new Character(characters[game.lastVictoryTeam[1].toLowerCase()], 1),
-            new Character(characters[game.lastVictoryTeam[2].toLowerCase()], 2)], //8
+            new Character(characters[game.lastVictoryTeam[2].toLowerCase()], 2)
+        ], //8
     ]
 
     const teacherTeam = [
@@ -774,7 +774,7 @@ document.addEventListener('DOMContentLoaded', () => {
         nextRound() {
             if (this.unlocksTrophy && !this.alreadyHasTrophy) {
                 trophies.ropeSkipNoMistakes.unlock()
-                setTimeout(() => document.getElementById('trophy-messages-container').innerHTML = '', 1000)
+                setTimeout(() => document.getElementById('trophy-messages-container').innerHTML = '', 3000)
             }
             game.round += 1
             itemManager.updateMoney(3)
@@ -1841,7 +1841,7 @@ document.addEventListener('DOMContentLoaded', () => {
             hasOpenedShop = true
             if(!hasOpenShopTrophy) {
                 trophies.openShop.unlock()
-                setTimeout(() => document.getElementById('trophy-messages-container').innerHTML = '', 1000)
+                setTimeout(() => document.getElementById('trophy-messages-container').innerHTML = '', 3000)
             }
         }
         updateMoneyAmountInShop()
