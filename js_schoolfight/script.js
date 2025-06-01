@@ -216,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ),
         richKid: new Trophy(
             'richKid',
-            'Own at least $20 in a run',
+            'Own at least $12 in a run',
             'rich-kid',
         ),
         openShop: new Trophy(
@@ -412,6 +412,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.money += amount
             if (this.unlocksTrophy && !this.alreadyHasTrophy && this.money > 12) {
                 trophies.richKid.unlock()
+                setTimeout(() => document.getElementById('trophy-messages-container').innerHTML = '', 3000)
                 this.unlocksTrophy = false
             }
             this.drawItemBox()
