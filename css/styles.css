@@ -27,7 +27,6 @@ i,
 }
 
 #background {
-    background-image: url("../images_schoolfight/background1.jpg");
     background-size: cover;
     background-repeat: no-repeat;
     position:relative;
@@ -35,6 +34,11 @@ i,
     height: 314px;
     overflow: hidden;
 }
+
+.background-1 { background-image: url('../images_schoolfight/background1.jpg'); }
+.background-2 { background-image: url('../images_schoolfight/background2.jpg'); }
+.background-3 { background-image: url('../images_schoolfight/background3.jpg'); }
+.background-4 { background-image: url('../images_schoolfight/background4.jpg'); }
 
 #money {
     color: white;

@@ -281,6 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.itemUsed = true
             this.runSnackAnimation()
             this.snacks -= 1
+            if (this.snacks <= 0) snackButton.disabled = true
             game.player.party.forEach(char => {
                 char.recoverPartially()
             })
@@ -300,6 +301,9 @@ document.addEventListener('DOMContentLoaded', () => {
             addHidden(itemBox)
 
             this.bombs -= 1
+            if (this.bombs <= 0) {
+                bombButton.disabled = true
+            }
             this.drawItemBox()
 
             game.enemy.party.forEach(enemy => {
@@ -403,8 +407,14 @@ document.addEventListener('DOMContentLoaded', () => {
             playSound(sounds.eating)
             updateMoneyAmountInShop()
             document.getElementById('shop-dialogue-box-wrapper').style.display = 'none'
-            if (item === 'bomb') this.bombs += 1
-            if (item === 'snack') this.snacks += 1
+            if (item === 'bomb') {
+                this.bombs += 1
+                bombButton.disabled = false
+            }
+            if (item === 'snack') {
+                this.snacks += 1
+                snackButton.disabled = false
+            }
             this.runReceivedItemAnimation(item)
         }
 
@@ -1059,8 +1069,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function startNextRound() {
         updateGameState(gameStates.selectTargets)
-        bombButton.removeAttribute('disabled')
-        snackButton.removeAttribute('disabled')
+        if (itemManager.bombs > 0) bombButton.removeAttribute('disabled')
+        if (itemManager.snacks > 0) snackButton.removeAttribute('disabled')
         removeHidden(document.getElementById('open-shop-button'))
 
         if (game.round === 3) {
@@ -1483,15 +1493,32 @@ document.addEventListener('DOMContentLoaded', () => {
         itemManager.updateMoneyEarnedTotal(moneyEarnedLastRound)
         itemManager.moneyEarnedLastRound = moneyEarnedLastRound
     }
+
+    function preloadBackgrounds() {
+        const backgrounds = [
+            'images_schoolfight/background1.jpg',
+            'images_schoolfight/background2.jpg',
+            'images_schoolfight/background3.jpg',
+            'images_schoolfight/background4.jpg',
+            'images_schoolfight/backgroundShop.jpg'
+        ];
+
+        backgrounds.forEach(src => {
+            const img = new Image()
+            img.src = src
+        })
+    }
+
+    preloadBackgrounds()
     
     function changeBackground() {
         switch (game.round) {
             case 0: {
-                backgroundElement.style.backgroundImage = "url('images_schoolfight/background1.jpg')"
+                backgroundElement.classList.add('background-1')
                 break
             }
             case 2: {
-                backgroundElement.style.backgroundImage = "url('images_schoolfight/background2.jpg')"
+                backgroundElement.classList.add('background-2')
                 break
             }
             case 5: {
@@ -1500,12 +1527,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 break
             }
             case 6: {
-                backgroundElement.style.backgroundImage = "url('images_schoolfight/background3.jpg')"
+                backgroundElement.classList.add('background-3')
                 addHidden(runningBackgroundWrapper)
                 break
             }
             case 8: {
-                backgroundElement.style.backgroundImage = "url('images_schoolfight/background4.jpg')"
+                backgroundElement.classList.add('background-4')
                 break
             }
             default: return

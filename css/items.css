@@ -1,10 +1,19 @@
 #bomb-button,
 #snack-button {
-    background:transparent;
     font-size:24px;
-    border:none;
     color:white;
     text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+    background: orange;
+    padding: 8px;
+    border: 2px solid white;
+    border-radius: 16px;
+    transition: 0.3s;
+}
+
+#bomb-button:disabled,
+#snack-button:disabled {
+    background: transparent;
+    opacity: 0.6;
 }
 
 #snack-button-wrapper,
@@ -12,6 +21,12 @@
     z-index: 1;
     text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
     position: relative;
+    transition: 0.3s;
+}
+
+#snack-button-wrapper:hover,
+#bomb-button-wrapper:hover {
+    transform: scale(1.1);
 }
 
 #bomb-button-wrapper .plus1,
@@ -29,7 +44,7 @@
     display: block;
 }
 
-#item-box div button:hover {
+#item-box div button:not(:disabled):hover {
     color: orange!important;
     transform: scale(1.1)
 }
@@ -57,7 +72,7 @@
 
 #item-box {
     position: absolute;
-    bottom: 8px;
+    bottom: 4px;
     width: 100%;
     display: flex;
     gap: 16px;
