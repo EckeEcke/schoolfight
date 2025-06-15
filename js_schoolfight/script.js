@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const trophies = {
         beatenGame: new Trophy(
             'beatenGame',
-            'Beaten the game',
+            'Beat the game',
             'trophy-beaten',
         ),
         allAssholes: new Trophy(
@@ -822,11 +822,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         getHitRope() {
             game.player.party[1].energy -= 30
+            this.unlocksTrophy = false
             playSound(sounds.fail)
             document.getElementById('energy-char2').style.width = game.player.party[1].energy + '%'
             document.getElementById('energy-char2').style.background = game.player.party[1].energy < 30 ? 'red' : 'green'
             if (game.player.party[1].energy <= 0) {
-                this.unlocksTrophy = false
                 jumpBox.classList.add('defeated')
                 setTimeout(() => {
                     this.gameOver()
@@ -1959,7 +1959,7 @@ document.addEventListener('DOMContentLoaded', () => {
         '#bomb-button': () => itemManager.throwBomb(),
         '#overlay-running': () => runningMiniGame.run(),
         '#overlay-jumping': () => ropeSkipMiniGame.jump(),
-        '#upgrade-inteligence-button': () => buyUpgrade(attackTypes.intelligence),
+        '#upgrade-intelligence-button': () => buyUpgrade(attackTypes.intelligence),
         '#upgrade-strength-button': () => buyUpgrade(attackTypes.strength),
         '#upgrade-assholiness-button': () => buyUpgrade(attackTypes.assholiness),
         '#buy-snack-button': () => itemManager.buyItem('snack'),
