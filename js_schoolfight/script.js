@@ -727,7 +727,6 @@ document.addEventListener('DOMContentLoaded', () => {
             hide(this.runningBackgroundText)
             playSound(sounds.deathCry)
             game.round += 1
-            console.log(game.round)
             this.enemyRunning.classList.add('defeated')
             sounds.steps.pause()
             removeHidden(document.getElementById('communication-container'))
@@ -1473,7 +1472,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         checkSurvivors()
         game.round += 1
-        console.log(game.round)
         disableAttackButtons = true
         setTimeout(() => {
             addHidden(battleTicker)
@@ -2165,7 +2163,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         audio.addEventListener('loadedmetadata', () => {
             totalSongDurationSec = audio.duration
-            console.log("Song duration loaded:", totalSongDurationSec.toFixed(2), "seconds")
         })
 
         canvasDancingGame.addEventListener('mousedown', handleClick)
@@ -2323,7 +2320,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleMiss(note) {
         if (note.missed || note.hit) return
-        console.log("Miss!")
         note.judgment = "Miss!"
         note.judgmentColor = '#FF0000'
         note.judgmentAlpha = 1
