@@ -245,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const game = {
         state: gameStates.title,
-        round: 6,
+        round: 0,
         player: {
             party: [],
             moves: [],
