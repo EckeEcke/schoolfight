@@ -22,6 +22,7 @@
   <link rel="stylesheet" href="css/spritePositions.css">
   <link rel="stylesheet" href="css/sprites.css">
   <link rel="stylesheet" href="css/trophies.css">
+  <link rel="stylesheet" href="css/dancing.css">
 </head>
 
 <body id="body">
@@ -667,7 +668,24 @@
         <i class='fas fa-volume-mute'></i>
       </button>
     </div>
+
+    <div id="dance-sprites" class="hidden">
+      <div id="character-wrapper-dance" class="sprite-sheet-wrapper">
+        <img id="dance-sprite" src="images_schoolfight/Character_spriteSheet.png" alt="spritesheet">
+      </div>
+      <div id="dancer-right" class="girl-sprite">
+        <div class="girl-sprite-sheet-wrapper">
+          <img src="images_schoolfight/Character_spriteSheet.png" class="girl-front" alt="spritesheet">
+        </div>
+      </div>
+    </div>
   </div>
+</div>
+
+<div id="disco-overlay" class="hidden"></div>
+
+<div id="dancing-game" class="hidden">
+  <canvas id="canvas-dancing"></canvas>
 </div>
 
 <script src="js_schoolfight/script.js"></script>

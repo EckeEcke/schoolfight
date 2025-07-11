@@ -41,6 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const enemySprites = document.querySelectorAll('.enemy-sprite')
     const switchSelectScreenButtons = document.querySelectorAll('.select-screen-button')
 
+    let fontSizeScaling = 0.5
+
     /**
      *
      * Sounds
@@ -96,10 +98,19 @@ document.addEventListener('DOMContentLoaded', () => {
     function adjustGameSize() { 
         const gameWrapper = document.getElementById('game-wrapper')
         const aspectRatio = 550 / 280
-        if (window.innerWidth >= window.innerHeight * aspectRatio) { 
+        if (window.innerWidth >= window.innerHeight * aspectRatio) {
             gameWrapper.style.transform = `scale(${window.innerHeight * aspectRatio / 660})`
-        } else { gameWrapper.style.transform = `scale(${window.innerWidth / 660})` 
-    }}
+            fontSizeScaling = (window.innerHeight * aspectRatio / 660)
+        } else {
+            gameWrapper.style.transform = `scale(${window.innerWidth / 660})`
+            if (window.innerWidth > 1000) {
+                fontSizeScaling = window.innerWidth / 660
+            } else fontSizeScaling = 0.75
+        }
+
+        if (fontSizeScaling > 1.5) fontSizeScaling = 1.5
+        if (fontSizeScaling < 0.75) fontSizeScaling = 0.75
+    }
 
     adjustGameSize()
 
@@ -234,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const game = {
         state: gameStates.title,
-        round: 0,
+        round: 6,
         player: {
             party: [],
             moves: [],
@@ -272,7 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.itemsUsed = 0
             this.bombAnimationRunning = false
             this.unlocksTrophy = true
-            this.alreadyHasTrophy = parsedTrophies && parsedTrophies.richKid ? true : false
+            this.alreadyHasTrophy = !!(parsedTrophies && parsedTrophies.richKid)
         }
 
         eatSnack() {
@@ -596,9 +607,10 @@ document.addEventListener('DOMContentLoaded', () => {
         [new Character(characters.dummy, 0), new Character(characters.dummy, 1), new Character(characters.dummy, 2)], //4 (rope skipping)
         [new Character(characters.richkid, 0), new Character(characters.nerd, 1), new Character(characters.bully, 2)], //5
         [new Character(characters.dummy, 0), new Character(characters.dummy, 1), new Character(characters.dummy, 2)], //6 (running)
-        [new Character(characters.richkid, 0), new Character(characters.richkid, 1), new Character(characters.richkid, 2)],  //6
-        [new Character(characters.nerd, 0), new Character(characters.nerd, 1), new Character(characters.nerd, 2)], //7
-        [new Character(characters.dummy, 0), new Character(characters.teacher, 1), new Character(characters.dummy, 2)], //8
+        [new Character(characters.richkid, 0), new Character(characters.richkid, 1), new Character(characters.richkid, 2)],  //7
+        [new Character(characters.dummy, 0), new Character(characters.dummy, 1), new Character(characters.dummy, 2)], //8 (dancing)
+        [new Character(characters.nerd, 0), new Character(characters.nerd, 1), new Character(characters.nerd, 2)], //9
+        [new Character(characters.dummy, 0), new Character(characters.teacher, 1), new Character(characters.dummy, 2)], //10
     ]
 
     const setTeamsTeacher = () => [
@@ -608,13 +620,14 @@ document.addEventListener('DOMContentLoaded', () => {
         [new Character(characters.dummy, 0), new Character(characters.dummy, 1), new Character(characters.dummy, 2)], //4 (rope skipping)
         [new Character(characters.richkid, 0), new Character(characters.nerd, 1), new Character(characters.bully, 2)], //5
         [new Character(characters.dummy, 0), new Character(characters.dummy, 1), new Character(characters.dummy, 2)], //6 (running)
-        [new Character(characters.richkid, 0), new Character(characters.richkid, 1), new Character(characters.richkid, 2)],  //6
-        [new Character(characters.nerd, 0), new Character(characters.nerd, 1), new Character(characters.nerd, 2)], //7
+        [new Character(characters.richkid, 0), new Character(characters.richkid, 1), new Character(characters.richkid, 2)],  // 7
+        [new Character(characters.dummy, 0), new Character(characters.dummy, 1), new Character(characters.dummy, 2)], //8 (dancing)
+        [new Character(characters.nerd, 0), new Character(characters.nerd, 1), new Character(characters.nerd, 2)], //9
         [
             new Character(characters[game.lastVictoryTeam[0].toLowerCase()], 0),
             new Character(characters[game.lastVictoryTeam[1].toLowerCase()], 1),
             new Character(characters[game.lastVictoryTeam[2].toLowerCase()], 2)
-        ], //8
+        ], //10
     ]
 
     const teacherTeam = [
@@ -714,6 +727,7 @@ document.addEventListener('DOMContentLoaded', () => {
             hide(this.runningBackgroundText)
             playSound(sounds.deathCry)
             game.round += 1
+            console.log(game.round)
             this.enemyRunning.classList.add('defeated')
             sounds.steps.pause()
             removeHidden(document.getElementById('communication-container'))
@@ -892,6 +906,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ["We dont like sports...", "And we don't like YOU!"],
         ["Greetings, little fellas. What´s up?", "How about a... wrestling match...?"],
         ["What are you doing here?! This is a private school!", "You are not wealthy and classy enough to be here."],
+        ["Show me your moves!", "Hit the note when its center is on the red line."],
         ["If our calculations are correct we have a 99% chance to beat you up.", "Go Go Power Rangers!"],
         ["You were beating up a lot of other kids recently to become king of school.", "You almost made it, but first you gotta beat ME!"]
     ]
@@ -904,6 +919,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ["We still dont like sports...", "And we don't like old farts like YOU!"],
         ["If police sees the two of us...", "you might get ARRESTED! 😈"],
         ["What are you doing here?! This is a private school!", "You are way too old and poor to be here."],
+        ["To get past us, you need to feel the rhythm!", "You look way too old for this though.."],
         ["Last time our calculations were incorrect.", "But this time we used quantum computing!"],
         ["How dare you coming back here?!", "Whatever, we will beat you up once again!"]
     ]
@@ -1048,6 +1064,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showPlayerSprites()
         showEnemySprites()
         itemManager.drawItemBox()
+        document.getElementById('dance-sprite').classList.add(game.player.party[1].frontSprite)
     }
 
     function initializeGameTeacher() {
@@ -1081,7 +1098,11 @@ document.addEventListener('DOMContentLoaded', () => {
             runningMiniGame.start()
         }
 
-        if (game.round === 8) {
+        if (game.round === 7) {
+            startDancingGame()
+        }
+
+        if (game.round === 9) {
             startBossRound()
         }
     }
@@ -1361,7 +1382,7 @@ document.addEventListener('DOMContentLoaded', () => {
         drawEnergyBars()
         resetDefending()
 
-        if (remainingEnemyParty.length > 0 && game.round <= 8){
+        if (remainingEnemyParty.length > 0 && game.round <= 9){
             setTimeout(() => removeHidden(itemBox), 2500)
         }
 
@@ -1452,13 +1473,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         checkSurvivors()
         game.round += 1
+        console.log(game.round)
         disableAttackButtons = true
         setTimeout(() => {
             addHidden(battleTicker)
             addHidden(itemBox)
             removeHidden(document.getElementById('communication-container'))
 
-            if (game.round < 9) {
+            if (game.round < 10) {
                 if (itemManager.moneyEarnedLastRound > 0) document.getElementById('money-placeholder').innerHTML = `Earned $${itemManager.moneyEarnedLastRound}`
                 return
             }
@@ -1501,7 +1523,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'images_schoolfight/background3.jpg',
             'images_schoolfight/background4.jpg',
             'images_schoolfight/backgroundShop.jpg'
-        ];
+        ]
 
         backgrounds.forEach(src => {
             const img = new Image()
@@ -1531,7 +1553,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 addHidden(runningBackgroundWrapper)
                 break
             }
-            case 8: {
+            case 9: {
                 backgroundElement.classList.add('background-4')
                 break
             }
@@ -1568,11 +1590,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 setupRunningGame()
             }
 
-            if (game.round !== 3 && game.round !== 5) {
+            if (game.round === 7) {
+                setupDancingGame()
+            }
+
+            if (game.round !== 3 && game.round !== 5 && game.round !== 7) {
                 setupRegularRound()
             } 
             
-            if (game.round === 8) {
+            if (game.round === 9) {
                 setupBossRound()
             } 
         }, 1000) 
@@ -1593,8 +1619,18 @@ document.addEventListener('DOMContentLoaded', () => {
         hideAll('left-party')
     }
 
+    function setupDancingGame() {
+        const energyBars = Array.from(document.getElementsByClassName('energy-bar-wrapper'))
+        energyBars.forEach(element => addHidden(element))
+        removeHidden(energyBars[1])
+        hideAll('left-party')
+        document.getElementById('dance-sprites').classList.remove('hidden')
+        sounds.music.pause()
+    }
+
     function setupRegularRound() {
         addHidden(document.getElementById('rope-skipping-game'))
+        addHidden(document.getElementById('dance-sprites'))
         showAll('left-party')
         showAll('energy-bar-wrapper')
         const energyBars = Array.from(document.getElementsByClassName('energy-bar-wrapper'))
@@ -1987,4 +2023,481 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('resize', adjustGameSize)
     window.addEventListener('fullscreenchange', adjustGameSize)
+
+    /*
+    *
+    * Dancing minigame
+    *
+     */
+
+    let CANVAS_WIDTH_LOGICAL = 500
+    let CANVAS_HEIGHT_LOGICAL = 314
+
+    const NOTE_RADIUS = 25
+    let HIT_LINE_Y = CANVAS_HEIGHT_LOGICAL - 50
+
+    const START_Y = -NOTE_RADIUS * 2
+
+    const APPROACH_TIME_MS = 1500
+    const ACCURACY_THRESHOLD_PERFECT = 40
+    const ACCURACY_THRESHOLD_GOOD = 60
+    const ACCURACY_THRESHOLD_OKAY = 80
+    const SONG_BPM = 117
+    const FIRST_BEAT_OFFSET_MS = 500
+
+    let totalSongDurationSec = 0
+    const MS_PER_BEAT = 60000 / SONG_BPM
+
+    let canvasDancingGame
+    let ctx2
+    let audio
+    let beatmap
+    let activeNotes = []
+    let nextNoteIndex = 0
+
+    let score = 0
+    let combo = 0
+    let gameStarted = false
+    let rainbowHueOffset = 0
+
+    const note = new Image()
+    note.src = 'images_schoolfight/note.svg'
+
+    class Note {
+        constructor(perfectHitTimeMs, beat) {
+            this.perfectHitTimeMs = perfectHitTimeMs
+            this.spawnTimeMs = perfectHitTimeMs - APPROACH_TIME_MS
+            this.x = CANVAS_WIDTH_LOGICAL / 2
+            this.y = START_Y
+            this.radius = NOTE_RADIUS
+            this.color = 'orange'
+            this.hit = false
+            this.missed = false
+            this.judgment = ''
+            this.judgmentColor = '#FFFFFF'
+            this.judgmentAlpha = 0
+            this.judgmentYOffset = 0
+            this.judgmentDisplayStartTime = 0
+            this.JUDGMENT_DISPLAY_DURATION = 600
+            this.beat = beat
+        }
+
+        update(currentTimeMs) {
+            if (!this.hit && !this.missed) {
+                const timeElapsedSinceSpawn = currentTimeMs - this.spawnTimeMs
+                let progress = timeElapsedSinceSpawn / APPROACH_TIME_MS
+                progress = Math.max(0, Math.min(progress, 1.5))
+                this.y = START_Y + (HIT_LINE_Y - START_Y) * progress
+            } else if (this.judgmentDisplayStartTime > 0) {
+                const timeSinceJudgment = currentTimeMs - this.judgmentDisplayStartTime
+                this.judgmentAlpha = 1 - (timeSinceJudgment / this.JUDGMENT_DISPLAY_DURATION)
+                this.judgmentAlpha = Math.max(0, this.judgmentAlpha)
+                this.judgmentYOffset = - (timeSinceJudgment / this.JUDGMENT_DISPLAY_DURATION) * (NOTE_RADIUS * 1.5)
+            }
+        }
+
+        draw() {
+            ctx2.save()
+
+            ctx2.font = `bold ${32*fontSizeScaling}px "Titan One"`
+            ctx2.strokeStyle = '#000000'
+            ctx2.lineWidth = 3
+
+            if (!this.hit && !this.missed) {
+                ctx2.beginPath()
+                ctx2.arc(this.x, this.y, this.radius * fontSizeScaling, 0, Math.PI * 2)
+                ctx2.fillStyle = this.color
+                ctx2.fill()
+                ctx2.strokeStyle = '#FFFFFF'
+                ctx2.lineWidth = 2
+                ctx2.stroke()
+                ctx2.closePath()
+
+                ctx2.fillStyle = '#FFFFFF'
+                ctx2.textAlign = 'center'
+                ctx2.textBaseline = 'middle'
+                // ctx2.font = `bold ${32*fontSizeScaling} "Titan One"`
+                // ctx2.fillText(this.beat, this.x, this.y)
+                const imageSize = 24 * fontSizeScaling
+                ctx2.drawImage(note, this.x - imageSize / 2, this.y - imageSize / 2, imageSize, imageSize)
+
+            } else if (this.judgmentAlpha > 0) {
+                ctx2.globalAlpha = this.judgmentAlpha
+
+                if (this.judgment === "Perfect!") {
+                    const textMetrics = ctx2.measureText(this.judgment)
+                    const gradientX0 = this.x - textMetrics.width / 2
+                    const gradientX1 = this.x + textMetrics.width / 2
+                    const gradient = ctx2.createLinearGradient(gradientX0, 0, gradientX1, 0)
+                    const hueStep = 360 / 7
+                    for (let i = 0; i < 7; i++) {
+                        const hue = (rainbowHueOffset + i * hueStep) % 360
+                        gradient.addColorStop(i / 6, `hsl(${hue}, 100%, 60%)`)
+                    }
+                    ctx2.fillStyle = gradient
+                } else {
+                    ctx2.fillStyle = this.judgmentColor
+                }
+
+                ctx2.textAlign = 'center'
+                ctx2.textBaseline = 'middle'
+                ctx2.font = `bold ${32*fontSizeScaling}px "Titan One"`
+                ctx2.strokeText(this.judgment, this.x, HIT_LINE_Y + this.judgmentYOffset)
+                ctx2.fillText(this.judgment, this.x, HIT_LINE_Y + this.judgmentYOffset)
+            }
+            ctx2.restore()
+        }
+
+        isClicked(clickX, clickY) {
+            const distance = Math.sqrt(
+                Math.pow(clickX - this.x, 2) + Math.pow(clickY - this.y, 2)
+            )
+            return distance < this.radius * fontSizeScaling
+        }
+    }
+
+    function initGame() {
+        canvasDancingGame = document.getElementById('canvas-dancing')
+        ctx2 = canvasDancingGame.getContext('2d')
+
+        audio = new Audio('sounds_schoolfight/117bpm.mp3')
+        audio.volume = 0.6
+
+        audio.addEventListener('loadedmetadata', () => {
+            totalSongDurationSec = audio.duration
+            console.log("Song duration loaded:", totalSongDurationSec.toFixed(2), "seconds")
+        })
+
+        canvasDancingGame.addEventListener('mousedown', handleClick)
+        canvasDancingGame.addEventListener('touchstart', (e) => {
+            e.preventDefault()
+            handleClick(e)
+        }, { passive: false })
+        canvasDancingGame.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false })
+
+        const resizeObserver = new ResizeObserver(entries => {
+            for (let entry of entries) {
+                if (entry.target === canvasDancingGame) {
+                    const newWidth = entry.contentRect.width
+                    const newHeight = entry.contentRect.height
+
+                    CANVAS_WIDTH_LOGICAL = newWidth
+                    CANVAS_HEIGHT_LOGICAL = newHeight
+
+                    HIT_LINE_Y = CANVAS_HEIGHT_LOGICAL - 50
+
+                    const devicePixelRatio = window.devicePixelRatio || 1
+                    canvasDancingGame.width = CANVAS_WIDTH_LOGICAL * devicePixelRatio
+                    canvasDancingGame.height = CANVAS_HEIGHT_LOGICAL * devicePixelRatio
+
+                    ctx2.resetTransform()
+                    ctx2.scale(devicePixelRatio, devicePixelRatio)
+
+                    drawGame()
+                }
+            }
+        })
+
+        resizeObserver.observe(canvasDancingGame)
+    }
+
+    function loadBeatmap() {
+        let rawBeatmap = {
+            songTitle: "117 BPM Track",
+            artist: "Your Artist",
+            notes: [
+                { beat: 7 }, { beat: 9 },
+                { beat: 14 }, { beat: 15 }, { beat: 16 },
+                { beat: 18.5 }, { beat: 19.5 }, { beat: 20.5 }, { beat: 22.5 },
+                { beat: 28.5 }, { beat: 29.5 }, { beat: 30.5 }, { beat: 32.5 }, { beat: 34.5 },
+                { beat: 38.5 }, { beat: 39.5 }, { beat: 40.5 }, { beat: 42.5 }, { beat: 43.5 }, { beat: 44.5 },
+                { beat: 50 }, { beat: 51 }, { beat: 51.5 }, { beat: 52 }, { beat: 54 },
+                { beat: 56 }, { beat: 58 }, { beat: 60 }, { beat: 62 }, { beat: 63 },
+                { beat: 65 }, { beat: 65.5 }, { beat: 66 },
+                { beat: 70.5 }, { beat: 71.5 }, { beat: 72.5 }, { beat: 73.5 },
+                { beat: 76.5 }, { beat: 77 }, { beat: 77.5 },
+                { beat: 81 }, { beat: 82 }, { beat: 83 }, { beat: 83.5 }, { beat: 84 },
+                { beat: 85 }, { beat: 86 }, { beat: 87 }, { beat: 88 }, { beat: 88.5 }, { beat: 89 },
+                { beat: 92 }, { beat: 93 }, { beat: 93.5 }, { beat: 94 },
+                { beat: 98 }, { beat: 98.5 }, { beat: 99 },
+                { beat: 100 }, { beat: 101 }, { beat: 102 }, { beat: 103 }, { beat: 104 },
+                { beat: 105 }, { beat: 106 }, { beat: 107 }, { beat: 108 }, { beat: 108.5 }, { beat: 109 },
+                { beat: 110 }, { beat: 111 }, { beat: 112 }, { beat: 113 }, { beat: 113.5 }, { beat: 114 },
+                { beat: 115 }, { beat: 116 }, { beat: 117 },
+                { beat: 120 }, { beat: 121 }, { beat: 121.5 }, { beat: 122 }, { beat: 123 },
+                { beat: 125 }, { beat: 126 }, { beat: 127 }, { beat: 128 }, { beat: 128.5 }, { beat: 129 },
+                { beat: 130 }, { beat: 131 }, { beat: 132 }, { beat: 133 }, { beat: 133.5 }, { beat: 134 },
+                { beat: 135 }, { beat: 136 }, { beat: 137 }, { beat: 138 }, { beat: 139 },
+                { beat: 140 }, { beat: 141 }, { beat: 142 }, { beat: 143 }, { beat: 143.5 }, { beat: 144 },
+                { beat: 146 }, { beat: 147 }, { beat: 148 },
+                { beat: 150 }, { beat: 151 }, { beat: 152 }, { beat: 153 },
+                { beat: 155 }, { beat: 156 }, { beat: 157 }, { beat: 158 }, { beat: 158.5 }, { beat: 159 },
+                { beat: 160 }, { beat: 161 }, { beat: 162 }, { beat: 163 }, { beat: 163.5 }, { beat: 164 },
+                { beat: 165 }, { beat: 166 }, { beat: 167 }, { beat: 168 }, { beat: 169 },
+                { beat: 170 }, { beat: 171 }, { beat: 172 }, { beat: 173 }, { beat: 173.5 }, { beat: 174 },
+                { beat: 177 }, { beat: 178 }, { beat: 179 },
+                { beat: 180 }, { beat: 181 }, { beat: 181.5 }, { beat: 182 }, { beat: 183 },
+                { beat: 186 }, { beat: 187 }, { beat: 188 }, { beat: 188.5 }, { beat: 189 },
+                { beat: 192 }, { beat: 193 }, { beat: 193.5 }, { beat: 194 },
+                { beat: 196 }, { beat: 197 }, { beat: 198 }, { beat: 199 },
+                { beat: 200 }, { beat: 201 }, { beat: 202 }, { beat: 203 }, { beat: 203.5 }, { beat: 204 },
+                { beat: 206 }, { beat: 207 }, { beat: 208 }, { beat: 209 },
+                { beat: 211 }, { beat: 211.5 }, { beat: 212 },
+                { beat: 215 }, { beat: 216 }, { beat: 217 }, { beat: 218 }, { beat: 218.5 }, { beat: 219 },
+                { beat: 220 }, { beat: 221 }, { beat: 222 }, { beat: 223 }, { beat: 223.5 }, { beat: 224 },
+                { beat: 225 }, { beat: 227 },
+            ]
+        }
+
+        beatmap = {
+            songTitle: rawBeatmap.songTitle,
+            artist: rawBeatmap.artist,
+            notes: rawBeatmap.notes.map(note => ({
+                timeMs: FIRST_BEAT_OFFSET_MS + (note.beat * MS_PER_BEAT),
+                beat: note.beat
+            }))
+        }
+        beatmap.notes.sort((a, b) => a.timeMs - b.timeMs)
+    }
+
+    function startDancingGame() {
+        addHidden(itemBox)
+        removeHidden(document.getElementById('disco-overlay'))
+        document.getElementById('dancing-game').classList.remove('hidden')
+        if (gameStarted) return
+
+        document.getElementById('character-wrapper-dance').classList.add('dancing1')
+        document.getElementById('dancer-right').classList.add('dancing2')
+
+        gameStarted = true
+        score = 0
+        combo = 0
+        activeNotes = []
+        nextNoteIndex = 0
+
+        audio.currentTime = 0
+        audio.play().catch(e => console.error("Audio play failed:", e))
+
+        requestAnimationFrame(gameLoop)
+    }
+
+    function gameLoop() {
+        if (!gameStarted) return
+        const currentTimeMs = audio.currentTime * 1000
+        rainbowHueOffset = (rainbowHueOffset + 2) % 360
+
+        updateNotes(currentTimeMs)
+        drawGame()
+
+        if (audio.ended || (totalSongDurationSec > 0 && audio.currentTime >= totalSongDurationSec - 0.1 && activeNotes.length === 0)) {
+            endGame(true)
+        } else {
+            requestAnimationFrame(gameLoop)
+        }
+    }
+
+    function updateNotes(currentTimeMs) {
+        while (nextNoteIndex < beatmap.notes.length) {
+            const noteData = beatmap.notes[nextNoteIndex]
+            const spawnTimeForThisNote = noteData.timeMs - APPROACH_TIME_MS
+            if (currentTimeMs >= spawnTimeForThisNote) {
+                const newNote = new Note(noteData.timeMs, noteData.beat)
+                activeNotes.push(newNote)
+                nextNoteIndex++
+            } else {
+                break
+            }
+        }
+        activeNotes = activeNotes.filter(note => {
+            note.update(currentTimeMs)
+            if (!note.hit && !note.missed) {
+                if (note.y > HIT_LINE_Y + NOTE_RADIUS * 1.5) {
+                    handleMiss(note)
+                }
+                return true
+            } else {
+                return note.judgmentAlpha > 0
+            }
+        })
+    }
+
+    function handleMiss(note) {
+        if (note.missed || note.hit) return
+        console.log("Miss!")
+        note.judgment = "Miss!"
+        note.judgmentColor = '#FF0000'
+        note.judgmentAlpha = 1
+        note.judgmentYOffset = 0
+        note.judgmentDisplayStartTime = audio.currentTime * 1000
+        note.missed = true
+
+        game.player.party[1].energy -= 10
+        playSound(sounds.fail)
+        document.getElementById('energy-char2').style.width = game.player.party[1].energy + '%'
+        document.getElementById('energy-char2').style.background = game.player.party[1].energy < 30 ? 'red' : 'green'
+
+        combo = 0
+        if (game.player.party[1].energy <= 0) {
+            endGame(false)
+        }
+    }
+
+    function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60)
+        const remainingSeconds = Math.floor(seconds % 60)
+        const formattedMinutes = String(minutes).padStart(2, '0')
+        const formattedSeconds = String(remainingSeconds).padStart(2, '0')
+        return `${formattedMinutes}:${formattedSeconds}`
+    }
+
+    function drawGame() {
+        ctx2.clearRect(0, 0, CANVAS_WIDTH_LOGICAL, CANVAS_HEIGHT_LOGICAL)
+
+        ctx2.strokeStyle = '#FF4500'
+        ctx2.lineWidth = 4
+        ctx2.beginPath()
+        ctx2.moveTo(0, HIT_LINE_Y)
+        ctx2.lineTo(CANVAS_WIDTH_LOGICAL, HIT_LINE_Y)
+        ctx2.stroke()
+        ctx2.closePath()
+
+        activeNotes.forEach(note => note.draw())
+
+        ctx2.font = `bold ${32*fontSizeScaling}px "Titan One"`
+        ctx2.strokeStyle = '#000000'
+        ctx2.lineWidth = 3
+
+        // ctx.textAlign = 'left'
+        //
+        // ctx.strokeText(`Score: ${score}`, 10, 30)
+        // ctx.fillText(`Score: ${score}`, 10, 30)
+
+        // ctx.textAlign = 'center'
+        // ctx.strokeText(`Combo: ${combo}`, CANVAS_WIDTH_LOGICAL / 2, 30)
+        // ctx.fillText(`Combo: ${combo}`, CANVAS_WIDTH_LOGICAL / 2, 30)
+
+        ctx2.fillStyle = '#FFFFFF'
+        ctx2.textAlign = 'center'
+        if (totalSongDurationSec > 0 && audio.currentTime !== null) {
+            const remainingTimeSec = Math.max(0, totalSongDurationSec - audio.currentTime)
+            ctx2.strokeText(`Time: ${formatTime(remainingTimeSec)}`, CANVAS_WIDTH_LOGICAL / 2, 48)
+            ctx2.fillText(`Time: ${formatTime(remainingTimeSec)}`, CANVAS_WIDTH_LOGICAL / 2, 48)
+        } else {
+            ctx2.strokeText(`Time: --:--`, 16, 32)
+            ctx2.fillText(`Time: --:--`, 16, 32)
+        }
+    }
+
+    function handleClick(event) {
+        if (!gameStarted || audio.paused) {
+            return
+        }
+        const rect = canvasDancingGame.getBoundingClientRect()
+        let clientX, clientY
+        if (event.type === 'touchstart') {
+            clientX = event.touches[0].clientX
+            clientY = event.touches[0].clientY
+        } else {
+            clientX = event.clientX
+            clientX = event.clientX
+            clientX = event.clientX
+            clientY = event.clientY
+        }
+
+        const clickX_css = clientX - rect.left
+        const clickY_css = clientY - rect.top
+
+        const clickX = clickX_css * (CANVAS_WIDTH_LOGICAL / rect.width)
+        const clickY = clickY_css * (CANVAS_HEIGHT_LOGICAL / rect.height)
+
+        const clickTimeMs = audio.currentTime * 1000
+        let hitNote = null
+        let minDiff = Infinity
+
+        for (let i = activeNotes.length - 1; i >= 0; i--) {
+            const note = activeNotes[i]
+            if (!note.hit && !note.missed &&
+                note.y > HIT_LINE_Y - NOTE_RADIUS * 3 &&
+                note.y < HIT_LINE_Y + NOTE_RADIUS * 3 &&
+                note.isClicked(clickX, clickY)) {
+                const diff = Math.abs(clickTimeMs - note.perfectHitTimeMs)
+                if (diff < minDiff) {
+                    minDiff = diff
+                    hitNote = note
+                }
+            }
+        }
+
+        if (hitNote) {
+            hitNote.hit = true
+            hitNote.judgmentAlpha = 1
+            hitNote.judgmentYOffset = 0
+            hitNote.judgmentDisplayStartTime = clickTimeMs
+
+            let judgment = ""
+            let scoreIncrease = 0
+            let judgmentColor = '#FFFFFF'
+
+            if (minDiff <= ACCURACY_THRESHOLD_PERFECT) {
+                judgment = "Perfect!"
+                scoreIncrease = 100
+                judgmentColor = '#00FF00'
+            } else if (minDiff <= ACCURACY_THRESHOLD_GOOD) {
+                judgment = "Good!"
+                scoreIncrease = 50
+                judgmentColor = '#FFFF00'
+            } else if (minDiff <= ACCURACY_THRESHOLD_OKAY) {
+                judgment = "Okay."
+                scoreIncrease = 20
+                judgmentColor = '#FFA500'
+            } else {
+                judgment = "Poor!"
+                scoreIncrease = 5
+                judgmentColor = '#FF4500'
+                game.player.party[1].energy -= 2
+                document.getElementById('energy-char2').style.width = game.player.party[1].energy + '%'
+                document.getElementById('energy-char2').style.background = game.player.party[1].energy < 30 ? 'red' : 'green'
+            }
+
+            hitNote.judgment = judgment
+            hitNote.judgmentColor = judgmentColor
+
+            score += scoreIncrease + (combo * 5)
+            combo++
+        } else {
+            combo = 0
+            game.player.party[1].energy -= 2
+            playSound(sounds.fail)
+            document.getElementById('energy-char2').style.width = game.player.party[1].energy + '%'
+            document.getElementById('energy-char2').style.background = game.player.party[1].energy < 30 ? 'red' : 'green'
+            if (game.player.party[1].energy <= 0) {
+                endGame(false)
+            }
+        }
+    }
+
+    function endGame(win) {
+        gameStarted = false
+        audio.pause()
+        document.getElementById('dancing-game').classList.add('hidden')
+        sounds.music.play()
+        game.round += 1
+        addHidden(document.getElementById('disco-overlay'))
+
+        if (win) {
+            document.getElementById('dancer-right').classList.add('defeated')
+            sounds.girl.play()
+            startNextRound()
+        }
+
+        if (!win) {
+            document.getElementById('character-wrapper-dance').classList.add('defeated')
+            showGameOverScreen()
+            sounds.deathCry.play()
+        }
+        removeHidden(document.getElementById('communication-container'))
+    }
+
+    loadBeatmap()
+    initGame()
 })

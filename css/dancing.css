@@ -1,0 +1,122 @@
+#dance-sprites {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+#character-wrapper-dance {
+    top: 50%;
+    left: 25%;
+    width: 60px;
+    height: 100px;
+}
+
+#dancer-right {
+    top: 50%!important;
+    left: unset!important;
+    right: 25%;
+}
+
+#dancing-game {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#canvas-dancing {
+    background: #00000033;
+    width: 250px;
+    height: 314px;
+    display: block;
+    border: 6px solid white;
+    border-radius: 16px;
+    z-index: 10;
+}
+
+.dancing1 {
+    animation-name: beatShake1;
+    animation-duration: calc(60000ms / 117);
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+}
+
+.dancing2 {
+    animation-name: beatShake2;
+    animation-duration: calc(60000ms / 117);
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+}
+
+@media (min-width: 1024px) {
+    #canvas-dancing {
+        width: 420px;
+        height: 500px;
+    }
+}
+
+@media (min-width: 1400px) {
+    #canvas-dancing {
+        height: 700px;
+    }
+}
+
+@keyframes beatShake1 {
+    0% { transform: translateX(-50%) translateX(0px) rotate(0); }
+    25% { transform: translateX(-50%) translateX(10px) rotate(10deg); }
+    75% { transform: translateX(-50%) translateX(-10px) rotate(0); }
+    100% { transform: translateX(-50%) translateX(0px) rotate(-10deg); }
+}
+
+@keyframes beatShake2 {
+    0% { transform: translateX(50%) translateX(0px) rotate(0); }
+    25% { transform: translateX(50%) translateX(10px) rotate(10deg); }
+    75% { transform: translateX(50%) translateX(-10px) rotate(0); }
+    100% { transform: translateX(50%) translateX(0px) rotate(-10deg); }
+}
+
+#disco-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0.3;
+    z-index: 9;
+
+    background: radial-gradient(
+            circle at 50% 50%,
+            hsl(0, 100%, 70%) 0%,
+            hsl(60, 100%, 70%) 15%,
+            hsl(120, 100%, 70%) 30%,
+            hsl(180, 100%, 70%) 45%,
+            hsl(240, 100%, 70%) 60%,
+            hsl(300, 100%, 70%) 75%,
+            transparent 90%
+    );
+    background-size: 300% 300%;
+    background-repeat: no-repeat;
+    animation:
+            discoMove 20s infinite linear,
+            discoHue 10s infinite linear;
+}
+
+@keyframes discoMove {
+    0% { background-position: 0 0; }
+    25% { background-position: 100% 0; }
+    50% { background-position: 100% 100%; }
+    75% { background-position: 0 100%; }
+    100% { background-position: 0 0; }
+}
+
+@keyframes discoHue {
+    0% { filter: hue-rotate(0deg); }
+    100% { filter: hue-rotate(360deg); }
+}

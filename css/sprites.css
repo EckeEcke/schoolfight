@@ -57,7 +57,8 @@
 
 .left-party.defeated,
 #jump-box.defeated,
-#girl-left.defeated {
+#girl-left.defeated,
+#character-wrapper-dance.defeated {
     filter: brightness(0.5) sepia(1) saturate(10000%);
     /*transform: scaleX(-1) rotate(90deg) !important;*/
     animation: kickoutCharacters1 1s forwards;
@@ -65,7 +66,8 @@
 
 .right-party.defeated,
 #girl-right.defeated,
-#enemy-running.defeated {
+#enemy-running.defeated,
+#dancer-right.defeated {
     filter: brightness(0.5) sepia(1) saturate(10000%);
     animation: kickoutCharacters2 1s forwards;
 }
