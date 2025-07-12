@@ -1718,6 +1718,12 @@ document.addEventListener('DOMContentLoaded', () => {
             removeHidden(enemySprite)
             enemySprite.className = `enemy-sprite ${char.frontSprite}`
             document.getElementById(`energy-enemy${index + 1}-text`).innerHTML = char.class
+            document.getElementById(`info-enemy${index + 1}`).innerHTML = `
+                Type: ${char.type} <br> 
+                Strength: ${char.class === 'Teacher' ? '?' : char.strength} <br> 
+                Intelligence: ${char.class === 'Teacher' ? '?' : char.intelligence} <br> 
+                Assholiness: ${char.class === 'Teacher' ? '?' : char.assholiness}
+            `
         })
     }
 
