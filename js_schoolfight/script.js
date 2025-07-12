@@ -40,6 +40,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const leftPartyElements = document.querySelectorAll('.left-party')
     const enemySprites = document.querySelectorAll('.enemy-sprite')
     const switchSelectScreenButtons = document.querySelectorAll('.select-screen-button')
+    const energyBarMiniGame = document.getElementById('energy-char2')
+    const openShopButton = document.getElementById('open-shop-button')
 
     let fontSizeScaling = 0.5
 
@@ -734,7 +736,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (itemManager.moneyEarnedLastRound > 0) {
                 document.getElementById('money-placeholder').innerHTML = `Earned $${itemManager.moneyEarnedLastRound}`
             }
-            addHidden(document.getElementById('open-shop-button'))
+            addHidden(openShopButton)
         }
     }
 
@@ -810,7 +812,7 @@ document.addEventListener('DOMContentLoaded', () => {
             playSound(sounds.girl)
             document.getElementById('rope-skips').innerHTML = ''
             removeHidden(document.getElementById('communication-container'))
-            addHidden(document.getElementById('open-shop-button'))
+            addHidden(openShopButton)
             hide(canvas)
             hide(overlayJumping)
         }
@@ -838,8 +840,8 @@ document.addEventListener('DOMContentLoaded', () => {
             game.player.party[1].energy -= 30
             this.unlocksTrophy = false
             playSound(sounds.fail)
-            document.getElementById('energy-char2').style.width = game.player.party[1].energy + '%'
-            document.getElementById('energy-char2').style.background = game.player.party[1].energy < 30 ? 'red' : 'green'
+            energyBarMiniGame.style.width = game.player.party[1].energy + '%'
+            energyBarMiniGame.style.background = game.player.party[1].energy < 30 ? 'red' : 'green'
             if (game.player.party[1].energy <= 0) {
                 jumpBox.classList.add('defeated')
                 setTimeout(() => {
@@ -1088,7 +1090,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateGameState(gameStates.selectTargets)
         if (itemManager.bombs > 0) bombButton.removeAttribute('disabled')
         if (itemManager.snacks > 0) snackButton.removeAttribute('disabled')
-        removeHidden(document.getElementById('open-shop-button'))
+        removeHidden(openShopButton)
 
         if (game.round === 2) {
             startRopeGame()
@@ -2329,8 +2331,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         game.player.party[1].energy -= 10
         playSound(sounds.fail)
-        document.getElementById('energy-char2').style.width = game.player.party[1].energy + '%'
-        document.getElementById('energy-char2').style.background = game.player.party[1].energy < 30 ? 'red' : 'green'
+        energyBarMiniGame.style.width = game.player.party[1].energy + '%'
+        energyBarMiniGame.style.background = game.player.party[1].energy < 30 ? 'red' : 'green'
 
         combo = 0
         if (game.player.party[1].energy <= 0) {
@@ -2451,8 +2453,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 scoreIncrease = 5
                 judgmentColor = '#FF4500'
                 game.player.party[1].energy -= 2
-                document.getElementById('energy-char2').style.width = game.player.party[1].energy + '%'
-                document.getElementById('energy-char2').style.background = game.player.party[1].energy < 30 ? 'red' : 'green'
+                energyBarMiniGame.style.width = game.player.party[1].energy + '%'
+                energyBarMiniGame.style.background = game.player.party[1].energy < 30 ? 'red' : 'green'
             }
 
             hitNote.judgment = judgment
@@ -2464,8 +2466,8 @@ document.addEventListener('DOMContentLoaded', () => {
             combo = 0
             game.player.party[1].energy -= 2
             playSound(sounds.fail)
-            document.getElementById('energy-char2').style.width = game.player.party[1].energy + '%'
-            document.getElementById('energy-char2').style.background = game.player.party[1].energy < 30 ? 'red' : 'green'
+            energyBarMiniGame.style.width = game.player.party[1].energy + '%'
+            energyBarMiniGame.style.background = game.player.party[1].energy < 30 ? 'red' : 'green'
             if (game.player.party[1].energy <= 0) {
                 endGame(false)
             }
@@ -2484,6 +2486,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('dancer-right').classList.add('defeated')
             sounds.girl.play()
             startNextRound()
+            addHidden(openShopButton)
         }
 
         if (!win) {
