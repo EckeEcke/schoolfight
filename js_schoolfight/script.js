@@ -74,6 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
         laugh: new Audio('sounds_schoolfight/laugh.wav'),
         trophy: new Audio('sounds_schoolfight/trophy unlocked.mp3'),
         powerUp: new Audio('sounds_schoolfight/powerup.mp3'),
+        danceMusic: new Audio('sounds_schoolfight/117bpm.mp3'),
     }
 
     const allAudio = Object.values(sounds)
@@ -603,8 +604,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const setTeams = [
         [new Character(characters.bully, 0), new Character(characters.nerd, 1), new Character(characters.normie, 2)], //1
         [new Character(characters.squealer, 0), new Character(characters.wally, 1), new Character(characters.richkid, 2)], //2
-        [new Character(characters.sportskid, 0), new Character(characters.sportskid, 1), new Character(characters.sportskid, 2)], //3
-        [new Character(characters.dummy, 0), new Character(characters.dummy, 1), new Character(characters.dummy, 2)], //4 (rope skipping)
+        [new Character(characters.dummy, 0), new Character(characters.dummy, 1), new Character(characters.dummy, 2)], //3 (rope skipping)
+        [new Character(characters.sportskid, 0), new Character(characters.sportskid, 1), new Character(characters.sportskid, 2)], //4
         [new Character(characters.richkid, 0), new Character(characters.nerd, 1), new Character(characters.bully, 2)], //5
         [new Character(characters.dummy, 0), new Character(characters.dummy, 1), new Character(characters.dummy, 2)], //6 (running)
         [new Character(characters.richkid, 0), new Character(characters.richkid, 1), new Character(characters.richkid, 2)],  //7
@@ -900,8 +901,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const dialogues = [
         ["YOU think you can become the kings of school?", "We will flush your heads in the toilet after beating you up."],
         ["Our friend in the middle may not be the smartest.", "But he is the strongest kid around. Ready for a beating?"],
-        ["Hey, we are just training here.", "If you don't leave we gotta teach you a lesson!"],
         ["Hi boooooys. We don't fight with our fists...", "So get ready for a ROPE SKIP FIGHT!"],
+        ["Hey, we are just training here.", "If you don't leave we gotta teach you a lesson!"],
         ["We dont like sports...", "And we don't like YOU!"],
         ["Greetings, little fellas. What´s up?", "How about a... wrestling match...?"],
         ["What are you doing here?! This is a private school!", "You are not wealthy and classy enough to be here."],
@@ -913,8 +914,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const dialoguesTeacher = [
         ["What are YOU doing here?!", "The new kings of school kicked you out of this place!"],
         ["Noooo... not you again...", "Give up, old man!"],
-        ["Perfect timing of yours!", "We were just looking for a good old sandbag."],
         ["You think you still got what it takes?", "Show us your moves. ROPE SKIP FIGHT!"],
+        ["Perfect timing of yours!", "We were just looking for a good old sandbag."],
         ["We still dont like sports...", "And we don't like old farts like YOU!"],
         ["If police sees the two of us...", "you might get ARRESTED! 😈"],
         ["What are you doing here?! This is a private school!", "You are way too old and poor to be here."],
@@ -1089,7 +1090,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (itemManager.snacks > 0) snackButton.removeAttribute('disabled')
         removeHidden(document.getElementById('open-shop-button'))
 
-        if (game.round === 3) {
+        if (game.round === 2) {
             startRopeGame()
         }
 
@@ -1580,7 +1581,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showPlayerSprites()
             showEnemySprites()
 
-            if (game.round === 3) {
+            if (game.round === 2) {
                 setupForRopeGame()
             }
 
@@ -1592,7 +1593,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 setupDancingGame()
             }
 
-            if (game.round !== 3 && game.round !== 5 && game.round !== 7) {
+            if (game.round !== 2 && game.round !== 5 && game.round !== 7) {
                 setupRegularRound()
             } 
             
@@ -2030,6 +2031,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let CANVAS_WIDTH_LOGICAL = 500
     let CANVAS_HEIGHT_LOGICAL = 314
+    const audio = sounds.danceMusic
 
     const NOTE_RADIUS = 25
     let HIT_LINE_Y = CANVAS_HEIGHT_LOGICAL - 50
@@ -2048,7 +2050,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let canvasDancingGame
     let ctx2
-    let audio
     let beatmap
     let activeNotes = []
     let nextNoteIndex = 0
@@ -2158,7 +2159,6 @@ document.addEventListener('DOMContentLoaded', () => {
         canvasDancingGame = document.getElementById('canvas-dancing')
         ctx2 = canvasDancingGame.getContext('2d')
 
-        audio = new Audio('sounds_schoolfight/117bpm.mp3')
         audio.volume = 0.6
 
         audio.addEventListener('loadedmetadata', () => {
