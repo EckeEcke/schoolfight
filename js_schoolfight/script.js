@@ -77,6 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
         trophy: new Audio('sounds_schoolfight/trophy unlocked.mp3'),
         powerUp: new Audio('sounds_schoolfight/powerup.mp3'),
         danceMusic: new Audio('sounds_schoolfight/117bpm.mp3'),
+        perfect: new Audio('sounds_schoolfight/perfect.wav'),
     }
 
     const allAudio = Object.values(sounds)
@@ -1073,7 +1074,6 @@ document.addEventListener('DOMContentLoaded', () => {
         dialogueManager = new DialogueManager(dialoguesTeacher)
         document.getElementById('energy-char2-text').innerHTML = characters.teacher.class
         teacherTeam.forEach(member => game.player.party.push(member))
-        console.log(game.player.party)
         dialogueManager.showDialogue()
         dialogueManager.showsDialogue = true
         const energyBars = Array.from(document.getElementsByClassName('energy-bar-wrapper'))
@@ -2089,6 +2089,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.judgmentDisplayStartTime = 0
             this.JUDGMENT_DISPLAY_DURATION = 600
             this.beat = beat
+            this.soundPlayed = false
         }
 
         update(currentTimeMs) {
@@ -2103,6 +2104,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.judgmentAlpha = Math.max(0, this.judgmentAlpha)
                 this.judgmentYOffset = - (timeSinceJudgment / this.JUDGMENT_DISPLAY_DURATION) * (NOTE_RADIUS * 1.5)
             }
+        }
+
+        playSound() {
+            if (this.soundPlayed) return
+
+            if (this.judgment === 'Perfect!') {
+                sounds.perfect.pause()
+                sounds.perfect.currentTime = 0
+                sounds.perfect.play()
+            } else {
+                sounds.clap.pause()
+                sounds.clap.currentTime = 0
+                sounds.clap.play()
+            }
+            this.soundPlayed = true
         }
 
         draw() {
@@ -2148,6 +2164,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     ctx2.fillStyle = this.judgmentColor
                 }
 
+                this.playSound()
                 ctx2.textAlign = 'center'
                 ctx2.textBaseline = 'middle'
                 ctx2.font = `bold ${32*fontSizeScaling}px "Titan One"`
