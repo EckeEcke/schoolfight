@@ -1073,6 +1073,7 @@ document.addEventListener('DOMContentLoaded', () => {
         dialogueManager = new DialogueManager(dialoguesTeacher)
         document.getElementById('energy-char2-text').innerHTML = characters.teacher.class
         teacherTeam.forEach(member => game.player.party.push(member))
+        console.log(game.player.party)
         dialogueManager.showDialogue()
         dialogueManager.showsDialogue = true
         const energyBars = Array.from(document.getElementsByClassName('energy-bar-wrapper'))
@@ -1084,6 +1085,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showPlayerSpritesTeacher()
         showEnemySprites()
         itemManager.drawItemBox()
+        document.getElementById('dance-sprite').classList.add(game.player.party[1].frontSprite)
     }
 
     function startNextRound() {
