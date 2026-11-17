@@ -17,3 +17,22 @@ Open index.html or go to https://eckeecke.github.io/schoolfight/ to start the ga
 ## Used Technologies
 
 The game is written in Javascript using mainly regular HTML and CSS for displaying graphics.
+
+## Code structure and tests
+
+- `js_schoolfight/characters.js`: character templates, attack types and character health/stat behavior.
+- `js_schoolfight/combat.js`: damage calculation, type advantages, enemy target selection, attack rotation and complete battle rounds. No DOM, audio or timer dependencies.
+- `js_schoolfight/script.js`: game flow, UI, animations, shop and minigames.
+- `js_schoolfight/game-flow.js`: active phase, input permissions and guards for delayed phase callbacks.
+
+Scripts load in that order. The game still runs by opening `index.html` directly; no build or installation is required.
+
+`resolveBattleRound` updates the supplied character instances and returns attack/defense events, surviving character counts, the next attack rotation state and an outcome (`continue`, `victory` or `defeat`). Enemy actions resolve first; queued player actions still execute even if their attacker falls during that round. Losing all players takes priority in a double knockout. The UI presents these results and handles animations and level transitions separately.
+
+`GameFlow` owns the current phase. Input handlers use `can(action)` instead of separate animation/dialogue lock flags. Phase-dependent timers use `after(callback, delay)`; their callbacks expire when the phase changes, including when the game later returns to the same phase. Cosmetic animation cleanup can use ordinary timers.
+
+Run the core rule tests with Node.js 18 or later:
+
+```sh
+node --test tests/*.test.cjs
+```

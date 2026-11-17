@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const { playAudio } = SchoolFightAudio
     /**
      *
      * UI variables
@@ -118,36 +119,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     adjustGameSize()
 
-    const attackTypes = {
-        strength: 'strength',
-        intelligence: 'intelligence',
-        assholiness: 'assholiness',
-        allrounder: 'allrounder',
-        teacher: 'teacher'
-    }
+    const { attackTypes, Character, characters } = SchoolFightCharacters
+    const { resolveBattleRound } = SchoolFightCombat
 
     const prices = {
         item: 3,
         upgrade: 2,
     }
 
-    const gameStates = {
-        title: 'display title screen',
-        characterSelect: 'display character select screen',
-        dialogue: 'display dialogues',
-        selectTargets: 'select targets',
-        battleAnimation: 'battle animation is running',
-        bombAnimation: 'bomb animation running',
-        snackAnimation: 'snack animation running',
-        levelComplete: 'fade away to next level',
-        ropeSkip: 'rope skip minigame',
-        lockerRoom: 'locker room minigame',
-        gameOver: 'player lost',
-        victory: 'player won the game',
-    }
+    const { GameFlow, gameStates } = SchoolFightFlow
+    const gameFlow = new GameFlow()
 
     function updateGameState(newState) {
-        game.state = newState // currently not used
+        gameFlow.enter(newState)
     }
 
     class Trophy {
@@ -248,7 +232,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const game = {
-        state: gameStates.title,
         round: 0,
         player: {
             party: [],
@@ -260,7 +243,6 @@ document.addEventListener('DOMContentLoaded', () => {
         enemy: {
             party: [],
         },
-        battleMessages: [],
         itemsUsed: 0,
         isTeacherMode: false,
         lastVictoryTeam: JSON.parse(localStorage.getItem('lastVictoryTeam')),
@@ -268,7 +250,6 @@ document.addEventListener('DOMContentLoaded', () => {
         lastMoveTeacher: 'intelligence',
     }
 
-    let fightAnimationRunning = false
 
     /*
     *
@@ -285,16 +266,21 @@ document.addEventListener('DOMContentLoaded', () => {
             this.moneyEarnedTotal = 0
             this.itemUsed = false
             this.itemsUsed = 0
-            this.bombAnimationRunning = false
             this.unlocksTrophy = true
             this.alreadyHasTrophy = !!(parsedTrophies && parsedTrophies.richKid)
         }
 
         eatSnack() {
+            if (!gameFlow.can('item')) return
             if (game.player.party.length === 0 || this.snacks === 0) return
             this.itemsUsed += 1
             this.itemUsed = true
+            updateGameState(gameStates.snackAnimation)
             this.runSnackAnimation()
+            gameFlow.after(() => {
+                updateGameState(gameStates.selectTargets)
+                removeHidden(itemBox)
+            }, 1000)
             this.snacks -= 1
             if (this.snacks <= 0) snackButton.disabled = true
             game.player.party.forEach(char => {
@@ -305,8 +291,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         throwBomb() {
+            if (!gameFlow.can('item')) return
             if (this.bombs <= 0 || game.enemy.party.length === 0) return
-            this.bombAnimationRunning = true
+            updateGameState(gameStates.bombAnimation)
             this.itemsUsed += 1
             this.itemUsed = true
             updateBattleTicker('bomb')
@@ -328,10 +315,10 @@ document.addEventListener('DOMContentLoaded', () => {
             drawEnergyBars()
             checkRemainingEnemies()
 
-            setTimeout(() => {
-                this.bombAnimationRunning = false
-                setCharactersDefeated()
+            setCharactersDefeated()
+            gameFlow.after(() => {
                 updateGameState(gameStates.selectTargets)
+                removeHidden(itemBox)
             }, 5000)
         }
 
@@ -396,12 +383,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 snackButtonWrapper.classList.add('animated-text')
             }
 
-            setTimeout(()=>{
+            gameFlow.after(()=>{
                 this.drawItemBox()
                 bombButtonWrapper.classList.remove('animated-text')
                 snackButtonWrapper.classList.remove('animated-text')
             },1500)
-            setTimeout(() => {
+            gameFlow.after(() => {
                 this.checkForAffordableItems()
                 addHidden(itemBox)
             }, 2500)
@@ -418,6 +405,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         buyItem(item){
+            if (!gameFlow.can('purchase')) return
             if (item !== 'money') this.money -= prices.item
             playSound(sounds.eating)
             updateMoneyAmountInShop()
@@ -455,154 +443,6 @@ document.addEventListener('DOMContentLoaded', () => {
     * Characters
     * 
     */
-
-    class Character {
-        constructor(type, id) {
-            this.id = id
-            this.class = type.class
-            this.type = type.type
-            this.energy = type.energy
-            this.strength = type.strength
-            this.intelligence = type.intelligence
-            this.assholiness = type.assholiness
-            this.defends = false
-            this.frontSprite = type.frontSprite
-            this.sideSprite = type.sideSprite
-        }
-        takeDamage(damage) {
-            this.energy -= this.defends ? damage : damage * 2
-            if (this.energy < 0) this.energy = 0
-            return this.defends ? damage : damage * 2
-        }
-        recoverPartially() {
-            if (this.energy <= 0) return
-            this.energy += 30
-            if (this.energy > 100) this.energy = 100
-        }
-        recoverFull() {
-            this.energy = 100
-        }
-        takeBombDamage() {
-            this.energy -= 30
-            if (this.energy < 0) this.energy = 0
-        }
-        upgradeStat(stat) {
-            this[stat] += 1
-        }
-    }
-
-    const characters = {
-        bully: {
-            class: 'Bully',
-            type: attackTypes.assholiness,
-            energy: 100,
-            strength: 12,
-            intelligence: 0,
-            assholiness: 14,
-            frontSprite: 'bully-front',
-            sideSprite: 'bully-side',
-        },
-        squealer: {
-            class: 'Squealer',
-            energy: 100,
-            type: attackTypes.assholiness,
-            strength: 0,
-            intelligence: 0,
-            assholiness: 20,
-            frontSprite: 'squealer-front',
-            sideSprite: 'squealer-side',
-        },
-        nerd: {
-            class: 'Nerd',
-            type: attackTypes.intelligence,
-            energy: 100,
-            strength: 0,
-            intelligence: 20,
-            assholiness: 0,
-            frontSprite: 'nerd-front',
-            sideSprite: 'nerd-side',
-        },
-        wally: {
-            class: 'Wally',
-            type: attackTypes.strength,
-            energy: 100,
-            strength: 20,
-            intelligence: 0,
-            assholiness: 0,
-            frontSprite: 'wally-front',
-            sideSprite: 'wally-side',
-        },
-        richkid: {
-            class: 'Richkid',
-            type: attackTypes.intelligence,
-            energy: 100,
-            strength: 0,
-            intelligence: 14,
-            assholiness: 12,
-            frontSprite: 'richkid-front',
-            sideSprite: 'richkid-side',
-        },
-        sportskid: {
-            class: 'Sportskid',
-            type: attackTypes.strength,
-            energy: 100,
-            strength: 14,
-            intelligence: 12,
-            assholiness: 0,
-            frontSprite: 'sportskid-front',
-            sideSprite: 'sportskid-side',
-        },
-        normie: {
-            class: 'Normie',
-            type: attackTypes.allrounder,
-            energy: 100,
-            strength: 8,
-            intelligence: 8,
-            assholiness: 8,
-            frontSprite: 'normie-front',
-            sideSprite: 'normie-side',
-        },
-        weirdo: {
-            class: 'Weirdo',
-            type: attackTypes.intelligence,
-            energy: 100,
-            strength: 6,
-            intelligence: 14,
-            assholiness: 6,
-            frontSprite: 'weirdo-front',
-            sideSprite: 'weirdo-side',
-        },
-        wolf: {
-            class: 'Wolfkid',
-            type: attackTypes.strength,
-            energy: 100,
-            strength: 16,
-            intelligence: 0,
-            assholiness: 10,
-            frontSprite: 'wolfkid-front',
-            sideSprite: 'wolfkid-side',
-        },
-        dummy: {
-            class: 'Dummy',
-            type: attackTypes.strength,
-            energy: 0,
-            strength: 0,
-            intelligence: 0,
-            assholiness: 0,
-            frontSprite: 'dummy-front',
-            sideSprite: 'dummy-side',
-        },
-        teacher: {
-            class: 'Teacher',
-            type: attackTypes.teacher,
-            energy: 100,
-            strength: 34,
-            intelligence: 34,
-            assholiness: 34,
-            frontSprite: 'teacher-front',
-            sideSprite: 'teacher-side',
-        }
-    }
 
     const setTeams = [
         [new Character(characters.bully, 0), new Character(characters.nerd, 1), new Character(characters.normie, 2)], //1
@@ -664,7 +504,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.moveBackgroundInterval = setInterval(this.moveBackground.bind(this), 1000 / 120)
             sounds.steps.playbackRate = 2
             sounds.steps.loop = true
-            sounds.steps.play().catch()
+            playAudio(sounds.steps)
             runningSprite.className = game.player.party[1].sideSprite
             this.characterRunning.classList.add('running')
             this.enemyRunning.classList.add('running')
@@ -672,10 +512,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         run() {
+            if (!gameFlow.can('run')) return
             this.characterLeft -= 4
         }
 
         moveBackground() {
+            if (!gameFlow.can('run')) return
             this.bg1Left += 1
             this.bg2Left += 1
             this.bg3Left += 1
@@ -730,6 +572,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.enemyRunning.classList.remove('running')
             hide(this.runningBackgroundText)
             playSound(sounds.deathCry)
+            updateGameState(gameStates.levelComplete)
             game.round += 1
             this.enemyRunning.classList.add('defeated')
             sounds.steps.pause()
@@ -767,6 +610,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         moveRope() {
+            if (!gameFlow.can('jump')) return
             ctx.clearRect(0, 0, canvas.width, canvas.height)
             ctx.beginPath()
             ctx.moveTo(150, 200)
@@ -800,6 +644,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         nextRound() {
+            updateGameState(gameStates.levelComplete)
             if (this.unlocksTrophy && !this.alreadyHasTrophy) {
                 trophies.ropeSkipNoMistakes.unlock()
                 setTimeout(() => document.getElementById('trophy-messages-container').innerHTML = '', 3000)
@@ -845,13 +690,15 @@ document.addEventListener('DOMContentLoaded', () => {
             energyBarMiniGame.style.background = game.player.party[1].energy < 30 ? 'red' : 'green'
             if (game.player.party[1].energy <= 0) {
                 jumpBox.classList.add('defeated')
-                setTimeout(() => {
+                clearInterval(this.interval)
+                gameFlow.after(() => {
                     this.gameOver()
                 }, 200)
             }
         }
 
         jump() {
+            if (!gameFlow.can('jump')) return
             if (!this.characterJumps) {
                 this.characterJumps = true
                 playSound(sounds.jump)
@@ -876,18 +723,17 @@ document.addEventListener('DOMContentLoaded', () => {
         constructor(dialogues) {
             this.messageIndex = 0
             this.dialogues = dialogues
-            this.showsDialogue = false
         }
 
         showDialogue() {
-            this.showsDialogue = true
-            disableAttackButtons = false
+            updateGameState(gameStates.dialogue)
             removeHidden(dialogueBoxWrapper)
             dialogueBox.innerHTML = this.dialogues[game.round][this.messageIndex]
         }
 
         nextDialogue() {
-            if (this.showsDialogue && this.messageIndex === 0) {
+            if (!gameFlow.can('dialogue')) return
+            if (this.messageIndex === 0) {
                 this.messageIndex = 1
                 this.showDialogue()
                 return
@@ -896,7 +742,6 @@ document.addEventListener('DOMContentLoaded', () => {
             this.messageIndex = 0
             addHidden(dialogueBoxWrapper)
             removeHidden(itemBox)
-            this.showsDialogue = false
             startNextRound()
         }
     }
@@ -927,7 +772,6 @@ document.addEventListener('DOMContentLoaded', () => {
         ["How dare you coming back here?!", "Whatever, we will beat you up once again!"]
     ]
 
-    let disableAttackButtons = false
 
       /**
      * 
@@ -994,13 +838,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function playSound(sound) {
         sound.pause()
         sound.currentTime = 0
-        sound.play().catch()
+        playAudio(sound)
     }
 
     function playMusic() {
         sounds.music.volume = 0.3
         sounds.music.loop = true
-        sounds.music.play().catch()
+        playAudio(sounds.music)
     }
 
     function hide(element) {
@@ -1039,6 +883,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let dialogueManager
 
     function startGame(isTeacherMode) {
+        if (!gameFlow.can('start')) return
         game.isTeacherMode = isTeacherMode
         hideAll('title-screen')
         playSound(sounds.schoolBell)
@@ -1059,7 +904,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateGameState(gameStates.dialogue)
         hideAll('select-screen')
         dialogueManager.showDialogue()
-        dialogueManager.showsDialogue = true
         const energyBars = Array.from(document.getElementsByClassName('energy-bar-wrapper'))
         energyBars.forEach(bar => removeHidden(bar))
         const spriteContainers = Array.from(document.getElementsByClassName('sprite-container'))
@@ -1075,7 +919,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('energy-char2-text').innerHTML = characters.teacher.class
         teacherTeam.forEach(member => game.player.party.push(member))
         dialogueManager.showDialogue()
-        dialogueManager.showsDialogue = true
         const energyBars = Array.from(document.getElementsByClassName('energy-bar-wrapper'))
         energyBars.forEach(bar => removeHidden(bar))
         addHidden(energyBars[0])
@@ -1099,6 +942,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (game.round === 5) {
+            updateGameState(gameStates.running)
             runningMiniGame.start()
         }
 
@@ -1120,10 +964,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function startBossRound() {
         sounds.bossMusic.volume = 0.6
         sounds.bossMusic.loop = true
-        sounds.bossMusic.play().catch()
+        playAudio(sounds.bossMusic)
     }
 
     function showGameOverScreen() {
+        updateGameState(gameStates.gameOver)
         runFadeGameOver()
         addHidden(battleTicker)
         addHidden(document.getElementById('next-round-message'))
@@ -1134,6 +979,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function addCharacter(event) {
+        if (!gameFlow.can('selectCharacter')) return
         const character = event.currentTarget.dataset.character
         const id = game.player.party.length + 1
         const obj = new Character(characters[character], id)
@@ -1146,8 +992,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (game.player.party.length === 3) {
+            updateGameState(gameStates.transition)
             runFadeAnimation()
-            setTimeout(() => {
+            gameFlow.after(() => {
                 initializeGame()
             }, 1000)
         }
@@ -1167,7 +1014,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showButtons(event) {
-        if (dialogueManager.showsDialogue || fightAnimationRunning || disableAttackButtons || itemManager.bombAnimationRunning) return
+        if (!gameFlow.can('battle')) return
 
         const element = event.currentTarget
         if (element.classList.contains('selected')) return
@@ -1183,6 +1030,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function selectChar(event) {
+        if (!gameFlow.can('battle')) return
         const target = event.currentTarget
         addHidden(bombContainerWrapper)
         playSound(sounds.confirm)
@@ -1201,6 +1049,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function selectTarget(event) {
+        if (!gameFlow.can('battle')) return
         if (game.player.selectedChar.class === 'Dummy' || game.player.selectedChar === '' ) return
         document.querySelector(`#char${game.player.selectedChar.id}`).classList.add('selected')
         const enemyWrapper = event.target.closest('.right-party')
@@ -1226,6 +1075,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function selectDefend(player) {
+        if (!gameFlow.can('battle')) return
         hideAll('buttons-wrapper')
         game.player.party.find(char => char.id === player.id).defends = true
         game.player.moves.push({ attacker: player, target: '', type: '' })
@@ -1238,8 +1088,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function fight() {
-        calculateDamage()
-        runFightAnimation()
+        if (!gameFlow.can('battle')) return
+        const result = resolveBattleRound({
+            playerParty: game.player.party,
+            enemyParty: game.enemy.party,
+            moves: game.player.moves,
+            lastAttackType: game.lastMoveTeacher,
+        })
+        game.lastMoveTeacher = result.lastAttackType
+        game.player.moves = []
+        updateGameState(gameStates.battleAnimation)
+        runFightAnimation(result.outcome)
+        presentBattleRound(result)
     }
 
     function setCharactersDefeated() {
@@ -1257,201 +1117,43 @@ document.addEventListener('DOMContentLoaded', () => {
         })
     }
 
-    function setEnemiesDefending() {
-        const remainingEnemyParty = getRemainingEnemies()
-        remainingEnemyParty.forEach((enemy) => {
-            const randomDefending = Math.floor(Math.random() * (10))
-            game.enemy.party.find(entry => entry.id === enemy.id).defends = false
-
-            if (randomDefending <= 8 || enemy.energy <= 0) return
-
-            game.enemy.party.find(entry => entry.id === enemy.id).defends = true
-            buildBattleTickerText(enemy, enemy, '', 0, false)    
-        })
-    }
-
-    function handlePlayerMoves() {
-        game.player.moves.forEach(element => {
-            if (element.attacker.defends) {
-                buildBattleTickerText(element.attacker, element.target, 0, 0, true)                
-                return
-            }
-            const selector = element.type
-            const attack = element.attacker[selector]
-            const defense = getDefenseType(selector, 'target')
-            const typeBonus = getEffectiveness(selector, element.target.type)
-            const damage = Math.floor(attack * typeBonus * (100 / (100 + element.target[defense] * 10)))
-            const receivedDamage = element.target.takeDamage(damage)
-
-            buildBattleTickerText(element.attacker, element.target, selector, receivedDamage, true)          
-            if (element.target.energy <= 0) {
-                element.target.energy = 0
-                setTimeout(() => playSound(sounds.deathCry2), 2500)
-            }
-        })
-    }
-
-    function handleEnemyMoves() {
-        const remainingEnemyParty = getRemainingEnemies()
-        remainingEnemyParty.forEach(enemy => {
-            if (!enemy.defends) {
-                const selector = (enemy.type === attackTypes.teacher || enemy.type === attackTypes.allrounder)
-                    ? randomAttackType() : enemy.type
-                const attack = enemy[selector]
-                const target = selectTargetForEnemy()
-                const defense = getDefenseType(selector, target)
-                const typeBonus = getEffectiveness(selector, target.type)
-                const damage = Math.floor(attack * typeBonus * (100 / (100 + target[defense] * 10)))
-                const receivedDamage = target.takeDamage(damage)
-                buildBattleTickerText(enemy, target, selector, receivedDamage, false)
-
-                if (target.energy <= 0) {
-                    setTimeout(() => playSound(sounds.deathCry), 2500)
-                }
-            }
-        })
-    }
-
-    function buildBattleTickerText(attacker, target, type, damage, isPlayer) {
-        if (isPlayer) {
-            if (attacker.defends) {
-                game.battleMessages.push("<div><span class='text-player'>" + attacker.class + " <i class='fas fa-shield-alt'></i>" + "</span></div>")
-            } else {
-                game.battleMessages.push("<div><span class='text-player'>" + attacker.class + '  ' + setBattleTickerIcon(type) + '  ' + "<span class='text-enemy'>Enemy " + target.class + "</span>" + ` <span class="damage-text"> -${damage}%</span></div>`)
-            }
-        } else {
-            if (attacker.defends) {
-                game.battleMessages.push("<div><span class='text-enemy'>Enemy " + attacker.class + " <i class='fas fa-shield-alt'></i>" + "</span></div>")
-            } else {
-                game.battleMessages.push("<div><span class='text-enemy'>Enemy " + attacker.class + '  ' + setBattleTickerIcon(type) + '  ' + "<span class='text-player'> " + target.class + "</span>" + ` <span class="damage-text"> -${damage}%</span></div>`)
-            }
+    function buildBattleTickerText(event) {
+        const { attacker, target, type, damage, side, kind } = event
+        const isPlayer = side === 'player'
+        const attackerClass = isPlayer ? 'text-player' : 'text-enemy'
+        const targetClass = isPlayer ? 'text-enemy' : 'text-player'
+        const attackerName = isPlayer ? attacker.class : 'Enemy ' + attacker.class
+        if (kind === 'defend') {
+            return `<div><span class="${attackerClass}">${attackerName} <i class="fas fa-shield-alt"></i></span></div>`
         }
-        
+        const targetName = isPlayer ? 'Enemy ' + target.class : target.class
+        return `<div><span class="${attackerClass}">${attackerName} ${setBattleTickerIcon(type)} <span class="${targetClass}">${targetName}</span> <span class="damage-text"> -${damage}%</span></div>`
     }
 
-    function randomAttackType() {
-        let selector
-        switch (game.lastMoveTeacher) {
-            case attackTypes.strength: {
-                selector = attackTypes.assholiness
-                game.lastMoveTeacher = attackTypes.assholiness
-                break
-            }
-            case attackTypes.assholiness: {
-                selector = attackTypes.intelligence
-                game.lastMoveTeacher = attackTypes.intelligence
-                break
-            }
-            case attackTypes.intelligence: {
-                selector = attackTypes.strength
-                game.lastMoveTeacher = attackTypes.strength
-                break
-            }
-        }
-
-        return selector
-    }
-
-    function selectTargetForEnemy() {
-        const possibleTargets = getRemainingParty()
-
-        if (possibleTargets.length === 0) return null
-
-        const randomNumber = Math.floor(Math.random() * (possibleTargets.length))
-        let energy = 100
-        let target = possibleTargets[0]
-
-        possibleTargets.forEach(element => {
-            if (element.energy <= energy) {
-                energy = element.energy
-                target = element
-            }
-        })
-
-        if (target === undefined && possibleTargets.length > 0) target = possibleTargets[0]
-        target = possibleTargets[randomNumber]
-
-        if (target === undefined) target = possibleTargets[0]
-
-        return target
-    }
-
-    function calculateDamage() {
-        const remainingEnemyParty = getRemainingEnemies()
-        document.getElementById('battle-ticker') .style.display = 'block'
-        game.battleMessages = []
-        setEnemiesDefending()
-        handleEnemyMoves()
-        handlePlayerMoves()
+    function presentBattleRound(result) {
+        battleTicker.style.display = 'block'
+        document.getElementById('battle-messages').innerHTML = result.events.map(buildBattleTickerText).join(' ')
         drawEnergyBars()
-        resetDefending()
 
-        if (remainingEnemyParty.length > 0 && game.round <= 9){
-            setTimeout(() => removeHidden(itemBox), 2500)
-        }
+        result.events.filter(event => event.defeated).forEach(event => {
+            const sound = event.side === 'player' ? sounds.deathCry2 : sounds.deathCry
+            setTimeout(() => playSound(sound), 2500)
+        })
 
-        checkGameOver()
-        document.getElementById('battle-messages').innerHTML = ''
-        document.getElementById('battle-messages').innerHTML = game.battleMessages.join(' ')
-        checkRemainingEnemies()
-    }
-
-    function checkGameOver() {
-        const gameOver = getPossibleMoves() === 0
-
-        if (gameOver) {
-            setTimeout(() => {
+        if (result.outcome === 'defeat') {
+            gameFlow.after(() => {
                 showGameOverScreen()
                 sounds.music.pause()
                 sounds.bossMusic.pause()
             }, 2500)
-        }     
+        } else if (result.outcome === 'victory') {
+            checkRemainingEnemies()
+        }
     }
 
     function getPossibleMoves() {
         const remainingChars = game.player.party.filter(char => char.energy > 0 && char.class !== 'Dummy')
         return remainingChars.length
-    }
-
-    function resetDefending() {
-        game.enemy.party.forEach(enemy => {
-            enemy.defends = false
-        })
-        game.player.party.forEach(char => {
-            char.defends = false
-        })
-    }
-
-    function getEffectiveness(attackType, defenderType) {
-        const isEffective = (attackType === attackTypes.strength && defenderType === attackTypes.intelligence) || 
-        (attackType === attackTypes.intelligence && defenderType === attackTypes.assholiness) || 
-        (attackType === attackTypes.assholiness && defenderType === attackTypes.strength)
-
-        return isEffective ? 1.5 : 1
-    }
-
-    function getDefenseType(attackType, target) {
-        if (target === undefined) {
-            return
-        }
-
-        let defense
-
-        switch (attackType) {
-            case attackTypes.strength:
-                defense = attackTypes.assholiness
-                break
-            case attackTypes.assholiness:
-                defense = attackTypes.intelligence
-                break
-            case attackTypes.intelligence:
-                defense = attackTypes.strength
-                break
-            default:
-                defense = null
-        }
-
-        return defense
     }
 
     function setBattleTickerIcon(selector) {
@@ -1472,18 +1174,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const remainingEnemies = getRemainingEnemies()
 
         if (remainingEnemies.length > 0) {
-            setTimeout(() => updateGameState(gameStates.selectTargets), 5000)
             return
         }
         checkSurvivors()
         game.round += 1
-        disableAttackButtons = true
-        setTimeout(() => {
+        updateGameState(gameStates.transition)
+        gameFlow.after(() => {
             addHidden(battleTicker)
             addHidden(itemBox)
             removeHidden(document.getElementById('communication-container'))
 
             if (game.round < 10) {
+                updateGameState(gameStates.levelComplete)
                 if (itemManager.moneyEarnedLastRound > 0) document.getElementById('money-placeholder').innerHTML = `Earned $${itemManager.moneyEarnedLastRound}`
                 return
             }
@@ -1565,12 +1267,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function setUpNextRound() {
+        if (!gameFlow.can('nextRound')) return
+        updateGameState(gameStates.transition)
         runFadeAnimation()
         addHidden(itemBox)
         addHidden(bombContainerWrapper)
         addHidden(document.getElementById('communication-container'))
-        setTimeout(() => changeBackground(), 1000)
-        setTimeout(() => {
+        gameFlow.after(() => changeBackground(), 1000)
+        gameFlow.after(() => {
             dialogueManager.showDialogue()
             document.querySelectorAll('.sprite-container').forEach(sprite => {
                 sprite.classList.remove('hidden-buttons')
@@ -1782,6 +1486,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showTrophiesScreen () {
+        if (!gameFlow.can('start')) return
+        updateGameState(gameStates.trophies)
         playSound(sounds.confirm)
         show(trophiesScreen)
         hideAll('title-screen')
@@ -1795,6 +1501,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showTutorialPage() {
+        if (!gameFlow.can('start')) return
+        updateGameState(gameStates.tutorial)
         playSound(sounds.confirm)
         removeHidden(tutorialScreen)
         hideAll('title-screen')
@@ -1839,15 +1547,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 100)
     }
 
-    function runFightAnimation() {
-        updateGameState(gameStates.battleAnimation)
+    function runFightAnimation(outcome = 'continue') {
         updateBattleTicker('battle')
         playSound(sounds.fight)
         hideAll('buttons-wrapper')
         const allSelected = document.querySelectorAll('.selected')
         allSelected.forEach(selected => selected.classList.remove('selected'))
         overlay.style.zIndex = '999'
-        fightAnimationRunning = true
         sounds.punch.playbackRate = 3
         addHidden(itemBox)
         setTimeout(() => playSound(sounds.punch), 500)
@@ -1875,14 +1581,11 @@ document.addEventListener('DOMContentLoaded', () => {
             showAll('buttons-char')
             setCharactersDefeated()
         }, 2600)
-        setTimeout(() => {
+        if (outcome === 'continue') gameFlow.after(() => {
             updateGameState(gameStates.selectTargets)
-            fightAnimationRunning = false
+            removeHidden(itemBox)
+            gameFlow.after(() => addHidden(battleTicker), 1000)
         }, 3000)
-        setTimeout(() => {
-            addHidden(battleTicker)
-        }, 4000)
-        game.player.moves = []
     }
 
     function runConfettiAnimation() {
@@ -1910,6 +1613,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let hasOpenedShop = false
 
     function openShop() {
+        if (!gameFlow.can('openShop')) return
+        updateGameState(gameStates.transition)
         if (!hasOpenedShop) {
             hasOpenedShop = true
             if(!hasOpenShopTrophy) {
@@ -1923,7 +1628,8 @@ document.addEventListener('DOMContentLoaded', () => {
         addHidden(document.getElementById('communication-container'))
         hideAll('energy-bar-wrapper')
         hideAll('left-party')
-        setTimeout(() => {
+        gameFlow.after(() => {
+            updateGameState(gameStates.shop)
             removeHidden(shop)
             document.getElementById('shop-dialogue-box-wrapper').style.display = 'block'
         }, 1000)
@@ -1935,8 +1641,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function leaveShop() {
+        if (!gameFlow.can('leaveShop')) return
+        updateGameState(gameStates.transition)
         runFadeAnimation()
-        setTimeout(() => {
+        gameFlow.after(() => {
+            updateGameState(gameStates.levelComplete)
             removeHidden(document.getElementById('communication-container'))
             showAll('left-party')
             showAll('energy-bar-wrapper')
@@ -1945,6 +1654,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function buyUpgrade(attackType) {
+        if (!gameFlow.can('purchase')) return
         playSound(sounds.powerUp)
         document.getElementById('upgrade-message-wrapper').innerHTML = ''
         itemManager.money -= prices.upgrade
@@ -1961,7 +1671,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         message.innerHTML = `<div class="animated-text">${icon()} +1</div>`
         document.getElementById('upgrade-message-wrapper').appendChild(message)
-        setTimeout(() => {
+        gameFlow.after(() => {
             itemManager.checkForAffordableItems()
             document.getElementById('upgrade-message-wrapper').innerHTML = ''
         }, 2000)
@@ -2066,7 +1776,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let score = 0
     let combo = 0
-    let gameStarted = false
     let rainbowHueOffset = 0
 
     const note = new Image()
@@ -2112,11 +1821,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (this.judgment === 'Perfect!') {
                 sounds.perfect.pause()
                 sounds.perfect.currentTime = 0
-                sounds.perfect.play()
+                playAudio(sounds.perfect)
             } else {
                 sounds.clap.pause()
                 sounds.clap.currentTime = 0
-                sounds.clap.play()
+                playAudio(sounds.clap)
             }
             this.soundPlayed = true
         }
@@ -2285,28 +1994,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function startDancingGame() {
+        if (gameFlow.can('dance')) return
+        updateGameState(gameStates.dancing)
         addHidden(itemBox)
         removeHidden(document.getElementById('disco-overlay'))
         document.getElementById('dancing-game').classList.remove('hidden')
-        if (gameStarted) return
 
         document.getElementById('character-wrapper-dance').classList.add('dancing1')
         document.getElementById('dancer-right').classList.add('dancing2')
 
-        gameStarted = true
         score = 0
         combo = 0
         activeNotes = []
         nextNoteIndex = 0
 
         audio.currentTime = 0
-        audio.play().catch(e => console.error("Audio play failed:", e))
+        playAudio(audio)
 
         requestAnimationFrame(gameLoop)
     }
 
     function gameLoop() {
-        if (!gameStarted) return
+        if (!gameFlow.can('dance')) return
         const currentTimeMs = audio.currentTime * 1000
         rainbowHueOffset = (rainbowHueOffset + 2) % 360
 
@@ -2412,7 +2121,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function handleClick(event) {
-        if (!gameStarted || audio.paused) {
+        if (!gameFlow.can('dance') || audio.paused) {
             return
         }
         const rect = canvasDancingGame.getBoundingClientRect()
@@ -2500,24 +2209,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function endGame(win) {
-        gameStarted = false
+        if (!gameFlow.can('dance')) return
         audio.pause()
         document.getElementById('dancing-game').classList.add('hidden')
-        sounds.music.play()
+        playAudio(sounds.music)
         game.round += 1
         addHidden(document.getElementById('disco-overlay'))
 
         if (win) {
             document.getElementById('dancer-right').classList.add('defeated')
-            sounds.girl.play()
-            startNextRound()
+            playAudio(sounds.girl)
+            updateGameState(gameStates.levelComplete)
             addHidden(openShopButton)
         }
 
         if (!win) {
             document.getElementById('character-wrapper-dance').classList.add('defeated')
             showGameOverScreen()
-            sounds.deathCry.play()
+            playAudio(sounds.deathCry)
         }
         removeHidden(document.getElementById('communication-container'))
     }
