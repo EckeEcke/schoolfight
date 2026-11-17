@@ -121,6 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const { attackTypes, Character, characters } = SchoolFightCharacters
     const { resolveBattleRound } = SchoolFightCombat
+    const { levels, getLevel, createEnemyParty } = SchoolFightLevels
 
     const prices = {
         item: 3,
@@ -440,39 +441,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /*
     * 
-    * Characters
+    * Level and party setup
     * 
     */
 
-    const setTeams = [
-        [new Character(characters.bully, 0), new Character(characters.nerd, 1), new Character(characters.normie, 2)], //1
-        [new Character(characters.squealer, 0), new Character(characters.wally, 1), new Character(characters.richkid, 2)], //2
-        [new Character(characters.dummy, 0), new Character(characters.dummy, 1), new Character(characters.dummy, 2)], //3 (rope skipping)
-        [new Character(characters.sportskid, 0), new Character(characters.sportskid, 1), new Character(characters.sportskid, 2)], //4
-        [new Character(characters.richkid, 0), new Character(characters.nerd, 1), new Character(characters.bully, 2)], //5
-        [new Character(characters.dummy, 0), new Character(characters.dummy, 1), new Character(characters.dummy, 2)], //6 (running)
-        [new Character(characters.richkid, 0), new Character(characters.richkid, 1), new Character(characters.richkid, 2)],  //7
-        [new Character(characters.dummy, 0), new Character(characters.dummy, 1), new Character(characters.dummy, 2)], //8 (dancing)
-        [new Character(characters.nerd, 0), new Character(characters.nerd, 1), new Character(characters.nerd, 2)], //9
-        [new Character(characters.dummy, 0), new Character(characters.teacher, 1), new Character(characters.dummy, 2)], //10
-    ]
+    function currentLevel() {
+        return getLevel(game.round)
+    }
 
-    const setTeamsTeacher = () => [
-        [new Character(characters.bully, 0), new Character(characters.nerd, 1), new Character(characters.normie, 2)], //1
-        [new Character(characters.squealer, 0), new Character(characters.wally, 1), new Character(characters.richkid, 2)], //2
-        [new Character(characters.dummy, 0), new Character(characters.dummy, 1), new Character(characters.dummy, 2)], //3 (rope skipping)
-        [new Character(characters.sportskid, 0), new Character(characters.sportskid, 1), new Character(characters.sportskid, 2)], //4
-        [new Character(characters.richkid, 0), new Character(characters.nerd, 1), new Character(characters.bully, 2)], //5
-        [new Character(characters.dummy, 0), new Character(characters.dummy, 1), new Character(characters.dummy, 2)], //6 (running)
-        [new Character(characters.richkid, 0), new Character(characters.richkid, 1), new Character(characters.richkid, 2)],  // 7
-        [new Character(characters.dummy, 0), new Character(characters.dummy, 1), new Character(characters.dummy, 2)], //8 (dancing)
-        [new Character(characters.nerd, 0), new Character(characters.nerd, 1), new Character(characters.nerd, 2)], //9
-        [
-            new Character(characters[game.lastVictoryTeam[0].toLowerCase()], 0),
-            new Character(characters[game.lastVictoryTeam[1].toLowerCase()], 1),
-            new Character(characters[game.lastVictoryTeam[2].toLowerCase()], 2)
-        ], //10
-    ]
+    function createCurrentEnemyParty() {
+        return createEnemyParty(game.round, game)
+    }
 
     const teacherTeam = [
         Object.assign(new Character(characters.dummy, 1)),
@@ -720,15 +699,15 @@ document.addEventListener('DOMContentLoaded', () => {
      */
 
     class DialogueManager {
-        constructor(dialogues) {
+        constructor() {
             this.messageIndex = 0
-            this.dialogues = dialogues
         }
 
         showDialogue() {
             updateGameState(gameStates.dialogue)
             removeHidden(dialogueBoxWrapper)
-            dialogueBox.innerHTML = this.dialogues[game.round][this.messageIndex]
+            const mode = game.isTeacherMode ? 'teacher' : 'normal'
+            dialogueBox.innerHTML = currentLevel().dialogue[mode][this.messageIndex]
         }
 
         nextDialogue() {
@@ -745,33 +724,6 @@ document.addEventListener('DOMContentLoaded', () => {
             startNextRound()
         }
     }
-
-    const dialogues = [
-        ["YOU think you can become the kings of school?", "We will flush your heads in the toilet after beating you up."],
-        ["Our friend in the middle may not be the smartest.", "But he is the strongest kid around. Ready for a beating?"],
-        ["Hi boooooys. We don't fight with our fists...", "So get ready for a ROPE SKIP FIGHT!"],
-        ["Hey, we are just training here.", "If you don't leave we gotta teach you a lesson!"],
-        ["We dont like sports...", "And we don't like YOU!"],
-        ["Greetings, little fellas. What´s up?", "How about a... wrestling match...?"],
-        ["What are you doing here?! This is a private school!", "You are not wealthy and classy enough to be here."],
-        ["Show me your moves!", "Hit the note when its center is on the red line."],
-        ["If our calculations are correct we have a 99% chance to beat you up.", "Go Go Power Rangers!"],
-        ["You were beating up a lot of other kids recently to become king of school.", "You almost made it, but first you gotta beat ME!"]
-    ]
-
-    const dialoguesTeacher = [
-        ["What are YOU doing here?!", "The new kings of school kicked you out of this place!"],
-        ["Noooo... not you again...", "Give up, old man!"],
-        ["You think you still got what it takes?", "Show us your moves. ROPE SKIP FIGHT!"],
-        ["Perfect timing of yours!", "We were just looking for a good old sandbag."],
-        ["We still dont like sports...", "And we don't like old farts like YOU!"],
-        ["If police sees the two of us...", "you might get ARRESTED! 😈"],
-        ["What are you doing here?! This is a private school!", "You are way too old and poor to be here."],
-        ["To get past us, you need to feel the rhythm!", "You look way too old for this though.."],
-        ["Last time our calculations were incorrect.", "But this time we used quantum computing!"],
-        ["How dare you coming back here?!", "Whatever, we will beat you up once again!"]
-    ]
-
 
       /**
      * 
@@ -889,18 +841,18 @@ document.addEventListener('DOMContentLoaded', () => {
         playSound(sounds.schoolBell)
         playMusic()
         if (isTeacherMode) {
-            game.enemy.party = setTeamsTeacher()[game.round]
+            game.enemy.party = createCurrentEnemyParty()
             initializeGameTeacher()
             return
         }
         updateGameState(gameStates.characterSelect)
         selectScreen.classList.remove('hidden')
         removeHidden(titleSelect)
-        game.enemy.party = setTeams[game.round]
+        game.enemy.party = createCurrentEnemyParty()
     }
 
     function initializeGame() {
-        dialogueManager = new DialogueManager(dialogues)
+        dialogueManager = new DialogueManager()
         updateGameState(gameStates.dialogue)
         hideAll('select-screen')
         dialogueManager.showDialogue()
@@ -915,7 +867,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function initializeGameTeacher() {
-        dialogueManager = new DialogueManager(dialoguesTeacher)
+        dialogueManager = new DialogueManager()
         document.getElementById('energy-char2-text').innerHTML = characters.teacher.class
         teacherTeam.forEach(member => game.player.party.push(member))
         dialogueManager.showDialogue()
@@ -932,27 +884,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function startNextRound() {
-        updateGameState(gameStates.selectTargets)
         if (itemManager.bombs > 0) bombButton.removeAttribute('disabled')
         if (itemManager.snacks > 0) snackButton.removeAttribute('disabled')
         removeHidden(openShopButton)
 
-        if (game.round === 2) {
-            startRopeGame()
+        const starters = {
+            battle: () => {
+                updateGameState(gameStates.selectTargets)
+                if (currentLevel().boss) startBossRound()
+            },
+            ropeSkip: startRopeGame,
+            running: () => {
+                updateGameState(gameStates.running)
+                runningMiniGame.start()
+            },
+            dancing: startDancingGame,
         }
-
-        if (game.round === 5) {
-            updateGameState(gameStates.running)
-            runningMiniGame.start()
-        }
-
-        if (game.round === 7) {
-            startDancingGame()
-        }
-
-        if (game.round === 9) {
-            startBossRound()
-        }
+        starters[currentLevel().type]()
     }
 
     function startRopeGame() {
@@ -1184,7 +1132,7 @@ document.addEventListener('DOMContentLoaded', () => {
             addHidden(itemBox)
             removeHidden(document.getElementById('communication-container'))
 
-            if (game.round < 10) {
+            if (game.round < levels.length) {
                 updateGameState(gameStates.levelComplete)
                 if (itemManager.moneyEarnedLastRound > 0) document.getElementById('money-placeholder').innerHTML = `Earned $${itemManager.moneyEarnedLastRound}`
                 return
@@ -1222,13 +1170,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function preloadBackgrounds() {
-        const backgrounds = [
-            'images_schoolfight/background1.jpg',
-            'images_schoolfight/background2.jpg',
-            'images_schoolfight/background3.jpg',
-            'images_schoolfight/background4.jpg',
-            'images_schoolfight/backgroundShop.jpg'
-        ]
+        const backgrounds = [...new Set([
+            ...levels.map(level => level.background.image),
+            ...levels.filter(level => level.runningBackground).map(level => level.runningBackground),
+            'images_schoolfight/backgroundShop.jpg',
+        ])]
 
         backgrounds.forEach(src => {
             const img = new Image()
@@ -1239,31 +1185,17 @@ document.addEventListener('DOMContentLoaded', () => {
     preloadBackgrounds()
     
     function changeBackground() {
-        switch (game.round) {
-            case 0: {
-                backgroundElement.classList.add('background-1')
-                break
-            }
-            case 2: {
-                backgroundElement.classList.add('background-2')
-                break
-            }
-            case 5: {
-                removeHidden(runningBackgroundWrapper)
-                runningSprite.className = game.player.party[1].frontSprite
-                break
-            }
-            case 6: {
-                backgroundElement.classList.add('background-3')
-                addHidden(runningBackgroundWrapper)
-                break
-            }
-            case 9: {
-                backgroundElement.classList.add('background-4')
-                break
-            }
-            default: return
-        }
+        const level = currentLevel()
+        levels.forEach(entry => backgroundElement.classList.remove(entry.background.className))
+        backgroundElement.classList.add(level.background.className)
+        backgroundElement.style.backgroundImage = `url('${level.background.image}')`
+        if (level.type === 'running') {
+            removeHidden(runningBackgroundWrapper)
+            runningSprite.className = game.player.party[1].frontSprite
+            document.querySelectorAll('#running-background > img').forEach(image => {
+                image.src = level.runningBackground
+            })
+        } else addHidden(runningBackgroundWrapper)
     }
 
     function setUpNextRound() {
@@ -1281,7 +1213,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }) 
             playSound(sounds.schoolBell)
             game.player.party.forEach(element => element.recoverFull())
-            game.enemy.party = game.isTeacherMode ? setTeamsTeacher()[game.round] : setTeams[game.round]
+            game.enemy.party = createCurrentEnemyParty()
             drawEnergyBars()
             document.querySelectorAll('.defeated').forEach(element => {
                 element.classList.remove('defeated')
@@ -1289,25 +1221,14 @@ document.addEventListener('DOMContentLoaded', () => {
             showPlayerSprites()
             showEnemySprites()
 
-            if (game.round === 2) {
-                setupForRopeGame()
+            const setups = {
+                battle: setupRegularRound,
+                ropeSkip: setupForRopeGame,
+                running: setupRunningGame,
+                dancing: setupDancingGame,
             }
-
-            if (game.round === 5) {
-                setupRunningGame()
-            }
-
-            if (game.round === 7) {
-                setupDancingGame()
-            }
-
-            if (game.round !== 2 && game.round !== 5 && game.round !== 7) {
-                setupRegularRound()
-            } 
-            
-            if (game.round === 9) {
-                setupBossRound()
-            } 
+            setups[currentLevel().type]()
+            if (currentLevel().boss) setupBossRound()
         }, 1000) 
     }
 
