@@ -19,7 +19,7 @@ test('the campaign places bomb dodge after battle 2 and rope skipping after batt
         const dialogue = levels[2].dialogue[mode].join(' ')
         assert.match(dialogue, /left\/right/i)
         assert.match(dialogue, /arrow keys/i)
-        assert.match(dialogue, /25 seconds/i)
+        assert.match(dialogue, /Three hits/i)
     }
 })
 

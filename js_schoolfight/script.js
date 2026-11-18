@@ -1131,11 +1131,7 @@ document.addEventListener('DOMContentLoaded', () => {
         battleTicker.style.display = 'block'
         document.getElementById('battle-messages').innerHTML = result.events.map(buildBattleTickerText).join(' ')
         drawEnergyBars()
-
-        result.events.filter(event => event.defeated).forEach(event => {
-            const sound = event.side === 'player' ? sounds.deathCry2 : sounds.deathCry
-            setTimeout(() => playSound(sound), 2500)
-        })
+        animateBattleEvents(result.events)
 
         if (result.outcome === 'defeat') {
             gameFlow.after(() => {
@@ -1543,6 +1539,37 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 100)
     }
 
+    function animateBattleEvents(events) {
+        const attacks = events.filter(event => event.kind === 'attack')
+        attacks.forEach((event, index) => {
+            setTimeout(() => {
+                const prefix = event.side === 'player' ? 'enemy' : 'char'
+                const target = document.getElementById(`${prefix}${event.target.id}`)
+                const wrapper = target.querySelector('.sprite-sheet-wrapper, .overflow-wrapper')
+                const attackerPrefix = event.side === 'player' ? 'char' : 'enemy'
+                const attacker = document.getElementById(`${attackerPrefix}${event.attacker.id}`)
+                const direction = event.side === 'player' ? 1 : -1
+                if (!target.classList.contains('defeated')) {
+                    target.style.animationPlayState = 'paused'
+                    attacker.style.animationPlayState = 'paused'
+                    setTimeout(() => {
+                        target.style.animationPlayState = ''
+                        attacker.style.animationPlayState = ''
+                    }, 55)
+                    wrapper.animate([
+                        { translate: '0px', filter: 'brightness(1)' },
+                        { translate: `${direction * (event.blocked ? 4 : 12)}px`, filter: 'brightness(2)' },
+                        { translate: '0px', filter: 'brightness(1)' },
+                    ], { duration: event.blocked ? 160 : 260, easing: 'ease-out' })
+                }
+                if (event.defeated) {
+                    target.classList.add('defeated')
+                    playSound(event.side === 'player' ? sounds.deathCry2 : sounds.deathCry)
+                }
+            }, 1050 + index * 180)
+        })
+    }
+
     function runFightAnimation(outcome = 'continue') {
         updateBattleTicker('battle')
         playSound(sounds.fight)
@@ -1558,7 +1585,7 @@ document.addEventListener('DOMContentLoaded', () => {
         )
 
 
-        document.querySelectorAll('.sprite-container.alive').forEach(element => {
+        document.querySelectorAll('.sprite-container.alive:not(.defeated)').forEach(element => {
             if (element.classList.contains('left-party')) {
                 element.classList.add('animated-character1')
             } else {

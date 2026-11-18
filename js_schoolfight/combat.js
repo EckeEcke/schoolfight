@@ -50,6 +50,7 @@
             const wasAlive = target.energy > 0
             const damage = target.takeDamage(calculateAttackDamage(attacker, target, type))
             events.push({ kind: 'attack', attacker, target, type, damage, side,
+                remainingEnergy: target.energy, blocked: target.defends,
                 defeated: wasAlive && target.energy === 0 })
         }
 

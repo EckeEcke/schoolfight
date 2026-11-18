@@ -20,6 +20,8 @@ test('a complete round resolves enemy attacks before queued player attacks', () 
         ['enemy', 'attack', 12], ['player', 'attack', 60],
     ])
     assert.equal(player.energy, 88)
+    assert.equal(result.events[0].remainingEnergy, 88)
+    assert.equal(result.events[0].blocked, false)
     assert.equal(enemy.energy, 40)
     assert.equal(result.outcome, 'continue')
     assert.equal(result.survivingPlayers, 1)
@@ -63,6 +65,8 @@ test('player defense reduces damage, emits a defense event and resets for the ne
     input.moves = [{ attacker: player, target: '', type: '' }]
     const result = resolveBattleRound(input, () => 0)
     assert.equal(player.energy, 94)
+    assert.equal(result.events[0].remainingEnergy, 94)
+    assert.equal(result.events[0].blocked, true)
     assert.equal(enemy.energy, 100)
     assert.equal(result.events[1].kind, 'defend')
     assert.equal(result.events[1].side, 'player')
