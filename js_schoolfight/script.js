@@ -1540,6 +1540,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function animateBattleEvents(events) {
+        events.filter(event => event.defeated).forEach(event => {
+            setTimeout(() => playSound(event.side === 'player' ? sounds.deathCry2 : sounds.deathCry), 2600)
+        })
         const attacks = events.filter(event => event.kind === 'attack')
         attacks.forEach((event, index) => {
             setTimeout(() => {
@@ -1561,10 +1564,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         { translate: `${direction * (event.blocked ? 4 : 12)}px`, filter: 'brightness(2)' },
                         { translate: '0px', filter: 'brightness(1)' },
                     ], { duration: event.blocked ? 160 : 260, easing: 'ease-out' })
-                }
-                if (event.defeated) {
-                    target.classList.add('defeated')
-                    playSound(event.side === 'player' ? sounds.deathCry2 : sounds.deathCry)
                 }
             }, 1050 + index * 180)
         })
