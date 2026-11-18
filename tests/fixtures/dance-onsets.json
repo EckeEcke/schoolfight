@@ -1,0 +1,381 @@
+{
+  "audioSha256": "6e256d10f0645d36d3ad3b5198e4dd7f3371b4ec8ef860294e4fd9cdcaaf1432",
+  "audioDurationMs": 119962.479,
+  "sampleRate": 48000,
+  "hopMs": 5,
+  "onsetThreshold": 0.8,
+  "measurements": [
+    {
+      "beat": 7,
+      "onsetMs": 4185,
+      "strength": 1.745,
+      "bassStrength": 1.263
+    },
+    {
+      "beat": 9,
+      "onsetMs": 5225,
+      "strength": 4.214,
+      "bassStrength": 2.648
+    },
+    {
+      "beat": 14,
+      "onsetMs": 7830,
+      "strength": 2.62,
+      "bassStrength": 1.285
+    },
+    {
+      "beat": 15,
+      "onsetMs": 8355,
+      "strength": 4.566,
+      "bassStrength": 3.296
+    },
+    {
+      "beat": 16,
+      "onsetMs": 8880,
+      "strength": 1.647,
+      "bassStrength": 1.327
+    },
+    {
+      "beat": 18,
+      "onsetMs": 9920,
+      "strength": 5.634,
+      "bassStrength": 3.325
+    },
+    {
+      "beat": 19,
+      "onsetMs": 10445,
+      "strength": 2.326,
+      "bassStrength": 1.425
+    },
+    {
+      "beat": 20,
+      "onsetMs": 10965,
+      "strength": 5.608,
+      "bassStrength": 3.363
+    },
+    {
+      "beat": 22,
+      "onsetMs": 12005,
+      "strength": 5.748,
+      "bassStrength": 3.264
+    },
+    {
+      "beat": 28,
+      "onsetMs": 15145,
+      "strength": 4.458,
+      "bassStrength": 2.747
+    },
+    {
+      "beat": 29,
+      "onsetMs": 15665,
+      "strength": 6.558,
+      "bassStrength": 4.269
+    },
+    {
+      "beat": 30,
+      "onsetMs": 16210,
+      "strength": 1.214,
+      "bassStrength": 0.957
+    },
+    {
+      "beat": 32,
+      "onsetMs": 17225,
+      "strength": 2.244,
+      "bassStrength": 1.672
+    },
+    {
+      "beat": 34,
+      "onsetMs": 18270,
+      "strength": 4.857,
+      "bassStrength": 3.207
+    },
+    {
+      "beat": 38,
+      "onsetMs": 20375,
+      "strength": 0.92,
+      "bassStrength": 0.895
+    },
+    {
+      "beat": 39,
+      "onsetMs": 20890,
+      "strength": 1.63,
+      "bassStrength": 1.63
+    },
+    {
+      "beat": 40,
+      "onsetMs": 21395,
+      "strength": 4.389,
+      "bassStrength": 2.644
+    },
+    {
+      "beat": 42,
+      "onsetMs": 22440,
+      "strength": 3.907,
+      "bassStrength": 2.004
+    },
+    {
+      "beat": 43,
+      "onsetMs": 22980,
+      "strength": 1.603,
+      "bassStrength": 1.411
+    },
+    {
+      "beat": 44,
+      "onsetMs": 23485,
+      "strength": 5.849,
+      "bassStrength": 4.049
+    },
+    {
+      "beat": 50,
+      "onsetMs": 26615,
+      "strength": 4.187,
+      "bassStrength": 1.983
+    },
+    {
+      "beat": 51,
+      "onsetMs": 27140,
+      "strength": 2.667,
+      "bassStrength": 1.485
+    },
+    {
+      "beat": 52,
+      "onsetMs": 27660,
+      "strength": 5.128,
+      "bassStrength": 3.18
+    },
+    {
+      "beat": 54,
+      "onsetMs": 28705,
+      "strength": 1.832,
+      "bassStrength": 0.66
+    },
+    {
+      "beat": 56,
+      "onsetMs": 29745,
+      "strength": 5.158,
+      "bassStrength": 2.98
+    },
+    {
+      "beat": 58,
+      "onsetMs": 30790,
+      "strength": 3.736,
+      "bassStrength": 1.905
+    },
+    {
+      "beat": 60,
+      "onsetMs": 31835,
+      "strength": 4.683,
+      "bassStrength": 2.885
+    },
+    {
+      "beat": 62,
+      "onsetMs": 32895,
+      "strength": 1.137,
+      "bassStrength": 0.945
+    },
+    {
+      "beat": 63,
+      "onsetMs": 33425,
+      "strength": 1.258,
+      "bassStrength": 1.078
+    },
+    {
+      "beat": 65,
+      "onsetMs": 34445,
+      "strength": 4.173,
+      "bassStrength": 2.738
+    },
+    {
+      "beat": 66,
+      "onsetMs": 34980,
+      "strength": 1.62,
+      "bassStrength": 1.591
+    },
+    {
+      "beat": 70,
+      "onsetMs": 37060,
+      "strength": 1.28,
+      "bassStrength": 1.135
+    },
+    {
+      "beat": 71,
+      "onsetMs": 37585,
+      "strength": 1.561,
+      "bassStrength": 1.525
+    },
+    {
+      "beat": 72,
+      "onsetMs": 38095,
+      "strength": 7.208,
+      "bassStrength": 4.21
+    },
+    {
+      "beat": 73,
+      "onsetMs": 38615,
+      "strength": 4.691,
+      "bassStrength": 2.382
+    },
+    {
+      "beat": 76,
+      "onsetMs": 40180,
+      "strength": 6.215,
+      "bassStrength": 3.476
+    },
+    {
+      "beat": 77,
+      "onsetMs": 40700,
+      "strength": 6.272,
+      "bassStrength": 3.449
+    },
+    {
+      "beat": 81,
+      "onsetMs": 42790,
+      "strength": 4.518,
+      "bassStrength": 2.449
+    },
+    {
+      "beat": 82,
+      "onsetMs": 43325,
+      "strength": 1.435,
+      "bassStrength": 1.435
+    },
+    {
+      "beat": 83,
+      "onsetMs": 43835,
+      "strength": 1.86,
+      "bassStrength": 0.92
+    },
+    {
+      "beat": 84,
+      "onsetMs": 44355,
+      "strength": 4.793,
+      "bassStrength": 2.517
+    },
+    {
+      "beat": 85,
+      "onsetMs": 44880,
+      "strength": 5.03,
+      "bassStrength": 3.25
+    },
+    {
+      "beat": 86,
+      "onsetMs": 45415,
+      "strength": 1.449,
+      "bassStrength": 1.382
+    },
+    {
+      "beat": 87,
+      "onsetMs": 45935,
+      "strength": 1.592,
+      "bassStrength": 1.558
+    },
+    {
+      "beat": 88,
+      "onsetMs": 46440,
+      "strength": 6.302,
+      "bassStrength": 3.337
+    },
+    {
+      "beat": 89,
+      "onsetMs": 46965,
+      "strength": 4.812,
+      "bassStrength": 2.596
+    },
+    {
+      "beat": 92,
+      "onsetMs": 48535,
+      "strength": 6.363,
+      "bassStrength": 4.141
+    },
+    {
+      "beat": 93,
+      "onsetMs": 49055,
+      "strength": 6.734,
+      "bassStrength": 4.05
+    },
+    {
+      "beat": 94,
+      "onsetMs": 49570,
+      "strength": 2.74,
+      "bassStrength": 1.48
+    },
+    {
+      "beat": 98,
+      "onsetMs": 51660,
+      "strength": 2.335,
+      "bassStrength": 1.057
+    },
+    {
+      "beat": 99,
+      "onsetMs": 52195,
+      "strength": 1.451,
+      "bassStrength": 1.445
+    },
+    {
+      "beat": 100,
+      "onsetMs": 52700,
+      "strength": 4.429,
+      "bassStrength": 2.418
+    },
+    {
+      "beat": 101,
+      "onsetMs": 53225,
+      "strength": 5.293,
+      "bassStrength": 2.806
+    },
+    {
+      "beat": 102,
+      "onsetMs": 53760,
+      "strength": 0.847,
+      "bassStrength": 0.847
+    },
+    {
+      "beat": 103,
+      "onsetMs": 54270,
+      "strength": 1.041,
+      "bassStrength": 0.616
+    },
+    {
+      "beat": 104,
+      "onsetMs": 54790,
+      "strength": 4.989,
+      "bassStrength": 3.287
+    },
+    {
+      "beat": 105,
+      "onsetMs": 55310,
+      "strength": 4.94,
+      "bassStrength": 2.591
+    },
+    {
+      "beat": 106,
+      "onsetMs": 55835,
+      "strength": 2.654,
+      "bassStrength": 1.4
+    },
+    {
+      "beat": 107,
+      "onsetMs": 56370,
+      "strength": 1.675,
+      "bassStrength": 1.675
+    },
+    {
+      "beat": 108,
+      "onsetMs": 56875,
+      "strength": 5.539,
+      "bassStrength": 3.403
+    },
+    {
+      "beat": 109,
+      "onsetMs": 57400,
+      "strength": 6.332,
+      "bassStrength": 3.884
+    },
+    {
+      "beat": 110,
+      "onsetMs": 57930,
+      "strength": 1.757,
+      "bassStrength": 1.652
+    }
+  ]
+}

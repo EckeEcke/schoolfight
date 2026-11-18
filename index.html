@@ -23,11 +23,23 @@
   <link rel="stylesheet" href="css/sprites.css">
   <link rel="stylesheet" href="css/trophies.css">
   <link rel="stylesheet" href="css/dancing.css">
+  <link rel="stylesheet" href="css/bombDodge.css">
 </head>
 
 <body id="body">
 <div id="game-wrapper">
   <div id="background" class="background-1">
+    <div id="bomb-dodge-game" class="hidden" aria-label="Dodge the falling stink bombs">
+      <div data-dodge-bombs></div>
+      <div class="dodge-player" data-dodge-player>
+        <div class="overflow-wrapper">
+          <img src="images_schoolfight/Character_spriteSheet.png" alt="Your character" data-dodge-sprite>
+        </div>
+      </div>
+      <div data-dodge-clouds></div>
+      <div class="dodge-hud" data-dodge-time>Time: 00:25</div>
+      <div class="dodge-controls"><span>← Hold left</span><span>Hold right →</span></div>
+    </div>
     <div id="trophies">
       <h2>Trophies</h2>
       <div class="trophies-grid">
@@ -707,6 +719,10 @@
 <script src="js_schoolfight/levels.js"></script>
 <script src="js_schoolfight/audio.js"></script>
 <script src="js_schoolfight/game-flow.js"></script>
+<script src="js_schoolfight/rhythm.js"></script>
+<script src="js_schoolfight/dance-beatmap.js"></script>
+<script src="js_schoolfight/bomb-dodge.js"></script>
+<script src="js_schoolfight/bomb-dodge-view.js"></script>
 <script src="js_schoolfight/script.js"></script>
 
 </body>

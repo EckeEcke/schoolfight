@@ -1,5 +1,3 @@
-// Classic scripts preserve support for opening index.html directly.
-// CommonJS exposes the same model to Node's test runner.
 (function (root) {
     'use strict'
 

@@ -25,6 +25,8 @@ The game is written in Javascript using mainly regular HTML and CSS for displayi
 - [levels.js](./js_schoolfight/levels.js): level types, enemy teams, backgrounds and both dialogue variants. Creates fresh enemy characters for each level, including the revenge boss from the saved victory team.
 - [audio.js](./js_schoolfight/audio.js): playback error handling, including interrupted sounds.
 - [game-flow.js](./js_schoolfight/game-flow.js): active phase, input permissions and guards for delayed phase callbacks.
+- [rhythm.js](./js_schoolfight/rhythm.js): audio-time-based dance hit windows, note positions and input timing.
+- [dance-beatmap.js](./js_schoolfight/dance-beatmap.js): concrete note timestamps aligned to the music asset.
 - [script.js](./js_schoolfight/script.js): UI, animations, shop, minigames and orchestration.
 
 Scripts load in that order in [index.html](./index.html). The game still runs by opening that file directly; no build or installation is required.
@@ -32,6 +34,12 @@ Scripts load in that order in [index.html](./index.html). The game still runs by
 `resolveBattleRound` updates the supplied character instances and returns attack/defense events, surviving character counts, the next attack rotation state and an outcome (`continue`, `victory` or `defeat`). Enemy actions resolve first; queued player actions still execute even if their attacker falls during that round. Losing all players takes priority in a double knockout. The UI presents these results and handles animations and level transitions separately.
 
 `GameFlow` owns the current phase. Input handlers use `can(action)` instead of separate animation/dialogue lock flags. Phase-dependent timers use `after(callback, delay)`; their callbacks expire when the phase changes, including when the game later returns to the same phase. Cosmetic animation cleanup can use ordinary timers.
+
+In the dancing minigame, tap anywhere on the canvas when a note's center reaches the red line. Timing uses the music clock: Perfect within ±40 ms, Good within ±60 ms, Okay within ±80 ms and Poor within ±150 ms. Notes expire after the same 150 ms late window on every screen size. The track BPM and first-beat offset are defined in [rhythm.js](./js_schoolfight/rhythm.js).
+
+The audio asset is named `117bpm.mp3`, but analysis of its transients gives approximately 115 BPM. Dancer animations use that beat duration. The short level uses the first 28 bars (58.435 seconds) with 62 notes on the main quarter-note pulse. Half-beat targets and isolated timing overrides were replaced with whole-beat positions; targets sharing a beat were merged. Music fades out during the final beat, then the game advances to the next level. The original audio file stays intact. The cut, fade duration and note timestamps are defined in [dance-beatmap.js](./js_schoolfight/dance-beatmap.js).
+
+[dance-onsets.json](./tests/fixtures/dance-onsets.json) records the detected audio attacks for every playable note, along with the music file's SHA-256. Measurements use 5 ms audio windows and positive log-energy changes in low/high bands. Tests check the exact audio revision, note spacing, proximity to measured attacks and the actual note position code. This is automated alignment to transients, not a manual musical transcription.
 
 Run the core rule tests with Node.js 24 (the version used for validation):
 

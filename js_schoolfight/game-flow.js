@@ -4,14 +4,14 @@
     const gameStates = Object.freeze(Object.fromEntries([
         'title', 'tutorial', 'trophies', 'characterSelect', 'transition', 'dialogue',
         'selectTargets', 'battleAnimation', 'bombAnimation', 'snackAnimation',
-        'levelComplete', 'shop', 'ropeSkip', 'running', 'dancing', 'gameOver', 'victory',
+        'levelComplete', 'shop', 'ropeSkip', 'running', 'dancing', 'bombDodge', 'gameOver', 'victory',
     ].map(state => [state, state])))
 
     const permissions = {
         start: ['title'], selectCharacter: ['characterSelect'], dialogue: ['dialogue'],
         battle: ['selectTargets'], item: ['selectTargets'],
         nextRound: ['levelComplete'], openShop: ['levelComplete'], purchase: ['shop'],
-        leaveShop: ['shop'], jump: ['ropeSkip'], run: ['running'], dance: ['dancing'],
+        leaveShop: ['shop'], jump: ['ropeSkip'], run: ['running'], dance: ['dancing'], dodge: ['bombDodge'],
     }
 
     class GameFlow {
@@ -30,8 +30,6 @@
             return permissions[action]?.includes(this.state) ?? false
         }
 
-        // A callback belongs to this particular visit to a phase, even if we
-        // leave and later return to the same phase before its timer runs.
         guard(callback) {
             const revision = this.revision
             return (...args) => {

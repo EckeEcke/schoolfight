@@ -15,7 +15,7 @@ test('dialogues, shop, minigames and level completion have separate permissions'
     const flow = new GameFlow()
     for (const [state, action] of [['title', 'start'], ['dialogue', 'dialogue'],
         ['shop', 'purchase'], ['ropeSkip', 'jump'], ['running', 'run'],
-        ['dancing', 'dance'], ['levelComplete', 'nextRound']]) {
+        ['dancing', 'dance'], ['bombDodge', 'dodge'], ['levelComplete', 'nextRound']]) {
         flow.enter(state)
         assert.equal(flow.can(action), true)
         flow.enter('transition')

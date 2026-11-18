@@ -441,7 +441,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /*
     * 
-    * Level and party setup
+    * Characters
     * 
     */
 
@@ -692,6 +692,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const ropeSkipMiniGame = new RopeSkipMiniGame()
 
+    const bombDodgeMinigame = new SchoolFightBombDodgeView.BombDodgeMinigame({
+        element: document.getElementById('bomb-dodge-game'),
+        onHit: health => {
+            game.player.party[1].energy = health
+            drawEnergyBars()
+            playSound(sounds.stink)
+        },
+        onFinish: (outcome, health) => {
+            if (!gameFlow.can('dodge')) return
+            game.player.party[1].energy = health
+            if (outcome === 'defeat') {
+                updateGameState(gameStates.transition)
+                gameFlow.after(() => {
+                    playSound(sounds.deathCry)
+                    sounds.music.pause()
+                    showGameOverScreen()
+                }, 650)
+                return
+            }
+            updateGameState(gameStates.levelComplete)
+            game.round += 1
+            itemManager.updateMoney(3)
+            itemManager.updateMoneyEarnedTotal(3)
+            itemManager.moneyEarnedLastRound = 3
+            document.getElementById('money-placeholder').textContent = 'Earned $3'
+            document.getElementById('enemy2').classList.add('defeated')
+            removeHidden(document.getElementById('communication-container'))
+            addHidden(openShopButton)
+        },
+    })
+
+
+
     /**
      * 
      * Dialogues
@@ -834,6 +867,21 @@ document.addEventListener('DOMContentLoaded', () => {
 */
     let dialogueManager
 
+    function startMinigamePreview(type) {
+        if (!gameFlow.can('start')) return
+        game.round = levels.findIndex(level => level.type === type)
+        game.player.party = [characters.bully, characters.nerd, characters.wally]
+            .map((character, index) => new Character(character, index + 1))
+        game.player.party.forEach(character => {
+            document.getElementById(`energy-char${character.id}-text`).textContent = character.class
+        })
+        game.enemy.party = createCurrentEnemyParty()
+        hideAll('title-screen')
+        initializeGame()
+        changeBackground()
+        setupLevel()
+    }
+
     function startGame(isTeacherMode) {
         if (!gameFlow.can('start')) return
         game.isTeacherMode = isTeacherMode
@@ -899,6 +947,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 runningMiniGame.start()
             },
             dancing: startDancingGame,
+            bombDodge: startBombDodge,
         }
         starters[currentLevel().type]()
     }
@@ -1201,6 +1250,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function setUpNextRound() {
         if (!gameFlow.can('nextRound')) return
         updateGameState(gameStates.transition)
+        bombDodgeMinigame.stop()
         runFadeAnimation()
         addHidden(itemBox)
         addHidden(bombContainerWrapper)
@@ -1221,15 +1271,40 @@ document.addEventListener('DOMContentLoaded', () => {
             showPlayerSprites()
             showEnemySprites()
 
-            const setups = {
-                battle: setupRegularRound,
-                ropeSkip: setupForRopeGame,
-                running: setupRunningGame,
-                dancing: setupDancingGame,
-            }
-            setups[currentLevel().type]()
-            if (currentLevel().boss) setupBossRound()
+            setupLevel()
         }, 1000) 
+    }
+
+    function setupLevel() {
+        const setups = {
+            battle: setupRegularRound,
+            ropeSkip: setupForRopeGame,
+            running: setupRunningGame,
+            dancing: setupDancingGame,
+            bombDodge: setupBombDodge,
+        }
+        setups[currentLevel().type]()
+        if (currentLevel().boss) setupBossRound()
+    }
+
+    function setupBombDodge() {
+        hideAll('left-party')
+        removeHidden(char2)
+        hideAll('energy-bar-wrapper')
+        addHidden(document.getElementById('rope-skipping-game'))
+        addHidden(document.getElementById('dance-sprites'))
+        removeHidden(document.getElementsByClassName('energy-bar-wrapper')[1])
+        addHidden(document.getElementById('enemy1'))
+        addHidden(document.getElementById('enemy3'))
+    }
+
+    function startBombDodge() {
+        updateGameState(gameStates.bombDodge)
+        hideAll('left-party')
+        hideAll('right-party')
+        addHidden(itemBox)
+        addHidden(openShopButton)
+        bombDodgeMinigame.start(game.player.party[1])
     }
 
     function setupForRopeGame() {
@@ -1647,7 +1722,11 @@ document.addEventListener('DOMContentLoaded', () => {
         '#sound-control-button': toggleMute,
         '#trophies-button': showTrophiesScreen,
         '#dialogue-box-wrapper': () => dialogueManager.nextDialogue(),
-        '#start-button': () => startGame(false),
+        '#start-button': () => {
+            const previewType = new URLSearchParams(window.location.search).get('minigame')
+            if (levels.some(level => level.type === previewType && level.type !== 'battle')) startMinigamePreview(previewType)
+            else startGame(false)
+        },
         '#vendetta-button': () => startGame(true)
 
     }
@@ -1679,14 +1758,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const START_Y = -NOTE_RADIUS * 2
 
-    const APPROACH_TIME_MS = 1500
-    const ACCURACY_THRESHOLD_PERFECT = 40
-    const ACCURACY_THRESHOLD_GOOD = 60
-    const ACCURACY_THRESHOLD_OKAY = 80
-    const SONG_BPM = 117
-    const FIRST_BEAT_OFFSET_MS = 500
+    const APPROACH_TIME_MS = SchoolFightRhythm.timing.approachMs
+    const { timing, notePosition, inputSongTime, closestNote, judgeHit, isMissed } = SchoolFightRhythm
+    const SONG_BPM = timing.bpm
 
-    let totalSongDurationSec = 0
+    let danceDurationSec = SchoolFightDanceBeatmap.durationMs / 1000
     const MS_PER_BEAT = 60000 / SONG_BPM
 
     let canvasDancingGame
@@ -1698,6 +1774,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let score = 0
     let combo = 0
     let rainbowHueOffset = 0
+    let danceAnimationFrame = null
 
     const note = new Image()
     note.src = 'images_schoolfight/note.svg'
@@ -1724,10 +1801,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         update(currentTimeMs) {
             if (!this.hit && !this.missed) {
-                const timeElapsedSinceSpawn = currentTimeMs - this.spawnTimeMs
-                let progress = timeElapsedSinceSpawn / APPROACH_TIME_MS
-                progress = Math.max(0, Math.min(progress, 1.5))
-                this.y = START_Y + (HIT_LINE_Y - START_Y) * progress
+                this.y = notePosition(this.perfectHitTimeMs, currentTimeMs, START_Y, HIT_LINE_Y)
             } else if (this.judgmentDisplayStartTime > 0) {
                 const timeSinceJudgment = currentTimeMs - this.judgmentDisplayStartTime
                 this.judgmentAlpha = 1 - (timeSinceJudgment / this.JUDGMENT_DISPLAY_DURATION)
@@ -1794,7 +1868,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     ctx2.fillStyle = this.judgmentColor
                 }
 
-                this.playSound()
                 ctx2.textAlign = 'center'
                 ctx2.textBaseline = 'middle'
                 ctx2.font = `bold ${32*fontSizeScaling}px "Titan One"`
@@ -1804,12 +1877,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx2.restore()
         }
 
-        isClicked(clickX, clickY) {
-            const distance = Math.sqrt(
-                Math.pow(clickX - this.x, 2) + Math.pow(clickY - this.y, 2)
-            )
-            return distance < this.radius * fontSizeScaling
-        }
+
     }
 
     function initGame() {
@@ -1818,27 +1886,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
         audio.volume = 0.6
 
-        audio.addEventListener('loadedmetadata', () => {
-            totalSongDurationSec = audio.duration
-        })
+        const updateDuration = () => {
+            const audioDuration = Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : Infinity
+            danceDurationSec = Math.min(SchoolFightDanceBeatmap.durationMs / 1000, audioDuration)
+        }
+        updateDuration()
+        audio.addEventListener('loadedmetadata', updateDuration)
 
-        canvasDancingGame.addEventListener('mousedown', handleClick)
-        canvasDancingGame.addEventListener('touchstart', (e) => {
-            e.preventDefault()
-            handleClick(e)
-        }, { passive: false })
-        canvasDancingGame.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false })
+        canvasDancingGame.addEventListener('pointerdown', handleClick)
 
         const resizeObserver = new ResizeObserver(entries => {
             for (let entry of entries) {
                 if (entry.target === canvasDancingGame) {
                     const newWidth = entry.contentRect.width
                     const newHeight = entry.contentRect.height
+                    if (newWidth <= 0 || newHeight <= 0) continue
 
                     CANVAS_WIDTH_LOGICAL = newWidth
                     CANVAS_HEIGHT_LOGICAL = newHeight
 
                     HIT_LINE_Y = CANVAS_HEIGHT_LOGICAL - 50
+                    activeNotes.forEach(note => { note.x = CANVAS_WIDTH_LOGICAL / 2 })
 
                     const devicePixelRatio = window.devicePixelRatio || 1
                     canvasDancingGame.width = CANVAS_WIDTH_LOGICAL * devicePixelRatio
@@ -1856,62 +1924,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function loadBeatmap() {
-        let rawBeatmap = {
-            songTitle: "117 BPM Track",
-            artist: "Your Artist",
-            notes: [
-                { beat: 7 }, { beat: 9 },
-                { beat: 14 }, { beat: 15 }, { beat: 16 },
-                { beat: 18.5 }, { beat: 19.5 }, { beat: 20.5 }, { beat: 22.5 },
-                { beat: 28.5 }, { beat: 29.5 }, { beat: 30.5 }, { beat: 32.5 }, { beat: 34.5 },
-                { beat: 38.5 }, { beat: 39.5 }, { beat: 40.5 }, { beat: 42.5 }, { beat: 43.5 }, { beat: 44.5 },
-                { beat: 50 }, { beat: 51 }, { beat: 51.5 }, { beat: 52 }, { beat: 54 },
-                { beat: 56 }, { beat: 58 }, { beat: 60 }, { beat: 62 }, { beat: 63 },
-                { beat: 65 }, { beat: 65.5 }, { beat: 66 },
-                { beat: 70.5 }, { beat: 71.5 }, { beat: 72.5 }, { beat: 73.5 },
-                { beat: 76.5 }, { beat: 77 }, { beat: 77.5 },
-                { beat: 81 }, { beat: 82 }, { beat: 83 }, { beat: 83.5 }, { beat: 84 },
-                { beat: 85 }, { beat: 86 }, { beat: 87 }, { beat: 88 }, { beat: 88.5 }, { beat: 89 },
-                { beat: 92 }, { beat: 93 }, { beat: 93.5 }, { beat: 94 },
-                { beat: 98 }, { beat: 98.5 }, { beat: 99 },
-                { beat: 100 }, { beat: 101 }, { beat: 102 }, { beat: 103 }, { beat: 104 },
-                { beat: 105 }, { beat: 106 }, { beat: 107 }, { beat: 108 }, { beat: 108.5 }, { beat: 109 },
-                { beat: 110 }, { beat: 111 }, { beat: 112 }, { beat: 113 }, { beat: 113.5 }, { beat: 114 },
-                { beat: 115 }, { beat: 116 }, { beat: 117 },
-                { beat: 120 }, { beat: 121 }, { beat: 121.5 }, { beat: 122 }, { beat: 123 },
-                { beat: 125 }, { beat: 126 }, { beat: 127 }, { beat: 128 }, { beat: 128.5 }, { beat: 129 },
-                { beat: 130 }, { beat: 131 }, { beat: 132 }, { beat: 133 }, { beat: 133.5 }, { beat: 134 },
-                { beat: 135 }, { beat: 136 }, { beat: 137 }, { beat: 138 }, { beat: 139 },
-                { beat: 140 }, { beat: 141 }, { beat: 142 }, { beat: 143 }, { beat: 143.5 }, { beat: 144 },
-                { beat: 146 }, { beat: 147 }, { beat: 148 },
-                { beat: 150 }, { beat: 151 }, { beat: 152 }, { beat: 153 },
-                { beat: 155 }, { beat: 156 }, { beat: 157 }, { beat: 158 }, { beat: 158.5 }, { beat: 159 },
-                { beat: 160 }, { beat: 161 }, { beat: 162 }, { beat: 163 }, { beat: 163.5 }, { beat: 164 },
-                { beat: 165 }, { beat: 166 }, { beat: 167 }, { beat: 168 }, { beat: 169 },
-                { beat: 170 }, { beat: 171 }, { beat: 172 }, { beat: 173 }, { beat: 173.5 }, { beat: 174 },
-                { beat: 177 }, { beat: 178 }, { beat: 179 },
-                { beat: 180 }, { beat: 181 }, { beat: 181.5 }, { beat: 182 }, { beat: 183 },
-                { beat: 186 }, { beat: 187 }, { beat: 188 }, { beat: 188.5 }, { beat: 189 },
-                { beat: 192 }, { beat: 193 }, { beat: 193.5 }, { beat: 194 },
-                { beat: 196 }, { beat: 197 }, { beat: 198 }, { beat: 199 },
-                { beat: 200 }, { beat: 201 }, { beat: 202 }, { beat: 203 }, { beat: 203.5 }, { beat: 204 },
-                { beat: 206 }, { beat: 207 }, { beat: 208 }, { beat: 209 },
-                { beat: 211 }, { beat: 211.5 }, { beat: 212 },
-                { beat: 215 }, { beat: 216 }, { beat: 217 }, { beat: 218 }, { beat: 218.5 }, { beat: 219 },
-                { beat: 220 }, { beat: 221 }, { beat: 222 }, { beat: 223 }, { beat: 223.5 }, { beat: 224 },
-                { beat: 225 }, { beat: 227 },
-            ]
-        }
-
         beatmap = {
-            songTitle: rawBeatmap.songTitle,
-            artist: rawBeatmap.artist,
-            notes: rawBeatmap.notes.map(note => ({
-                timeMs: FIRST_BEAT_OFFSET_MS + (note.beat * MS_PER_BEAT),
-                beat: note.beat
-            }))
+            songTitle: SchoolFightDanceBeatmap.songTitle,
+            fadeOutMs: SchoolFightDanceBeatmap.fadeOutMs,
+            notes: SchoolFightDanceBeatmap.notes.map(note => ({ ...note })),
         }
-        beatmap.notes.sort((a, b) => a.timeMs - b.timeMs)
     }
 
     function startDancingGame() {
@@ -1921,6 +1938,7 @@ document.addEventListener('DOMContentLoaded', () => {
         removeHidden(document.getElementById('disco-overlay'))
         document.getElementById('dancing-game').classList.remove('hidden')
 
+        document.getElementById('dance-sprites').style.setProperty('--dance-beat-duration', `${MS_PER_BEAT}ms`)
         document.getElementById('character-wrapper-dance').classList.add('dancing1')
         document.getElementById('dancer-right').classList.add('dancing2')
 
@@ -1930,9 +1948,10 @@ document.addEventListener('DOMContentLoaded', () => {
         nextNoteIndex = 0
 
         audio.currentTime = 0
+        audio.volume = 0.6
         playAudio(audio)
 
-        requestAnimationFrame(gameLoop)
+        danceAnimationFrame = requestAnimationFrame(gameLoop)
     }
 
     function gameLoop() {
@@ -1941,12 +1960,15 @@ document.addEventListener('DOMContentLoaded', () => {
         rainbowHueOffset = (rainbowHueOffset + 2) % 360
 
         updateNotes(currentTimeMs)
+        if (!gameFlow.can('dance')) return
+        const remainingMs = Math.max(0, danceDurationSec * 1000 - currentTimeMs)
+        audio.volume = 0.6 * Math.min(1, remainingMs / beatmap.fadeOutMs)
         drawGame()
 
-        if (audio.ended || (totalSongDurationSec > 0 && audio.currentTime >= totalSongDurationSec - 0.1 && activeNotes.length === 0)) {
+        if (audio.ended || remainingMs === 0) {
             endGame(true)
         } else {
-            requestAnimationFrame(gameLoop)
+            danceAnimationFrame = requestAnimationFrame(gameLoop)
         }
     }
 
@@ -1962,21 +1984,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 break
             }
         }
-        activeNotes = activeNotes.filter(note => {
+        for (const note of activeNotes) {
+            if (!gameFlow.can('dance')) break
             note.update(currentTimeMs)
-            if (!note.hit && !note.missed) {
-                if (note.y > HIT_LINE_Y + NOTE_RADIUS * 1.5) {
-                    handleMiss(note)
-                }
-                return true
-            } else {
-                return note.judgmentAlpha > 0
-            }
-        })
+            if (!note.hit && !note.missed && isMissed(note.perfectHitTimeMs, currentTimeMs)) handleMiss(note)
+        }
+        activeNotes = activeNotes.filter(note => (!note.hit && !note.missed) || note.judgmentAlpha > 0)
     }
 
+
     function handleMiss(note) {
-        if (note.missed || note.hit) return
+        if (!gameFlow.can('dance') || note.missed || note.hit) return
         note.judgment = "Miss!"
         note.judgmentColor = '#FF0000'
         note.judgmentAlpha = 1
@@ -2031,8 +2049,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         ctx2.fillStyle = '#FFFFFF'
         ctx2.textAlign = 'center'
-        if (totalSongDurationSec > 0 && audio.currentTime !== null) {
-            const remainingTimeSec = Math.max(0, totalSongDurationSec - audio.currentTime)
+        if (danceDurationSec > 0 && audio.currentTime !== null) {
+            const remainingTimeSec = Math.max(0, danceDurationSec - audio.currentTime)
             ctx2.strokeText(`Time: ${formatTime(remainingTimeSec)}`, CANVAS_WIDTH_LOGICAL / 2, 48)
             ctx2.fillText(`Time: ${formatTime(remainingTimeSec)}`, CANVAS_WIDTH_LOGICAL / 2, 48)
         } else {
@@ -2042,95 +2060,43 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function handleClick(event) {
-        if (!gameFlow.can('dance') || audio.paused) {
-            return
-        }
-        const rect = canvasDancingGame.getBoundingClientRect()
-        let clientX, clientY
-        if (event.type === 'touchstart') {
-            clientX = event.touches[0].clientX
-            clientY = event.touches[0].clientY
-        } else {
-            clientX = event.clientX
-            clientX = event.clientX
-            clientX = event.clientX
-            clientY = event.clientY
-        }
-
-        const clickX_css = clientX - rect.left
-        const clickY_css = clientY - rect.top
-
-        const clickX = clickX_css * (CANVAS_WIDTH_LOGICAL / rect.width)
-        const clickY = clickY_css * (CANVAS_HEIGHT_LOGICAL / rect.height)
-
-        const clickTimeMs = audio.currentTime * 1000
-        let hitNote = null
-        let minDiff = Infinity
-
-        for (let i = activeNotes.length - 1; i >= 0; i--) {
-            const note = activeNotes[i]
-            if (!note.hit && !note.missed &&
-                note.y > HIT_LINE_Y - NOTE_RADIUS * 3 &&
-                note.y < HIT_LINE_Y + NOTE_RADIUS * 3 &&
-                note.isClicked(clickX, clickY)) {
-                const diff = Math.abs(clickTimeMs - note.perfectHitTimeMs)
-                if (diff < minDiff) {
-                    minDiff = diff
-                    hitNote = note
-                }
-            }
-        }
+        if (!gameFlow.can('dance') || audio.paused || event.isPrimary === false || event.button > 0) return
+        event.preventDefault()
+        const clickTimeMs = inputSongTime({
+            currentTimeSec: audio.currentTime,
+            playbackRate: audio.playbackRate,
+            eventTimestamp: event.timeStamp,
+            now: performance.now(),
+            timeOrigin: performance.timeOrigin,
+        })
+        const hitNote = closestNote(activeNotes, clickTimeMs)
 
         if (hitNote) {
+            const judgment = judgeHit(clickTimeMs - hitNote.perfectHitTimeMs)
             hitNote.hit = true
             hitNote.judgmentAlpha = 1
             hitNote.judgmentYOffset = 0
-            hitNote.judgmentDisplayStartTime = clickTimeMs
-
-            let judgment = ""
-            let scoreIncrease = 0
-            let judgmentColor = '#FFFFFF'
-
-            if (minDiff <= ACCURACY_THRESHOLD_PERFECT) {
-                judgment = "Perfect!"
-                scoreIncrease = 100
-                judgmentColor = '#00FF00'
-            } else if (minDiff <= ACCURACY_THRESHOLD_GOOD) {
-                judgment = "Good!"
-                scoreIncrease = 50
-                judgmentColor = '#FFFF00'
-            } else if (minDiff <= ACCURACY_THRESHOLD_OKAY) {
-                judgment = "Okay."
-                scoreIncrease = 20
-                judgmentColor = '#FFA500'
-            } else {
-                judgment = "Poor!"
-                scoreIncrease = 5
-                judgmentColor = '#FF4500'
-                game.player.party[1].energy -= 2
-                energyBarMiniGame.style.width = game.player.party[1].energy + '%'
-                energyBarMiniGame.style.background = game.player.party[1].energy < 30 ? 'red' : 'green'
-            }
-
-            hitNote.judgment = judgment
-            hitNote.judgmentColor = judgmentColor
-
-            score += scoreIncrease + (combo * 5)
+            hitNote.judgmentDisplayStartTime = audio.currentTime * 1000
+            hitNote.judgment = judgment.label
+            hitNote.judgmentColor = judgment.color
+            hitNote.playSound()
+            score += judgment.score + combo * 5
             combo++
+            game.player.party[1].energy -= judgment.damage
         } else {
             combo = 0
             game.player.party[1].energy -= 2
             playSound(sounds.fail)
-            energyBarMiniGame.style.width = game.player.party[1].energy + '%'
-            energyBarMiniGame.style.background = game.player.party[1].energy < 30 ? 'red' : 'green'
-            if (game.player.party[1].energy <= 0) {
-                endGame(false)
-            }
         }
+        energyBarMiniGame.style.width = Math.max(0, game.player.party[1].energy) + '%'
+        energyBarMiniGame.style.background = game.player.party[1].energy < 30 ? 'red' : 'green'
+        if (game.player.party[1].energy <= 0) endGame(false)
     }
 
     function endGame(win) {
         if (!gameFlow.can('dance')) return
+        cancelAnimationFrame(danceAnimationFrame)
+        danceAnimationFrame = null
         audio.pause()
         document.getElementById('dancing-game').classList.add('hidden')
         playAudio(sounds.music)

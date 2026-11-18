@@ -56,25 +56,25 @@
         },
         {
             "id": 3,
-            "type": "ropeSkip",
+            "type": "bombDodge",
             "boss": false,
             "background": {
-                "className": "background-2",
-                "image": "images_schoolfight/background2.jpg"
+                "className": "background-1",
+                "image": "images_schoolfight/background1.jpg"
             },
             "enemies": [
                 "dummy",
-                "dummy",
+                "squealer",
                 "dummy"
             ],
             "dialogue": {
                 "normal": [
-                    "Hi boooooys. We don't fight with our fists...",
-                    "So get ready for a ROPE SKIP FIGHT!"
+                    "Let's see if you can dodge my stink bombs! Three hits and you're out.",
+                    "Hold the left/right half of the screen to move, or use the arrow keys."
                 ],
                 "teacher": [
-                    "You think you still got what it takes?",
-                    "Show us your moves. ROPE SKIP FIGHT!"
+                    "Dodge these stink bombs, old man! Three hits and you're out.",
+                    "Hold the left/right half of the screen to move, or use the arrow keys."
                 ]
             }
         },
@@ -104,6 +104,30 @@
         },
         {
             "id": 5,
+            "type": "ropeSkip",
+            "boss": false,
+            "background": {
+                "className": "background-2",
+                "image": "images_schoolfight/background2.jpg"
+            },
+            "enemies": [
+                "dummy",
+                "dummy",
+                "dummy"
+            ],
+            "dialogue": {
+                "normal": [
+                    "Hi boooooys. We don't fight with our fists...",
+                    "So get ready for a ROPE SKIP FIGHT!"
+                ],
+                "teacher": [
+                    "You think you still got what it takes?",
+                    "Show us your moves. ROPE SKIP FIGHT!"
+                ]
+            }
+        },
+        {
+            "id": 6,
             "type": "battle",
             "boss": false,
             "background": {
@@ -127,7 +151,7 @@
             }
         },
         {
-            "id": 6,
+            "id": 7,
             "type": "running",
             "boss": false,
             "background": {
@@ -152,7 +176,7 @@
             }
         },
         {
-            "id": 7,
+            "id": 8,
             "type": "battle",
             "boss": false,
             "background": {
@@ -176,7 +200,7 @@
             }
         },
         {
-            "id": 8,
+            "id": 9,
             "type": "dancing",
             "boss": false,
             "background": {
@@ -200,7 +224,7 @@
             }
         },
         {
-            "id": 9,
+            "id": 10,
             "type": "battle",
             "boss": false,
             "background": {
@@ -224,7 +248,7 @@
             }
         },
         {
-            "id": 10,
+            "id": 11,
             "type": "battle",
             "boss": true,
             "background": {

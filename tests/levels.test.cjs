@@ -5,21 +5,22 @@ const path = require('node:path')
 const vm = require('node:vm')
 const { levels, getLevel, createEnemyParty } = require('../js_schoolfight/levels.js')
 
-test('the campaign preserves its ten stations, teams, backgrounds and minigame positions', () => {
+test('the campaign places bomb dodge after battle 2 and rope skipping after battle 4', () => {
     assert.deepEqual(levels.map(level => level.type), [
-        'battle', 'battle', 'ropeSkip', 'battle', 'battle', 'running', 'battle', 'dancing', 'battle', 'battle',
+        'battle', 'battle', 'bombDodge', 'battle', 'ropeSkip', 'battle', 'running', 'battle', 'dancing', 'battle', 'battle',
     ])
-    assert.deepEqual(levels.map(level => level.background.className), [
-        'background-1', 'background-1', 'background-2', 'background-2', 'background-2',
-        'background-2', 'background-3', 'background-3', 'background-3', 'background-4',
-    ])
-    assert.deepEqual(levels.map(level => level.enemies), [
-        ['bully', 'nerd', 'normie'], ['squealer', 'wally', 'richkid'], ['dummy', 'dummy', 'dummy'],
-        ['sportskid', 'sportskid', 'sportskid'], ['richkid', 'nerd', 'bully'], ['dummy', 'dummy', 'dummy'],
-        ['richkid', 'richkid', 'richkid'], ['dummy', 'dummy', 'dummy'], ['nerd', 'nerd', 'nerd'],
-        ['dummy', 'teacher', 'dummy'],
-    ])
-    assert.deepEqual(levels.filter(level => level.boss).map(level => level.id), [10])
+    assert.equal(levels[3].id, 4)
+    assert.deepEqual(levels[3].enemies, ['sportskid', 'sportskid', 'sportskid'])
+    assert.equal(levels[2].background.className, 'background-1')
+    assert.deepEqual(levels[2].enemies, ['dummy', 'squealer', 'dummy'])
+    assert.equal(levels[4].background.className, 'background-2')
+    assert.deepEqual(levels.filter(level => level.boss).map(level => level.id), [11])
+    for (const mode of ['normal', 'teacher']) {
+        const dialogue = levels[2].dialogue[mode].join(' ')
+        assert.match(dialogue, /left\/right/i)
+        assert.match(dialogue, /arrow keys/i)
+        assert.match(dialogue, /25 seconds/i)
+    }
 })
 
 test('every level defines both dialogues and existing background assets', () => {
@@ -54,15 +55,15 @@ test('revenge uses the regular teams before the final boss and the saved victory
     for (let index = 0; index < levels.length - 1; index++) {
         assert.deepEqual(createEnemyParty(index, { isTeacherMode: true }), createEnemyParty(index))
     }
-    const party = createEnemyParty(9, { isTeacherMode: true, lastVictoryTeam: ['Wolfkid', 'Nerd', 'Bully'] })
+    const party = createEnemyParty(10, { isTeacherMode: true, lastVictoryTeam: ['Wolfkid', 'Nerd', 'Bully'] })
     assert.deepEqual(party.map(character => character.class), ['Wolfkid', 'Nerd', 'Bully'])
-    assert.deepEqual(createEnemyParty(9).map(character => character.class), ['Dummy', 'Teacher', 'Dummy'])
+    assert.deepEqual(createEnemyParty(10).map(character => character.class), ['Dummy', 'Teacher', 'Dummy'])
 })
 
 test('invalid campaign indexes and incomplete revenge teams fail explicitly', () => {
-    for (const index of [-1, 10, 0.5, '0']) assert.throws(() => getLevel(index), RangeError)
+    for (const index of [-1, 11, 0.5, '0']) assert.throws(() => getLevel(index), RangeError)
     for (const team of [null, [], ['Bully'], ['Bully', 'Nerd', 'Unknown']]) {
-        assert.throws(() => createEnemyParty(9, { isTeacherMode: true, lastVictoryTeam: team }), /three known characters/)
+        assert.throws(() => createEnemyParty(10, { isTeacherMode: true, lastVictoryTeam: team }), /three known characters/)
     }
 })
 
@@ -71,5 +72,5 @@ test('level data loads as a classic browser script without a build step', () => 
     for (const filename of ['characters.js', 'levels.js']) {
         vm.runInContext(fs.readFileSync(path.join(__dirname, '../js_schoolfight', filename), 'utf8'), browser)
     }
-    assert.equal(vm.runInContext('SchoolFightLevels.createEnemyParty(9)[1].class', browser), 'Teacher')
+    assert.equal(vm.runInContext('SchoolFightLevels.createEnemyParty(10)[1].class', browser), 'Teacher')
 })

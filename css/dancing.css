@@ -31,6 +31,7 @@
 }
 
 #canvas-dancing {
+    touch-action: none;
     background: #00000033;
     width: 250px;
     height: 314px;
@@ -42,14 +43,14 @@
 
 .dancing1 {
     animation-name: beatShake1;
-    animation-duration: calc(60000ms / 117);
+    animation-duration: var(--dance-beat-duration, 522ms);
     animation-iteration-count: infinite;
     animation-timing-function: ease-in-out;
 }
 
 .dancing2 {
     animation-name: beatShake2;
-    animation-duration: calc(60000ms / 117);
+    animation-duration: var(--dance-beat-duration, 522ms);
     animation-iteration-count: infinite;
     animation-timing-function: ease-in-out;
 }

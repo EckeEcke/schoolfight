@@ -21,7 +21,6 @@
         return effectiveAgainst[attackType] === defenderType ? 1.5 : 1
     }
 
-    // Returns base damage. Character.takeDamage applies the defense multiplier.
     function calculateAttackDamage(attacker, target, attackType) {
         const attack = attacker[attackType]
         const defense = target[defenseTypes[attackType]]
@@ -35,14 +34,10 @@
         return targets[Math.floor(random() * targets.length)]
     }
 
-    // Teachers and allrounders cycle attacks; the original selection is deterministic.
     function nextAttackType(previousType) {
         return defenseTypes[previousType]
     }
 
-    // Resolves model changes synchronously; callers present the returned events.
-    // Queued player attacks still happen after enemy attacks, even if the attacker
-    // was defeated during this turn (the game's simultaneous-attack rule).
     function resolveBattleRound({ playerParty, enemyParty, moves, lastAttackType }, random = Math.random) {
         const events = []
         const livingEnemies = enemyParty.filter(character => character.energy > 0)
@@ -83,7 +78,6 @@
 
         const survivingPlayers = playerParty.filter(character => character.energy > 0 && character.class !== 'Dummy').length
         const survivingEnemies = enemyParty.filter(character => character.energy > 0).length
-        // Losing the final player takes priority over a simultaneous enemy defeat.
         const outcome = survivingPlayers === 0 ? 'defeat' : survivingEnemies === 0 ? 'victory' : 'continue'
         return { events, lastAttackType, survivingPlayers, survivingEnemies, outcome }
     }
